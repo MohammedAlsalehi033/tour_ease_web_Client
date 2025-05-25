@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { MapPin, Calendar, Users, DollarSign, Clock, ArrowRight, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { RideListing } from '../../../(model)/rideSharing/RideListting/rideListtingModel';
+import { RideRequest } from '../../../(model)/rideSharing/RideRequest/rideRequestModel';
 
-const RideRequestComponent = ({ rideRequests }) => {
+const RideRequestComponent = ({ rideRequests} : {rideRequests : RideRequest[]}) => {
     const [activeTab, setActiveTab] = useState("requests");
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isLoading, setIsLoading] = useState(false);

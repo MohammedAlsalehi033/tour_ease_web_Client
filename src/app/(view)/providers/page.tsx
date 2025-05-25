@@ -283,11 +283,12 @@ function ProviderFilterSection({ providerType }) {
   );
 }
 
-export default function ProviderApprovalPage({ searchParams }) {
+export default async function ProviderApprovalPage(props) {
+  const searchParams = await props.searchParams;
   const tab = searchParams?.tab || 'transportation';
   const status = searchParams?.status || 'pending';
   const search = searchParams?.search || '';
-  
+
   return (
     <div className="min-h-screen transition-colors duration-300 flex flex-col">
 

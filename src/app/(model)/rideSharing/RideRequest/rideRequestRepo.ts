@@ -13,6 +13,8 @@ export class RideRequestRepo {
         latitude: number,
         longitude: number,
         radius?: number,
+         dropLoationLatitude?: number,
+        dropLoationLongitude?: number
     ): Promise<RideRequest[]> {
         try {
             let endpoint = `/searchForNearByRequests?lat=${latitude}&lng=${longitude}`;
@@ -30,6 +32,24 @@ export class RideRequestRepo {
             return response.data;
         } catch (error) {
             console.error('Error fetching nearby ride requests:', error);
+            throw error;
+        }
+    }
+
+
+    async createRideRequest(
+        rideRequest: RideRequest
+    ): Promise<RideRequest> {
+        try {
+            const response = await this.apiService.post<ResponseModel<RideRequest>>('/createRideSharingRequest', rideRequest);
+
+            if (!response.success) {
+                throw new Error('Failed to create ride request');
+            }
+
+            return response.data;
+        } catch (error) {
+            console.error('Error creating ride request:', error);
             throw error;
         }
     }

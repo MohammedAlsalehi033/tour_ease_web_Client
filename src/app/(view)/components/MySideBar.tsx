@@ -58,13 +58,30 @@ const UserSidebar = () => {
               </Link>
               
               {/* Ride Sharing */}
-              <Link href="/rideSharing" 
+              <Link href="/rideSharing/maps" 
                 className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${
                   isActive('/ride-sharing') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
                 }`}
               >
                 <TruckIcon className="mr-3 h-6 w-6" />
                 Ride Sharing
+              </Link>
+
+              <Link href="/rideSharing/listing/maps" 
+                className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${
+                  isActive('/ride-sharing') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
+                }`}
+              >
+                <TruckIcon className="mr-3 h-6 w-6" />
+                Create Listing
+              </Link>
+              <Link href="/rideSharing/request/maps" 
+                className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${
+                  isActive('/ride-sharing') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
+                }`}
+              >
+                <TruckIcon className="mr-3 h-6 w-6" />
+                Create Request
               </Link>
               
               {/* Trip Planner */}

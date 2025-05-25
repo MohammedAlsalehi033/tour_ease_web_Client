@@ -163,11 +163,12 @@ function UserTableSkeleton() {
 
 
 
-export default function UserManagement({ searchParams }) {
+export default async function UserManagement(props) {
+  const searchParams = await props.searchParams;
   const role = searchParams?.role || '';
   const status = searchParams?.status || '';
   const search = searchParams?.search || '';
-  
+
 
   return (
     <div className="px-6 py-8 ml-64">

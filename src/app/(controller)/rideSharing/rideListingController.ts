@@ -11,13 +11,19 @@ export class RideListingController {
   async getNearByRideListing(
     latitude: number,
     longitude: number,
-    radius?: number
+    radius?: number,
+     dropLoationLatitude?: number,
+        dropLoationLongitude?: number
+    
   ): Promise<RideListing[]> {
     try {
       const rideRequests = await this.rideListingRepo.getNearbyListings( 
         latitude,
         longitude,
-        radius
+        radius,
+        dropLoationLatitude,
+        dropLoationLongitude
+
       );
       return rideRequests;
     } catch (error) {
@@ -25,12 +31,14 @@ export class RideListingController {
     }
   }
 
-//   async getRideRequestById(id: number): Promise<RideRequest | null> {
-//     try {
-//       const rideRequest = await this.rideRequestRepository.getRideRequestById(id);
-//       return rideRequest;
-//     } catch (error) {
-//       throw new Error('Error fetching ride request');
-//     }
-//   }
+async createRideListing(
+    rideListing: RideListing
+  ): Promise<RideListing> {
+    try {
+      const createdRideListing = await this.rideListingRepo.createRideListing(rideListing);
+      return createdRideListing;
+    } catch (error) {
+      throw new Error('Error creating ride listing');
+    }
+  }
 } 
