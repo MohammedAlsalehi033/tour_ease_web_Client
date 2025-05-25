@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode variables (blue theme) */
+    --primary: 33, 150, 243;          /* #2196F3 - Material Blue */
+    --primary-light: 66, 165, 245;    /* #42A5F5 - Blue 400 */
+    --primary-dark: 13, 71, 161;      /* #0D47A1 - Darker for hover */
+    
+    --error: 229, 57, 53;             /* #E53935 - Red 600 */
+    --success: 67, 160, 71;           /* #43A047 - Green 600 */
+    --warning: 255, 160, 0;           /* #FFA000 - Amber 700 */
+    --info: 2, 136, 209;              /* #0288D1 - Light Blue 700 */
+    
+    --background: 245, 245, 245;      /* #F5F5F5 - Slightly off-white */
+    --surface: 255, 255, 255;         /* #FFFFFF - White */
+    --text: 0, 0, 0, 0.87;            /* Black87 - Standard Material text */
+    
+    /* Typography styling */
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  .dark {
+    /* Dark mode variables (same primary colors but dark backgrounds) */
+    --primary: 33, 150, 243;          /* Same blue for consistency */
+    --primary-light: 66, 165, 245;    /* Same blue light */
+    --primary-dark: 13, 71, 161;      /* Same blue dark */
+    
+    --background: 18, 18, 18;         /* #121212 - Standard Material dark background */
+    --surface: 32, 32, 32;            /* #202020 - Slightly lighter than background */
+    --text: 255, 255, 255;            /* White text for dark mode */
+  }
+
+  body {
+    @apply bg-light-background dark:bg-dark-background text-light-text dark:text-dark-text;
+    @apply transition-colors duration-200;
+  }
+
+  h1 {
+    @apply text-display-sm font-bold text-primary dark:text-primary;
+  }
+
+  h2 {
+    @apply text-headline-md font-semibold text-light-text dark:text-dark-text;
+  }
+
+  h3 {
+    @apply text-headline-sm font-semibold text-light-text dark:text-dark-text;
+  }
+
+  p {
+    @apply text-body-md font-normal text-light-text dark:text-dark-text;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-6 py-3 rounded-button transition-all duration-200;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-dark active:opacity-80 
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  
+  .btn-outlined {
+    @apply btn bg-transparent border-2 border-primary text-primary 
+           hover:bg-primary/10 active:opacity-80 
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  
+  .btn-text {
+    @apply btn bg-transparent text-primary hover:bg-primary/10 active:opacity-80 
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  
+  .card {
+    @apply bg-light-surface dark:bg-dark-surface rounded-standard p-4 m-2
+           shadow-card-light dark:shadow-card-dark transition-shadow duration-200;
+  }
+  
+  .input {
+    @apply bg-light-surface dark:bg-dark-surface/50 
+           border border-primary/20 dark:border-white/20
+           rounded-standard px-4 py-4
+           focus:border-primary focus:border-2 focus:outline-none
+           text-body-md text-light-text dark:text-dark-text;
+  }
+  
+  /* Divider matching Flutter's divider */
+  .divider {
+    @apply h-px bg-light-text/10 dark:bg-dark-text/10 my-4;
+  }
+  
+  /* Checkbox styling similar to Flutter */
+  .checkbox {
+    @apply h-5 w-5 rounded accent-primary;
+  }
+  
+  /* Switch styling */
+  .switch {
+    @apply h-6 w-11 rounded-full bg-gray-300 dark:bg-gray-600 
+           peer-checked:bg-primary/50 after:content-[''] after:absolute 
+           after:top-0.5 after:left-0.5 after:bg-white after:rounded-full 
+           after:h-5 after:w-5 after:transition-all 
+           peer-checked:after:translate-x-5 peer-checked:after:bg-primary;
+  }
+  
+  /* App bar styling */
+  .app-bar {
+    @apply bg-light-surface dark:bg-dark-surface 
+           border-b border-light-text/10 dark:border-dark-text/10
+           py-4 px-6 flex items-center;
+  }
+  
+  /* Bottom sheet styling */
+  .bottom-sheet {
+    @apply bg-light-surface dark:bg-dark-surface 
+           rounded-t-standard p-6 shadow-lg;
+  }
+}
+
+@keyframes progress {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+
+@keyframes delay-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}

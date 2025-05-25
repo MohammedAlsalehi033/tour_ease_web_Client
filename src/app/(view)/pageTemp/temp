@@ -1,0 +1,49 @@
+import "reflect-metadata";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import { container } from "@/app/lib/diContainer";
+import { RideRequestController } from "@/app/(controller)/rideSharing/rideRequestController";
+import { RideListing } from '../../(model)/rideSharing/RideListting/rideListtingModel';
+import { RideRequest } from "@/app/(model)/rideSharing/RideRequest/rideRequestModel";
+import { RideListingController } from "@/app/(controller)/rideSharing/rideListingController";
+import { UserController } from "@/app/(controller)/user/userController";
+
+
+
+export default async function Page() {
+  const rideListingController = container.resolve(RideListingController);
+  const rideRequestController = container.resolve(RideRequestController);
+  const userController = container.resolve(UserController);
+  const session = await getServerSession(authOptions);
+  
+  // Check if user is authenticated
+  if (!session || !session.user) {
+    // Redirect to sign in if there is no session
+    redirect("/api/auth/signin");
+  }
+
+  // Get data needed for the page
+  const rideRequests: RideRequest[] = await rideRequestController.getNearByRideRequests(
+    37.42564360372425, 
+    -122.098366767168, 
+    18000000
+  );
+  
+  const rideListings: RideListing[] = await rideListingController.getNearByRideListing(
+    37.42564360372425, 
+    -122.098366767168, 
+    18000000
+  );
+  
+  const userData = await userController.getUserById(session?.user.id);
+  
+  // Pass data to the client component
+  return (
+    <ClientComponent 
+      rideRequests={rideRequests} 
+      rideListings={rideListings}
+      userData={userData}
+    />
+  );
+}
