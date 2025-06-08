@@ -1,5 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { OfferRepo } from '@/app/(model)/rideSharing/offer/offerRepo';
+import { promises } from 'dns';
+import { TransportationOffer } from '@/app/(model)/rideSharing/offer/offerModel';
 
 @injectable()
 export class OfferController {
@@ -7,9 +9,10 @@ export class OfferController {
 
     constructor(@inject(OfferRepo) private offerRepo: OfferRepo) {}
 
-    async getReceivedOffers(id: string) {
+    async getReceivedOffers(id: string) : Promise <TransportationOffer[]> {
         try {
             const offers = await this.offerRepo.getReceivedOffers(id);
+            console.log(offers)
             return offers;
         } catch (error) {
             console.error('Error fetching received offers:', error);
@@ -17,7 +20,7 @@ export class OfferController {
         }
     
     }
-    async getSentOffers(id: string) {
+    async getSentOffers(id: string) : Promise <TransportationOffer[]>{
         try {
             const offers = await this.offerRepo.getSentOffers(id);
             return offers;
@@ -26,5 +29,15 @@ export class OfferController {
             throw error;
         }
     
+    }
+
+    async createOffer(offer: TransportationOffer): Promise<TransportationOffer> {
+        try {
+            const createdOffer = await this.offerRepo.createOffer(offer);
+            return createdOffer;
+        } catch (error) {
+            console.error('Error creating offer:', error);
+            throw error;
+        }
     }
 }

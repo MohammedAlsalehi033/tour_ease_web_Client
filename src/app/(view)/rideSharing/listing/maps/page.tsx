@@ -188,6 +188,8 @@ export default function GoogleMapComponent() {
 
   const handleSearch = async () =>  {
 const rideListingController =  container.resolve(RideListingController)
+
+setLoaded(false);
 const result = await rideListingController.createRideListing({
    providerId: session?.user?.id,
    startLocationText: pickAddress,
@@ -206,8 +208,7 @@ const result = await rideListingController.createRideListing({
 
     } as RideListing);
 
- console.log(result)
-
+setLoaded(true);
 
   };
 

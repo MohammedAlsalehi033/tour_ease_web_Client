@@ -194,7 +194,7 @@ export default function GoogleMapComponent2() {
       budget: priceRange.min,
       createdAt: new Date().toISOString(),
       distance_km: 0,
-    } as RideRequest);
+    } as unknown as RideRequest);
     // You might want to do something with the 'result' here, like showing a notification.
   };
 

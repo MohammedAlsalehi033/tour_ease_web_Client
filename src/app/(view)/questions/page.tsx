@@ -4,7 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { container } from "@/app/lib/diContainer";
 import { UserController } from "@/app/(controller)/user/userController";
-import { ContentController } from '../../(controller)/content/contentController';
+// import { ContentController } from '../../(controller)/content/contentController';
 
 
 

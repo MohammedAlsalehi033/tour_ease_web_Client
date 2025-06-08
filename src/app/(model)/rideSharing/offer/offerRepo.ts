@@ -31,5 +31,15 @@ export class OfferRepo {
         }
 
     }
+
+    async createOffer(offer: TransportationOffer): Promise<TransportationOffer> {
+        try {
+            const response = await this.apiService.post<ResponseModel<TransportationOffer>>("/offers", offer);
+            return response.data;
+        } catch (error) {
+            console.error("Error creating offer:", error);
+            throw error;
+        }
+    }
 }
 

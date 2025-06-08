@@ -22,13 +22,15 @@ export const authOptions = {
           );
           
           const user = userCredential.user;
+          const idToken = await user.getIdToken();
           
           if (user) {
             return {
               id: user.uid,
               email: user.email,
               name: user.displayName || user.email.split('@')[0],
-              image: user.photoURL
+              image: user.photoURL,
+              firebaseToken: idToken, // This gets passed to JWT callback
             };
           }
           
@@ -47,9 +49,16 @@ export const authOptions = {
     strategy: "jwt",
   },
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.firebaseToken = user.firebaseToken;
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (session?.user) {
         session.user.id = token.sub;
+        session.user.firebaseToken = token.firebaseToken;
       }
       return session;
     },

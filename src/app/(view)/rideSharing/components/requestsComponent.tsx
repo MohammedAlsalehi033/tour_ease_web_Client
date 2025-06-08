@@ -73,37 +73,7 @@ const RideRequestComponent = ({ rideRequests} : {rideRequests : RideRequest[]}) 
     return (
         <div className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-start pt-12 bg-light-background dark:bg-dark-background`}>
             <div className="w-full max-w-6xl px-4 md:px-6">
-                {/* Tabs */}
-                <div className="mb-6 border-b border-light-outline dark:border-dark-outline">
-                    <div className="flex space-x-1">
-                        <button
-                            onClick={() => setActiveTab("requests")}
-                            className={`py-3 px-4 text-sm font-medium transition-colors duration-200 relative ${
-                                activeTab === "requests"
-                                    ? "text-primary"
-                                    : "text-light-on-surface-variant dark:text-dark-on-surface-variant hover:text-light-on-surface dark:hover:text-dark-on-surface"
-                            }`}
-                        >
-                            Ride Requests
-                            {activeTab === "requests" && (
-                                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
-                            )}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("myOffers")}
-                            className={`py-3 px-4 text-sm font-medium transition-colors duration-200 relative ${
-                                activeTab === "myOffers"
-                                    ? "text-primary"
-                                    : "text-light-on-surface-variant dark:text-dark-on-surface-variant hover:text-light-on-surface dark:hover:text-dark-on-surface"
-                            }`}
-                        >
-                            My Offers
-                            {activeTab === "myOffers" && (
-                                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
-                            )}
-                        </button>
-                    </div>
-                </div>
+               
 
                 <div className="flex flex-col md:flex-row gap-6">
                     {/* Requests Panel */}
