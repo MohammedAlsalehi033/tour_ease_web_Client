@@ -1,5 +1,5 @@
 "use client";
-
+import "reflect-metadata"
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { 
@@ -8,6 +8,7 @@ import {
   updateProfile
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { ApiService } from "@/app/services/apiService";
 
 const AuthContext = createContext({});
 
@@ -19,6 +20,15 @@ export const AuthProvider = ({ children }) => {
   const signup = async (name, email, password) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const apiserver = new ApiService();
+
+      console.log(`User created: ${JSON.stringify(userCredential.user)}`);
+      const createdUserinDB = await apiserver.post("/createUser", {
+        id: userCredential.user.uid,
+        username: name,
+        email: userCredential.user.email,
+        password: password,
+      });
       
       // Update the user's profile with their name if provided
       if (name) {

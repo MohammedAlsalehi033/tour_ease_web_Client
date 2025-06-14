@@ -17,7 +17,7 @@ export default function GoogleMapComponent2() {
 
   const [selectedDate, setSelectedDate] = useState('');
   const [time, setTime] = useState('11:41:00.000Z');
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });
   const [travelers, setTravelers] = useState(1);
   const [luggage, setLuggage] = useState(0);
 

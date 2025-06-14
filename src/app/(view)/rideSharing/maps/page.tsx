@@ -16,7 +16,7 @@ const router = useRouter();
   // New form fields
   const [selectedDate, setSelectedDate] = useState('');
   const [timeRange, setTimeRange] = useState({ start: '09:00', end: '17:00' });
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });
   const [travelers, setTravelers] = useState(1);
   const [luggage, setLuggage] = useState(0);
 
@@ -337,7 +337,7 @@ const handleSearch = () => {
               <input
                 type="number"
                 min="0"
-                step="0.01"
+                step="1000"
                 placeholder="Min"
                 value={priceRange.min}
                 onChange={(e) => handlePriceChange('min', e.target.value)}
@@ -347,7 +347,7 @@ const handleSearch = () => {
               <input
                 type="number"
                 min="0"
-                step="0.01"
+                step="1000"
                 placeholder="Max"
                 value={priceRange.max}
                 onChange={(e) => handlePriceChange('max', e.target.value)}
