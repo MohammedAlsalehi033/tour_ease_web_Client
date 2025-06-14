@@ -27,9 +27,9 @@ export class BookingController {
         }
     }
 
-    async updateBookingStatus(id: string) {
+    async updateBookingStatus(id: string, statusHere: string) {
         try {
-            const updatedBooking = await this.bookingRepo.updateState(id);
+            const updatedBooking = await this.bookingRepo.updateState(id, statusHere);
             return updatedBooking;
         } catch (error) {
             console.error("Error updating booking status:", error);

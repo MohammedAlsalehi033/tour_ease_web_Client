@@ -31,9 +31,9 @@ export class BookingRepo {
         }
     }
 
-    async updateState(id: string): Promise<ResponseModel<Booking>> {
+    async updateState(id: string, status: string): Promise<ResponseModel<Booking>> {
         try {
-            return await this.apiService.delete<ResponseModel<Booking>>(`/booking/status?id=${id}`);
+            return await this.apiService.post<ResponseModel<Booking>>(`/booking/status?bookingId=${id}&status=${status}`);
         } catch (error) {
             console.error(`Error updating state for booking ${id}:`, error);
             throw new Error("Failed to update the booking's status.");

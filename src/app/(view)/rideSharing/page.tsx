@@ -46,8 +46,8 @@ interface SearchData {
 }
 
 export default async function Page(
-  props: { 
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }> 
+  props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
   }
 ) {
   const searchParams = await props.searchParams;
@@ -70,14 +70,14 @@ export default async function Page(
       return decodeURIComponent(value);
     } catch (error) {
       console.warn('Failed to decode URI component:', value, error);
-      return value; 
+      return value;
     }
   };
 
   const isValidCoordinate = (lat: number, lng: number): boolean => {
-    return lat !== 0 && lng !== 0 && 
-           lat >= -90 && lat <= 90 && 
-           lng >= -180 && lng <= 180;
+    return lat !== 0 && lng !== 0 &&
+      lat >= -90 && lat <= 90 &&
+      lng >= -180 && lng <= 180;
   };
 
   const isValidTimeFormat = (time: string): boolean => {
@@ -171,19 +171,19 @@ export default async function Page(
   } catch (error) {
     console.error("Error parsing search parameters:", error);
     parseError = error instanceof Error ? error.message : 'Unknown error occurred';
-    
+
   }
 
-  if (parseError) {
-    console.error("Parse error:", parseError);
+  if (parseError || !searchData) {
+    console.error("Parse error or no search data:", parseError);
     return (
       <div className="p-4 pl-72">
         <h1 className="text-2xl font-bold text-red-600">Search Parameter Error</h1>
-        <p className="text-gray-700 mt-2">{parseError}</p>
+        <p className="text-gray-700 mt-2">{parseError || 'Could not process search data.'}</p>
         <p className="text-sm text-gray-500 mt-4">
           Please go back and try your search again with valid parameters.
         </p>
-                  <Link href="/rideSharing/maps">click here</Link>
+        <Link href="/rideSharing/maps">click here</Link>
 
       </div>
     );
@@ -197,39 +197,39 @@ export default async function Page(
 
     const rideListingController = container.resolve(RideListingController);
     const rideRequestController = container.resolve(RideRequestController);
-    const transformationProviderController = container.resolve(TransformationProviderController);
     const userController = container.resolve(UserController);
     const offerController = container.resolve(OfferController);
 
     // Get user data and validate
     const userData = await userController.getUserById(session.user.id);
-    
+
     if (!userData) {
       redirect("/api/auth/signin");
     }
 
-    if (!userData.roles.some(role => role === "transportationProvider")) {
-      return <TransportationProviderForm />;
-    }
-
-    const searchLat = searchData?.pickupLocation.coordinates.lat || 37.42564360372425;
-    const searchLng = searchData?.pickupLocation.coordinates.lng || -122.098366767168;
+    const searchLat = searchData.pickupLocation.coordinates.lat;
+    const searchLng = searchData.pickupLocation.coordinates.lng;
     const searchRadius = 18000000; // 18,000 km radius
 
     const rideRequests: RideRequest[] = await rideRequestController.getNearByRideRequests(
       searchLat,
       searchLng,
       searchRadius,
-      searchData?.dropoffLocation.coordinates.lat,
-      searchData?.dropoffLocation.coordinates.lng
+      searchData.dropoffLocation.coordinates.lat,
+      searchData.dropoffLocation.coordinates.lng
     );
 
     const rideListings: RideListing[] = await rideListingController.getNearByRideListing(
       searchLat,
       searchLng,
       searchRadius,
-      searchData?.dropoffLocation.coordinates.lat,
-      searchData?.dropoffLocation.coordinates.lng
+      searchData.dropoffLocation.coordinates.lat,
+      searchData.dropoffLocation.coordinates.lng,
+      searchData.date,
+      searchData.timeRange,
+      searchData.priceRange,
+      searchData.travelers,
+      searchData.luggage
     );
 
     const offers = await offerController.getReceivedOffers(session.user.id);
@@ -237,14 +237,7 @@ export default async function Page(
 
     return (
       <div>
-        <RideOrlistingSelector rideListings={rideListings} rideRequests={rideRequests}/>
-
-
-        {/* <ListingComponent rideListings={rideListings}/> */}
-
-        {/* <RideRequestComponent rideRequests={rideRequests}/> */}
-        
-     
+        <RideOrlistingSelector rideListings={rideListings} rideRequests={rideRequests} />
       </div>
     );
 
@@ -254,11 +247,9 @@ export default async function Page(
       <div className="p-4">
         <h1 className="text-2xl font-bold text-red-600">Application Error</h1>
         <p className="text-gray-700 mt-2">
-          An error occurred while loading the page. Please try again later. go back to the search page.
+          An error occurred while loading the page. Please try again later. Go back to the search page.
           <Link href="/src/app/(view)/rideSharing/maps/page.tsx"></Link>
         </p>
-
-        
       </div>
     );
   }

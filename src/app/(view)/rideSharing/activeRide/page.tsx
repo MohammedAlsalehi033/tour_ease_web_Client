@@ -65,8 +65,16 @@ setOtherUserId(providerId || null); // Set the ID or null if not found
     }, [userId, sessionStatus]);
 
     const handleMarkAsComplete = () => {
-        // No logic for now - as requested
-        console.log('Mark as complete clicked');
+                        const bookingController = container.resolve(BookingController);
+                        const response = bookingController.updateBookingStatus(activeRideDetails[0].id, 'completed');
+        if (response.success) {
+            setActiveRideDetails(null);
+            setError(null);
+            console.log('Ride marked as complete successfully.');
+        window.location.reload(); // Reload the page to reflect changes
+        }
+
+
     };
 
     const handleCheckLocation = () => {
