@@ -86,8 +86,9 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
 
         // Here you would call an actual API endpoint
         // For now, we simulate success and update local state
+
+        const response = offerController.createOffer(offer)
         setTimeout(() => {
-             console.log("Submitting offer for request:", offer);
              const newAcceptedOffers = [...myAcceptedOffers, requestToAccept];
              setMyAcceptedOffers(newAcceptedOffers);
              localStorage.setItem('myAcceptedOffers', JSON.stringify(newAcceptedOffers));

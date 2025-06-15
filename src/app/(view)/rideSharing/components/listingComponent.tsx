@@ -80,7 +80,7 @@ const ListingComponent = ({ rideListings: initialListings }) => {
             senderId: userId,
             recipientId: listingToBook.providerId,
             pricePerSeat: listingToBook.pricePerSeat,
-            seatsRequested: 1, // Defaulting to 1 seat, you can add a selector for this
+            seatsRequested: 1, 
             transportationListingId: listingToBook.id,
             message: "I'd like to book a seat for this ride.",
             status: 'pending',

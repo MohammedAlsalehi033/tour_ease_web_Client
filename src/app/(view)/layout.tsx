@@ -36,7 +36,10 @@ async function getActiveRideStatus() {
       return { hasActiveRide: false };
     }
     const bookings = await bookingController.getBookingsForTraveler(session.user.id);
-    const hasActiveRide = bookings.data.some(booking => booking.status === 'pending');
+    const bookingForDriver = await bookingController.getBookingsForDriver(session.user.id);
+   
+    console.log(bookingForDriver)
+    const hasActiveRide = bookings.data.some(booking => booking.status === 'pending') || bookingForDriver.data.some(booking => booking.status === 'pending');
     console.log(hasActiveRide)
     return { hasActiveRide };
   } catch (error) {
