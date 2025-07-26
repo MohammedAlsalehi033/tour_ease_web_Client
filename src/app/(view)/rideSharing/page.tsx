@@ -177,7 +177,7 @@ export default async function Page(
   if (parseError || !searchData) {
     console.error("Parse error or no search data:", parseError);
     return (
-      <div className="p-4 pl-72">
+      <div>
         <h1 className="text-2xl font-bold text-red-600">Search Parameter Error</h1>
         <p className="text-gray-700 mt-2">{parseError || 'Could not process search data.'}</p>
         <p className="text-sm text-gray-500 mt-4">
@@ -244,7 +244,7 @@ export default async function Page(
   } catch (error) {
     console.error("Error in main page logic:", error);
     return (
-      <div className="p-4">
+      <div>
         <h1 className="text-2xl font-bold text-red-600">Application Error</h1>
         <p className="text-gray-700 mt-2">
           An error occurred while loading the page. Please try again later. Go back to the search page.

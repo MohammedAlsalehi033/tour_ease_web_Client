@@ -26,4 +26,4 @@ const auth = getAuth(app);
 const database = getDatabase(app);
 
 
-export { app, analytics,auth, database  };
+export { app,auth, database  };

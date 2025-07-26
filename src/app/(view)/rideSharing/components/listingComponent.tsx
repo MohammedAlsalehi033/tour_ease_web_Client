@@ -182,115 +182,119 @@ const ListingComponent = ({ rideListings: initialListings }) => {
 
 
     return (
-        <div className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-start pt-12 bg-light-background dark:bg-dark-background`}>
-            <div className="w-full max-w-6xl px-4 md:px-6">
-                <div className="mb-6 border-b border-light-outline dark:border-dark-outline">
-                    <div className="flex space-x-1">
-                        <button
-                            onClick={() => setActiveTab("listings")}
-                            className={`py-3 px-4 text-sm font-medium transition-colors duration-200 relative ${activeTab === "listings" ? "text-primary" : "text-light-on-surface-variant dark:text-dark-on-surface-variant hover:text-light-on-surface dark:hover:text-dark-on-surface"}`}
-                        >
-                            Available Rides
-                            {activeTab === "listings" && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("myRides")}
-                            className={`py-3 px-4 text-sm font-medium transition-colors duration-200 relative ${activeTab === "myRides" ? "text-primary" : "text-light-on-surface-variant dark:text-dark-on-surface-variant hover:text-light-on-surface dark:hover:text-dark-on-surface"}`}
-                        >
-                            My Rides
-                            {activeTab === "myRides" && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>}
-                        </button>
-                    </div>
-                </div>
+        <div className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-start bg-light-background dark:bg-dark-background`}>
+            <div className="w-full">
+                <div className="">
+                    <div className="mb-6 border-b">
+                        <div className="flex space-x-1">
+                            <button
+                                onClick={() => setActiveTab("listings")}
+                                className={`py-3 px-4 text-sm font-medium transition-colors duration-200 relative ${activeTab === "listings" ? "text-primary" : "text-light-on-surface-variant dark:text-dark-on-surface-variant"}`}
+                            >
+                                Available Rides
+                                {activeTab === "listings" && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>}
+                            </button>
+                            <button
+                                onClick={() => setActiveTab("myRides")}
+                                className={`py-3 px-4 text-sm font-medium transition-colors duration-200 relative ${activeTab === "myRides" ? "text-primary" : "text-light-on-surface-variant dark:text-dark-on-surface-variant"}`}
+                            >
+                                My Rides
+                                {activeTab === "myRides" && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>}
+                            </button>
+                        </div>
+                      
 
-                <div className="flex flex-col md:flex-row gap-6">
-                    <div className={`w-full ${selectedListing ? 'md:w-1/2' : 'md:w-full'} transition-all duration-300`}>
-                        <h2 className="text-headline-sm mb-4 text-light-on-surface dark:text-dark-on-surface flex items-center">
-                           {activeTab === 'listings' ? 'Available Rides' : 'My Rides'}
-                           <span className="ml-2 text-sm font-normal px-2 py-0.5 bg-primary/10 text-primary rounded-full">
-                                {activeTab === 'listings' ? allListings.filter(l => l.status === 'active').length : myRides.length}
-                            </span>
-                        </h2>
-                        {activeTab === 'listings' ? renderRideList(allListings.filter(l => l.status === 'active')) : renderRideList(myRides)}
                     </div>
 
-                    {selectedListing && (
-                         <div className="w-full md:w-1/2 animate-fadeIn">
-                            <div className="card p-6 rounded-lg border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface sticky top-24">
-                                 <div className="flex justify-between items-center mb-6">
-                                     <h2 className="text-headline-sm text-light-on-surface dark:text-dark-on-surface">Ride Details</h2>
-                                     <button onClick={() => setSelectedListing(null)} className="p-1 rounded-full hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant transition-colors" aria-label="Close details">
-                                         <X className="w-5 h-5 text-light-on-surface-variant dark:text-dark-on-surface-variant" />
-                                     </button>
-                                 </div>
-                                 
-                                <div className="mb-6">
-                                    <div className="flex items-start mb-4">
-                                        <div className="bg-primary/10 p-2 rounded-full mr-3"><MapPin className="w-5 h-5 text-primary" /></div>
-                                        <div>
-                                            <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">From</p>
-                                            <p className="text-lg font-medium text-light-on-surface dark:text-dark-on-surface">{selectedListing.startLocationText}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start">
-                                        <div className="bg-primary/10 p-2 rounded-full mr-3"><MapPin className="w-5 h-5 text-primary" /></div>
-                                        <div>
-                                            <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">To</p>
-                                            <p className="text-lg font-medium text-light-on-surface dark:text-dark-on-surface">{selectedListing.endLocationText}</p>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div className="flex flex-col md:flex-row gap-6">
+                        <div className={`w-full ${selectedListing ? 'md:w-1/2' : 'md:w-full'} transition-all duration-300`}>
+                            <h2 className="text-headline-sm mb-4 text-light-on-surface dark:text-dark-on-surface flex items-center">
+                               {activeTab === 'listings' ? 'Available Rides' : 'My Rides'}
+                               <span className="badge badge-info ml-2">
+                                    {activeTab === 'listings' ? allListings.filter(l => l.status === 'active').length : myRides.length}
+                                </span>
+                            </h2>
+                            {activeTab === 'listings' ? renderRideList(allListings.filter(l => l.status === 'active')) : renderRideList(myRides)}
+                        </div>
 
-                                 <div className="grid grid-cols-2 gap-4 mb-6">
-                                    <div className="p-3 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
-                                        <div className="flex items-center mb-1"><Calendar className="w-4 h-4 text-primary mr-1" /><p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">Date</p></div>
-                                        <p className="text-light-on-surface dark:text-dark-on-surface">{formatDate(selectedListing.departureTime)}</p>
-                                    </div>
-                                    <div className="p-3 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
-                                        <div className="flex items-center mb-1"><Clock className="w-4 h-4 text-primary mr-1" /><p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">Time</p></div>
-                                        <p className="text-light-on-surface dark:text-dark-on-surface">{formatTime(selectedListing.departureTime)}</p>
-                                    </div>
-                                    <div className="p-3 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
-                                        <div className="flex items-center mb-1"><DollarSign className="w-4 h-4 text-primary mr-1" /><p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">Price</p></div>
-                                        <p className="text-lg font-medium text-primary">{getPriceDisplay(selectedListing.pricePerSeat)}</p>
-                                    </div>
-                                    <div className="p-3 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
-                                        <div className="flex items-center mb-1"><Users className="w-4 h-4 text-primary mr-1" /><p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">Seats</p></div>
-                                        <p className="text-light-on-surface dark:text-dark-on-surface">{selectedListing.seatsAvailable}</p>
-                                    </div>
-                                 </div>
-                                 
-                                <div className="mb-6 p-4 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
-                                    <h3 className="text-title-md mb-3 text-light-on-surface dark:text-dark-on-surface">Driver</h3>
-                                    <div className="flex items-center">
-                                        <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-medium text-primary">
-                                            {selectedListing.provider?.user?.name?.charAt(0) || "U"}
+                        {selectedListing && (
+                             <div className="w-full md:w-1/2 animate-fadeIn">
+                                <div className="card p-6 sticky top-24">
+                                     <div className="flex justify-between items-center mb-6">
+                                         <h2 className="text-headline-sm text-light-on-surface dark:text-dark-on-surface">Ride Details</h2>
+                                         <button onClick={() => setSelectedListing(null)} className="btn-text p-1 rounded-full" aria-label="Close details">
+                                             <X className="w-5 h-5 text-light-on-surface-variant dark:text-dark-on-surface-variant" />
+                                         </button>
+                                     </div>
+                                     
+                                    <div className="mb-6">
+                                        <div className="flex items-start mb-4">
+                                            <div className="bg-primary/10 p-2 rounded-full mr-3"><MapPin className="w-5 h-5 text-primary" /></div>
+                                            <div>
+                                                <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">From</p>
+                                                <p className="text-lg font-medium text-light-on-surface dark:text-dark-on-surface">{selectedListing.startLocationText}</p>
+                                            </div>
                                         </div>
-                                        <div className="ml-4">
-                                            <p className="text-body-lg font-medium text-light-on-surface dark:text-dark-on-surface">{selectedListing.provider?.user?.name || "Driver"}</p>
-                                            <p className="text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant capitalize">{selectedListing.provider?.vehicleType || "Vehicle"}</p>
+                                        <div className="flex items-start">
+                                            <div className="bg-primary/10 p-2 rounded-full mr-3"><MapPin className="w-5 h-5 text-primary" /></div>
+                                            <div>
+                                                <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">To</p>
+                                                <p className="text-lg font-medium text-light-on-surface dark:text-dark-on-surface">{selectedListing.endLocationText}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                 <div className="space-y-3">
-                                     <button
-                                         className="btn-primary py-3 px-6 rounded-full bg-primary text-white font-medium w-full flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-70"
-                                         onClick={() => handleBookRide(selectedListing)}
-                                         disabled={isLoading || myRides.some(ride => ride.id === selectedListing.id)}
-                                     >
-                                         {isLoading ? (
-                                             <><svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Processing...</>
-                                         ) : myRides.some(ride => ride.id === selectedListing.id) ? 'Request Sent' : 'Book This Ride'}
-                                     </button>
-                                     <div className="grid grid-cols-2 gap-3">
-                                         <button className="btn-outlined py-2 px-4 rounded-full border border-light-outline dark:border-dark-outline text-light-on-surface dark:text-dark-on-surface font-medium flex items-center justify-center hover:bg-light-surface-variant/30 dark:hover:bg-dark-surface-variant/30 transition-colors"><MessageCircle className="w-4 h-4 mr-2" />Message</button>
-                                         <button className="btn-outlined py-2 px-4 rounded-full border border-light-outline dark:border-dark-outline text-light-on-surface dark:text-dark-on-surface font-medium flex items-center justify-center hover:bg-light-surface-variant/30 dark:hover:bg-dark-surface-variant/30 transition-colors"><Phone className="w-4 h-4 mr-2" />Call</button>
+
+                                     <div className="grid grid-cols-2 gap-4 mb-6">
+                                        <div className="p-3 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
+                                            <div className="flex items-center mb-1"><Calendar className="w-4 h-4 text-primary mr-1" /><p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">Date</p></div>
+                                            <p className="text-light-on-surface dark:text-dark-on-surface">{formatDate(selectedListing.departureTime)}</p>
+                                        </div>
+                                        <div className="p-3 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
+                                            <div className="flex items-center mb-1"><Clock className="w-4 h-4 text-primary mr-1" /><p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">Time</p></div>
+                                            <p className="text-light-on-surface dark:text-dark-on-surface">{formatTime(selectedListing.departureTime)}</p>
+                                        </div>
+                                        <div className="p-3 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
+                                            <div className="flex items-center mb-1"><DollarSign className="w-4 h-4 text-primary mr-1" /><p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">Price</p></div>
+                                            <p className="text-lg font-medium text-primary">{getPriceDisplay(selectedListing.pricePerSeat)}</p>
+                                        </div>
+                                        <div className="p-3 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
+                                            <div className="flex items-center mb-1"><Users className="w-4 h-4 text-primary mr-1" /><p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">Seats</p></div>
+                                            <p className="text-light-on-surface dark:text-dark-on-surface">{selectedListing.seatsAvailable}</p>
+                                        </div>
+                                     </div>
+                                     
+                                    <div className="mb-6 p-4 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
+                                        <h3 className="text-title-md mb-3 text-light-on-surface dark:text-dark-on-surface">Driver</h3>
+                                        <div className="flex items-center">
+                                            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-medium text-primary">
+                                                {selectedListing.provider?.user?.name?.charAt(0) || "U"}
+                                            </div>
+                                            <div className="ml-4">
+                                                <p className="text-body-lg font-medium text-light-on-surface dark:text-dark-on-surface">{selectedListing.provider?.user?.name || "Driver"}</p>
+                                                <p className="text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant capitalize">{selectedListing.provider?.vehicleType || "Vehicle"}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                     <div className="space-y-3">
+                                         <button
+                                             className="btn-primary w-full flex items-center justify-center"
+                                             onClick={() => handleBookRide(selectedListing)}
+                                             disabled={isLoading || myRides.some(ride => ride.id === selectedListing.id)}
+                                         >
+                                             {isLoading ? (
+                                                 <><svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Processing...</>
+                                             ) : myRides.some(ride => ride.id === selectedListing.id) ? 'Request Sent' : 'Book This Ride'}
+                                         </button>
+                                         <div className="grid grid-cols-2 gap-3">
+                                             <button className="btn-outlined py-2 px-4 rounded-full border border-light-outline dark:border-dark-outline text-light-on-surface dark:text-dark-on-surface font-medium flex items-center justify-center hover:bg-light-surface-variant/30 dark:hover:bg-dark-surface-variant/30 transition-colors"><MessageCircle className="w-4 h-4 mr-2" />Message</button>
+                                             <button className="btn-outlined py-2 px-4 rounded-full border border-light-outline dark:border-dark-outline text-light-on-surface dark:text-dark-on-surface font-medium flex items-center justify-center hover:bg-light-surface-variant/30 dark:hover:bg-dark-surface-variant/30 transition-colors"><Phone className="w-4 h-4 mr-2" />Call</button>
+                                         </div>
                                      </div>
                                  </div>
                              </div>
-                         </div>
-                     )}
+                         )}
+                    </div>
                 </div>
             </div>
         </div>

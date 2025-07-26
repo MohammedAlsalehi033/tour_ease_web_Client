@@ -4,53 +4,62 @@ import { useEffect, useState } from 'react';
 import { useSession } from "next-auth/react";
 import { io, Socket } from 'socket.io-client';
 import { ApiService } from "@/app/services/apiService";
+import { ChatMessage } from "@/app/(model)/chat/chatModel";
+import { container } from "tsyringe";
+import { ChatController } from "@/app/(controller)/chat/chatController";
+import { useParams } from 'next/navigation'
 
-// --- Best Practice: Initialize Socket outside the component ---
-// This prevents the socket from being re-initialized on every render.
+
 const socket: Socket = io(new ApiService().baseUrl2.split("/api")[0], {
-    autoConnect: false, // Important: prevent auto-connection
+    autoConnect: false, 
 });
 
 export default function Page() {
     const { data: session } = useSession();
     const [isConnected, setIsConnected] = useState(socket.connected);
-
+    const chatController = container.resolve(ChatController);
+    const params = useParams();
+    const [partnerId, setPartnerId] = useState<string>(params.partnerId as string);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     useEffect(() => {
-        if (!session?.user?.id) {
+        const fetchMessages = async () => {
+            if (!session?.user?.id) {
             return;
         }
 
-        // --- Connection Logic ---
-        // If the socket is not already connected, connect it.
+        const messages = await chatController.fetchMessages(session.user.id, partnerId);
+        setMessages(messages);
+        }
+        fetchMessages();
+
         if (!socket.connected) {
             socket.connect();
         }
 
         const onConnect = () => {
-            console.log("Socket connected!");
                 socket.emit('user_connected', session.user.id); // Emitting a custom event
 
             setIsConnected(true);
         };
 
-        const onDisconnect = () => {
-            console.log("Socket disconnected.");
-            setIsConnected(false);
-        };
+       
 
         socket.on('connect', onConnect);
-        socket.on('disconnect', onDisconnect);
-        socket.on("new_message", (message)=>{console.log(message)})
+        socket.on("new_message", (message: ChatMessage)=>{
+            setMessages([...messages, message])
+        })
 
 
         return () => {
             console.log("Cleaning up socket listeners.");
             socket.off('connect', onConnect);
-            socket.off('disconnect', onDisconnect);
-  
+            socket.off("new_message", (message: ChatMessage)=>{
+                console.log(message)
+                setMessages([...messages, message])
+            })
             socket.disconnect();
         };
-    }, [session]); // Dependency array ensures this runs when the session state changes.
+    }, [session]); 
 
     return (
         <div>
@@ -61,6 +70,16 @@ export default function Page() {
             ) : (
                 <p>Waiting for user session...</p>
             )}
+            <div className="flex flex-col gap-2">
+                {messages.map((message) => (
+                    <div key={message.id} className={`chat-message flex-1 ${message.senderId === session?.user?.id ? 'self-end bg-primary-light' : 'self-start'}`}>
+                        {message.content}
+                        <p>{message.sentAt}</p>
+                        <p>{message.senderId}</p>
+                        <p>{message.receiverId}</p>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }

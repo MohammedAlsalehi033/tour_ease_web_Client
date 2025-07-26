@@ -151,8 +151,8 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
     };
 
     return (
-        <div className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-start pt-12 bg-light-background dark:bg-dark-background`}>
-            <div className="w-full max-w-6xl px-4 md:px-6">
+            <div className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-start bg-light-background dark:bg-dark-background`}>
+            <div className="w-full">
                 <div className="mb-6 border-b border-light-outline dark:border-dark-outline">
                     <div className="flex space-x-1">
                         <button onClick={() => setActiveTab("requests")} className={`py-3 px-4 text-sm font-medium transition-colors duration-200 relative ${activeTab === "requests" ? "text-primary" : "text-light-on-surface-variant dark:text-dark-on-surface-variant"}`}>

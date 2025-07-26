@@ -13,7 +13,7 @@ interface RideOrListingSelectorProps {
 const RideOrlistingSelector: React.FC<RideOrListingSelectorProps> = ({rideListings, rideRequests}) => {
   const [selectedTap, setSelectedTap] = useState<'Request' | 'listing'>('listing');
     return (
-    <div className='lg:pl-72'>
+    <div className=''>
         <div className='flex justify-center items-center gap-4 p-4'>
             <button
             className={`px-4 py-2 rounded ${selectedTap === 'listing' ? 'bg-primary' : 'bg-primary-disabled'}`}

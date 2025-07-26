@@ -15,17 +15,17 @@ export default function Home() {
   if (!mounted) return null;
   
   return (
-    <div className="min-h-screen transition-colors duration-300 flex flex-col items-center justify-start pt-12">
+    <div className="flex flex-col items-center justify-start pt-12">
       <div className="app-bar w-full fixed top-0 left-0 z-10">
         <h1 className="text-headline-md">Flutter-inspired Theme</h1>
       </div>
       
       <div className="max-w-3xl w-full px-6 mt-16">
-        <h1 className="mb-6">Material Design Theme</h1>
+        <h1 className="font-display text-headline-md mb-6">Material Design Theme</h1>
         
         <div className="card mb-8">
-          <h2 className="mb-4">Theme Preferences</h2>
-          <p className="mb-6">Select your preferred theme mode below:</p>
+          <h2 className="font-display text-title-lg mb-4">Theme Preferences</h2>
+          <p className="font-sans text-body-md mb-6">Select your preferred theme mode below:</p>
           
           <div className="flex space-x-4">
             <button 
@@ -43,7 +43,7 @@ export default function Home() {
         </div>
         
         <div className="card mb-8">
-          <h2 className="mb-4">Button Styles</h2>
+          <h2 className="font-display text-title-lg mb-4">Button Styles</h2>
           <div className="flex flex-wrap gap-4 mb-6">
             <button className="btn-primary">Primary</button>
             <button className="btn-outlined">Outlined</button>
@@ -53,10 +53,10 @@ export default function Home() {
           
           <div className="divider"></div>
           
-          <h2 className="my-4">Form Controls</h2>
+          <h2 className="font-display text-title-lg my-4">Form Controls</h2>
           <div className="space-y-4 mb-6">
             <div>
-              <label className="block text-title-md mb-2">Input Field</label>
+              <label className="font-display text-title-md mb-2">Input Field</label>
               <input 
                 type="text" 
                 placeholder="Enter some text"
@@ -66,7 +66,7 @@ export default function Home() {
             
             <div className="flex items-center space-x-2">
               <input type="checkbox" className="checkbox" id="check1" />
-              <label htmlFor="check1" className="text-body-md">Checkbox</label>
+              <label htmlFor="check1" className="font-sans text-body-md">Checkbox</label>
             </div>
             
             <div className="flex items-center space-x-2">
@@ -81,61 +81,61 @@ export default function Home() {
                   className="switch absolute cursor-pointer"
                 ></label>
               </div>
-              <label htmlFor="switch1" className="text-body-md">Toggle Switch</label>
+              <label htmlFor="switch1" className="font-sans text-body-md">Toggle Switch</label>
             </div>
           </div>
           
           <div className="divider"></div>
           
-          <h2 className="my-4">Typography</h2>
+          <h2 className="font-display text-title-lg my-4">Typography</h2>
           <div className="space-y-2">
-            <p className="text-display-lg font-bold">Display Large</p>
-            <p className="text-display-md font-bold">Display Medium</p>
-            <p className="text-display-sm font-bold">Display Small</p>
-            <p className="text-headline-lg font-semibold">Headline Large</p>
-            <p className="text-headline-md font-semibold">Headline Medium</p>
-            <p className="text-headline-sm font-semibold">Headline Small</p>
-            <p className="text-body-lg">Body Large</p>
-            <p className="text-body-md">Body Medium</p>
-            <p className="text-body-sm">Body Small</p>
+            <p className="font-display text-display-lg font-bold">Display Large</p>
+            <p className="font-display text-display-md font-bold">Display Medium</p>
+            <p className="font-display text-display-sm font-bold">Display Small</p>
+            <p className="font-display text-headline-lg font-semibold">Headline Large</p>
+            <p className="font-display text-headline-md font-semibold">Headline Medium</p>
+            <p className="font-display text-headline-sm font-semibold">Headline Small</p>
+            <p className="font-sans text-body-lg">Body Large</p>
+            <p className="font-sans text-body-md">Body Medium</p>
+            <p className="font-sans text-body-sm">Body Small</p>
           </div>
         </div>
         
         {/* Colors Section */}
         <div className="card mb-8">
-          <h2 className="mb-4">Color Palette</h2>
+          <h2 className="font-display text-title-lg mb-4">Color Palette</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="flex flex-col items-center">
               <div className="h-16 w-16 rounded-full bg-primary"></div>
-              <p className="mt-2 text-title-sm">Primary</p>
+              <p className="font-display text-title-sm mt-2">Primary</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="h-16 w-16 rounded-full bg-primary-light"></div>
-              <p className="mt-2 text-title-sm">Primary Light</p>
+              <p className="font-display text-title-sm mt-2">Primary Light</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="h-16 w-16 rounded-full bg-error"></div>
-              <p className="mt-2 text-title-sm">Error</p>
+              <p className="font-display text-title-sm mt-2">Error</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="h-16 w-16 rounded-full bg-success"></div>
-              <p className="mt-2 text-title-sm">Success</p>
+              <p className="font-display text-title-sm mt-2">Success</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="h-16 w-16 rounded-full bg-warning"></div>
-              <p className="mt-2 text-title-sm">Warning</p>
+              <p className="font-display text-title-sm mt-2">Warning</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="h-16 w-16 rounded-full bg-info"></div>
-              <p className="mt-2 text-title-sm">Info</p>
+              <p className="font-display text-title-sm mt-2">Info</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="h-16 w-16 rounded-full bg-light-background dark:bg-dark-background border border-gray-300 dark:border-gray-700"></div>
-              <p className="mt-2 text-title-sm">Background</p>
+              <p className="font-display text-title-sm mt-2">Background</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="h-16 w-16 rounded-full bg-light-surface dark:bg-dark-surface border border-gray-300 dark:border-gray-700"></div>
-              <p className="mt-2 text-title-sm">Surface</p>
+              <p className="font-display text-title-sm mt-2">Surface</p>
             </div>
           </div>
         </div>

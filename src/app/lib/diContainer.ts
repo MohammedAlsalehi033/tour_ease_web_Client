@@ -11,6 +11,8 @@ import { OfferRepo }  from '../(model)/rideSharing/offer/offerRepo';
 import { OfferController } from '../(controller)/rideSharing/offerController';
 import { BookingController } from '../(controller)/rideSharing/bookingController';
 import { BookingRepo } from '../(model)/rideSharing/booking/bookingRepo';
+import { QuestionsController } from '../(controller)/questions/questionsController';
+import { QuestionsRepo } from '../(model)/questions/questionsRepo';
 
 
 container.registerSingleton(RideListingRepo)
@@ -23,5 +25,7 @@ container.registerSingleton(OfferRepo)
 container.registerSingleton(OfferController)
 container.registerSingleton(BookingRepo)
 container.registerSingleton(BookingController)
+container.registerSingleton(QuestionsRepo)
+container.registerSingleton(QuestionsController)
 
 export { container };

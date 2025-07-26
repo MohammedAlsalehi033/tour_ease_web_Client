@@ -12,16 +12,20 @@ import { Suspense } from 'react';
 import SidebarSkeleton from './components/SidebarSkeleton';
 import { container } from 'tsyringe';
 import { BookingController } from '../(controller)/rideSharing/bookingController';
+import localFont from 'next/font/local';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+
+export const myFont = localFont({
+  src: '../../../public/fonts/Lina round/Linaround-Regular.otf',
+  display: 'swap', 
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+export const rounded1cExtraBold = localFont({
+  src: '../../../public/fonts/Rounded Mplus 1c/MPLUSRounded1c-ExtraBold.ttf',
+  display: 'swap', 
 });
+
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -54,17 +58,20 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
-  const { hasActiveRide } = await getActiveRideStatus();
+  // const { hasActiveRide } = await getActiveRideStatus();
 
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider attribute="class">
+      {/* <body className={`${myFont.className} ${rounded1cExtraBold.className}`}> */}
+       <body className="font-lina font-rounded">
+       <ThemeProvider attribute="class">
           <Suspense fallback={<SidebarSkeleton />}>
-            <MySideBar hasActiveRide={hasActiveRide} />
+            <MySideBar hasActiveRide={false} />
           </Suspense>
           <Providers>
-            {children}
+            <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72 lg:pl-64 p-5  md:p-10">
+              {children}
+            </div>
           </Providers>
         </ThemeProvider>
       </body>

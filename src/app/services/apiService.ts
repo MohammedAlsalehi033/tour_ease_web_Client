@@ -11,8 +11,8 @@ interface FetchOptions {
 
 @injectable()
 export class ApiService {
-  readonly baseUrl2: string = 'http://13.201.19.41:3003/api';
-  readonly baseUrl: string = 'http://localhost:3000/api';
+  readonly baseUrl: string = 'http://13.201.19.41:3003/api';
+  readonly baseUrl2: string = 'http://localhost:3000/api';
 
   constructor() {
     // Constructor should be synchronous - we'll get session in methods instead

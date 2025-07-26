@@ -6,12 +6,13 @@ import { usePathname } from 'next/navigation';
 import {
     HomeIcon, ChatBubbleLeftRightIcon, UserIcon,
     MapIcon, TruckIcon, BuildingOfficeIcon,
-    QuestionMarkCircleIcon
+    QuestionMarkCircleIcon, ChevronDownIcon, ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import ThemeToggler from './themeToggler';
 
 const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [rideSharingOpen, setRideSharingOpen] = useState(false); // NEW
     const pathname = usePathname();
 
     const isActive = (path: string) => {
@@ -25,18 +26,13 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
         return pathname === path;
     };
 
-    const rideSharingLinks = [
-        { href: "/rideSharing/maps", label: "Ride Sharing", mainPath: '/ride-sharing' },
-        { href: "/rideSharing/listing/maps", label: "Create Listing", mainPath: '/ride-sharing' },
-        { href: "/rideSharing/request/maps", label: "Create Request", mainPath: '/ride-sharing' },
-    ];
-
+    // Remove rideSharingLinks from here
     return (
         <div>
             <ThemeToggler />
 
             {/* Mobile Sidebar Toggle */}
-            <div className="lg:hidden fixed top-0 left-0 z-20 p-4">
+            <div className="xl:hidden fixed top-0 left-0 z-20 p-4">
                 <button
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     className="text-body-md focus:outline-none"
@@ -50,7 +46,7 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
             {/* Sidebar */}
             <aside
                 className={`fixed inset-y-0 left-0 z-10 w-64 bg-primary text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    } lg:translate-x-0 transition-transform duration-300 ease-in-out`}
+                    } xl:translate-x-0 transition-transform duration-300 ease-in-out`}
             >
                 <div className="flex items-center justify-center h-16 border-b border-primary-light">
                     <p className="text-title-lg font-bold">TourEase</p>
@@ -62,32 +58,55 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                         <div className="mt-3 space-y-1">
                             {/* Accommodations */}
                             <Link href="/accommodations"
-                                className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${isActive('/accommodations') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
-                                    }`}
+                                className={`btn-text group flex items-center ${isActive('/accommodations') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'}`}
                             >
                                 <BuildingOfficeIcon className="mr-3 h-6 w-6" />
                                 Accommodations
                             </Link>
-
-                            {/* Ride Sharing Links */}
-                            {rideSharingLinks.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={hasActiveRide ? '/rideSharing/activeRide' : link.href}
-                                    title={hasActiveRide ? 'View your active ride' : link.label}
-                                    className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${isActive(link.mainPath) ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
-                                        } ${hasActiveRide ? 'animate-pulse-glow' : ''
-                                        }`}
-                                >
-                                    <TruckIcon className="mr-3 h-6 w-6" />
-                                    {link.label}
-                                </Link>
-                            ))}
-
+                            {/* Ride Sharing Collapsible Section */}
+                            <button
+                                type="button"
+                                onClick={() => setRideSharingOpen((open) => !open)}
+                                className={`btn-text group flex items-center w-full ${isActive('/ride-sharing') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'}`}
+                                aria-expanded={rideSharingOpen}
+                                aria-controls="ride-sharing-sub-links"
+                            >
+                                <TruckIcon className="mr-3 h-6 w-6" />
+                                Ride Sharing
+                                {rideSharingOpen ? (
+                                    <ChevronDownIcon className="ml-auto h-5 w-5" />
+                                ) : (
+                                    <ChevronRightIcon className="ml-auto h-5 w-5" />
+                                )}
+                            </button>
+                            {rideSharingOpen && (
+                                <div id="ride-sharing-sub-links" className="ml-8 mt-1 flex flex-col space-y-1">
+                                    <Link
+                                        href={hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/maps'}
+                                        title={hasActiveRide ? 'View your active ride' : 'View Listings'}
+                                        className={`btn-text group flex items-center ${isActive('/rideSharing/maps') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'} ${hasActiveRide ? 'animate-pulse-glow' : ''}`}
+                                    >
+                                        View Listings
+                                    </Link>
+                                    <Link
+                                        href={hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/listing/maps'}
+                                        title={hasActiveRide ? 'View your active ride' : 'Create Listing'}
+                                        className={`btn-text group flex items-center ${isActive('/rideSharing/listing/maps') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'} ${hasActiveRide ? 'animate-pulse-glow' : ''}`}
+                                    >
+                                        Create Listing
+                                    </Link>
+                                    <Link
+                                        href={hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/request/maps'}
+                                        title={hasActiveRide ? 'View your active ride' : 'Create Request'}
+                                        className={`btn-text group flex items-center ${isActive('/rideSharing/request/maps') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'} ${hasActiveRide ? 'animate-pulse-glow' : ''}`}
+                                    >
+                                        Create Request
+                                    </Link>
+                                </div>
+                            )}
                             {/* Trip Planner */}
                             <Link href="/trip-planner"
-                                className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${isActive('/trip-planner') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
-                                    }`}
+                                className={`btn-text group flex items-center ${isActive('/trip-planner') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'}`}
                             >
                                 <MapIcon className="mr-3 h-6 w-6" />
                                 Trip Planner
@@ -101,15 +120,15 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                         <div className="mt-3 space-y-1">
                             {/* Chats */}
                             <Link href="/chats"
-                                className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${isActive('/chats') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
-                                    }`}>
+                                className={`btn-text group flex items-center ${isActive('/chats') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'}`}
+                            >
                                 <ChatBubbleLeftRightIcon className="mr-3 h-6 w-6" />
                                 Chats
                             </Link>
                             {/* Questions */}
                             <Link href="/questions"
-                                className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${isActive('/questions') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
-                                    }`}>
+                                className={`btn-text group flex items-center ${isActive('/questions') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'}`}
+                            >
                                 <QuestionMarkCircleIcon className="mr-3 h-6 w-6" />
                                 Questions
                             </Link>
@@ -121,8 +140,8 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                         <div className="mt-3 space-y-1">
                             {/* Profile */}
                             <Link href="/profile"
-                                className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${isActive('/profile') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
-                                    }`}>
+                                className={`btn-text group flex items-center ${isActive('/profile') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'}`}
+                            >
                                 <UserIcon className="mr-3 h-6 w-6" />
                                 Profile
                             </Link>
@@ -134,8 +153,8 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                         <div className="mt-3 space-y-1">
                             {/* Notifications Link */}
                             <Link href="/notifications"
-                                className={`group flex items-center px-2 py-2 text-body-md font-medium rounded-md ${isActive('/notifications') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'
-                                    }`}>
+                                className={`btn-text group flex items-center ${isActive('/notifications') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'}`}
+                            >
                                 <UserIcon className="mr-3 h-6 w-6" />
                                 Notifications
                             </Link>

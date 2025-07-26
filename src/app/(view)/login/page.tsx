@@ -30,19 +30,19 @@ export default function Login() {
   };
 
 return (
-  <div className="min-h-screen transition-colors duration-300 flex items-center justify-center bg-light-background dark:bg-dark-background">
+  <div>
     <div className="max-w-md w-full p-6 bg-light-surface dark:bg-dark-surface rounded-lg shadow-md card">
-      <h1 className="text-headline-md font-semibold mb-6 text-center">Login</h1>
+      <h1 className="font-display text-headline-md font-semibold mb-6 text-center">Login</h1>
       
       {error && (
-        <div className="bg-error bg-opacity-10 border border-error text-error px-4 py-3 rounded mb-4">
+        <div className="bg-error bg-opacity-10 border border-error text-error px-4 py-3 rounded mb-4 font-sans text-body-md font-medium">
           {error}
         </div>
       )}
       
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-title-md mb-2" htmlFor="email">
+          <label className="font-display text-title-md mb-2" htmlFor="email">
             Email
           </label>
           <input
@@ -57,7 +57,7 @@ return (
         </div>
         
         <div className="mb-6">
-          <label className="block text-title-md mb-2" htmlFor="password">
+          <label className="font-display text-title-md mb-2" htmlFor="password">
             Password
           </label>
           <input

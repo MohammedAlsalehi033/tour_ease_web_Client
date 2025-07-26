@@ -7,12 +7,17 @@ module.exports = {
   ],
   darkMode: 'class',
   theme:  {
-    extend: {animation: {
-      'progress-bar': 'progress 3s ease-in-out infinite',
-      'bounce': 'delay-bounce 1s infinite',
-      'delay-100': 'delay-bounce 1s infinite 0.1s',
-      'delay-200': 'delay-bounce 1s infinite 0.2s',
-    },
+    extend: {
+      fontFamily: {
+        sans: ['Lina round', 'Arial', 'Helvetica', 'sans-serif'],
+        display: ['Rounded Mplus 1c', 'Arial', 'Helvetica', 'sans-serif'],
+      },
+      animation: {
+        'progress-bar': 'progress 3s ease-in-out infinite',
+        'bounce': 'delay-bounce 1s infinite',
+        'delay-100': 'delay-bounce 1s infinite 0.1s',
+        'delay-200': 'delay-bounce 1s infinite 0.2s',
+      },
       colors: {
         // Primary colors from Flutter theme
         primary: {

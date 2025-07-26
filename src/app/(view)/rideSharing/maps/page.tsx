@@ -215,7 +215,7 @@ const handleSearch = () => {
   const isSearchReady = pickLocation && dropLocation && selectedDate;
 
   return (
-    <div className='mt-10 lg:pl-64'>
+    <div className='mt-10'>
       <div className="card w-full p-4 mb-8">
         <h2 className="mb-4">Trip Booking System</h2>
       
@@ -392,7 +392,7 @@ const handleSearch = () => {
           <button
             onClick={handleSearch}
             disabled={!isSearchReady}
-            className={`btn-${isSearchReady ? 'primary' : 'outlined'} px-8 py-3`}
+            className={`btn-${isSearchReady ? 'primary' : 'outlined'}`}
           >
             {isSearchReady ? 'Search Trips' : 'Complete Required Fields'}
           </button>

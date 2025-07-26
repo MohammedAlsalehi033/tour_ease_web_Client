@@ -16,13 +16,13 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-const formatTimestamp = (timestamp) => {
+const formatTimestamp = (timestamp: string | number | Date) => {
   const date = new Date(timestamp);
   const now = new Date();
-  const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+  const diffInHours = Math.floor((+now - +date) / (1000 * 60 * 60));
   
   if (diffInHours < 1) {
-    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+    const diffInMinutes = Math.floor((+now - +date) / (1000 * 60));
     return diffInMinutes < 1 ? 'Just now' : `${diffInMinutes}m ago`;
   }
   if (diffInHours < 24) return `${diffInHours}h ago`;
@@ -36,52 +36,55 @@ const formatTimestamp = (timestamp) => {
   });
 };
 
-const ChatItem = ({ chat }) => {
+const ChatItem = ({ chat }: { chat: Chat }) => {
   return (
-    <Link href={`/chats/${chat.partnerId}`} className="block">
-      <div className="card p-4 rounded-lg border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface hover:shadow-lg hover:border-primary/30 transition-all duration-200 cursor-pointer">
-        <div className="flex items-center space-x-4">
+    <Link href={`/chats/${chat.partnerId}`} className="block group">
+      <div className="card p-0 rounded-xl border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface hover:shadow-xl hover:border-primary/50 transition-all duration-200 cursor-pointer flex overflow-hidden relative">
+        {/* Colored accent bar */}
+        <div className="w-2 bg-gradient-to-b from-primary/80 to-primary/40 dark:from-primary/60 dark:to-primary/20" />
+        <div className="flex items-center space-x-4 flex-1 p-4">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-medium text-lg">
+            <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-display font-medium text-title-lg">
               {chat.userName?.charAt(0)?.toUpperCase() || "U"}
             </div>
-            {/* Online status indicator */}
+            {/* Online status indicator with pulse */}
             {chat.isOnline && (
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
+              <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white dark:border-gray-800"></span>
+              </span>
             )}
           </div>
 
           {/* Chat content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">
+              <h3 className="font-display text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">
                 {chat.userName || 'Unknown User'}
               </h3>
               <div className="flex items-center space-x-2 flex-shrink-0">
-                {/* Unread indicator */}
+                {/* Unread badge */}
                 {chat.isUnread && (
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span className="badge badge-info animate-pulse-glow">New</span>
                 )}
-                <span className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                <span className="badge bg-light-surface-variant/60 dark:bg-dark-surface-variant/60 text-xs font-semibold px-2 py-0.5">
                   {formatTimestamp(chat.timestamp)}
                 </span>
               </div>
             </div>
-            
-            <div className="flex items-center justify-between">
-              <p className={`text-body-md truncate flex-1 ${
-                chat.isUnread 
-                  ? 'font-medium text-light-on-surface dark:text-dark-on-surface' 
+            <div className="flex items-center justify-between gap-2">
+              <p className={`font-sans text-body-md truncate flex-1 ${
+                chat.isUnread
+                  ? 'font-semibold text-light-on-surface dark:text-dark-on-surface'
                   : 'text-light-on-surface-variant dark:text-dark-on-surface-variant'
               }`}>
                 {chat.lastMessage || 'No messages yet'}
               </p>
-              
               {/* Message status icons */}
               <div className="flex items-center ml-2">
                 {!chat.isUnread && (
-                  <CheckCheck className="w-4 h-4 text-light-on-surface-variant dark:text-dark-on-surface-variant" />
+                  <CheckCheck className="w-4 h-4 text-primary/60" />
                 )}
               </div>
             </div>
@@ -100,10 +103,10 @@ const EmptyState = () => {
           <MessageCircle className="w-10 h-10 text-primary" />
         </div>
       </div>
-      <h2 className="text-title-lg mb-3 text-light-on-surface dark:text-dark-on-surface">
+      <h2 className="font-display text-title-lg mb-3 text-light-on-surface dark:text-dark-on-surface">
         No conversations yet
       </h2>
-      <p className="text-body-lg mb-6 text-light-on-surface-variant dark:text-dark-on-surface-variant max-w-md mx-auto">
+      <p className="font-sans text-body-lg mb-6 text-light-on-surface-variant dark:text-dark-on-surface-variant max-w-md mx-auto">
         Start chatting with other users when you book rides or receive ride requests.
       </p>
       <div className="flex gap-4 justify-center">
@@ -127,10 +130,10 @@ const LoginPrompt = () => {
             <User className="w-8 h-8 text-primary" />
           </div>
         </div>
-        <h2 className="text-title-lg mb-3 text-light-on-surface dark:text-dark-on-surface">
+        <h2 className="font-display text-title-lg mb-3 text-light-on-surface dark:text-dark-on-surface">
           Login Required
         </h2>
-        <p className="text-body-lg mb-6 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+        <p className="font-sans text-body-lg mb-6 text-light-on-surface-variant dark:text-dark-on-surface-variant">
           Please log in to view your chats and messages.
         </p>
         <Link href="/auth/signin" className="btn-primary py-3 px-6 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">
@@ -141,72 +144,63 @@ const LoginPrompt = () => {
   );
 };
 
+
 const page = async () => {
-  const session = await getServerSession(authOptions);
+  const session = (await getServerSession(authOptions as any)) as any;
+  const userId = (session?.user as { id?: string })?.id;
   
-  if (!session?.user?.id) {
+
+  if (!userId) {
     return <LoginPrompt />;
   }
 
-  let chats = [];
+  let chats: Chat[] = [];
   try {
     const chatController = container.resolve(ChatController);
-    chats = await chatController.fetchChats(session.user.id);
+    chats = await chatController.fetchChats(userId);
+    console.log(userId)
   } catch (error) {
     console.error('Error fetching chats:', error);
   }
 
   return (
-    <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center">
               <div className="bg-primary/10 p-3 rounded-full mr-4">
                 <MessageCircle className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface">
+                <h1 className="font-display text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface">
                   Messages 
                 </h1>
-                <p className="text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                <p className="font-sans text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
                   Stay connected with your ride partners
                 </p>
               </div>
             </div>
             
-            {/* Chat count badge */}
-            {chats && chats.length > 0 && (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium px-3 py-1 bg-primary/10 text-primary rounded-full">
-                  {chats.length} {chats.length === 1 ? 'conversation' : 'conversations'}
-                </span>
-                {chats.some(chat => chat.isUnread) && (
-                  <span className="text-sm font-medium px-3 py-1 bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 rounded-full">
-                    {chats.filter(chat => chat.isUnread).length} unread
-                  </span>
-                )}
-              </div>
-            )}
+           
           </div>
-
           {/* Search bar */}
-          {chats && chats.length > 0 && (
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-on-surface-variant dark:text-dark-on-surface-variant" />
+          <div className="mt-6 flex items-center gap-2">
+            <div className="relative flex-1">
               <input
                 type="text"
-                placeholder="Search conversations..."
-                className="w-full pl-10 pr-4 py-3 rounded-lg border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface text-light-on-surface dark:text-dark-on-surface placeholder-light-on-surface-variant dark:placeholder-dark-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                placeholder="Search chats..."
+                className="input w-full pl-10 pr-4 py-3 rounded-xl shadow focus:ring-2 focus:ring-primary/30"
+                // onChange={...} // Add search logic if needed
               />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary/60" />
             </div>
-          )}
+          </div>
         </div>
 
         {/* Chats List */}
         {chats && chats.length > 0 ? (
-          <div className="space-y-3">
+          <div className="divide-y divide-light-outline/30 dark:divide-dark-outline/30 rounded-xl overflow-hidden shadow-sm">
             {chats.map((chat, index) => (
               <ChatItem key={`${chat.partnerId}-${index}`} chat={chat} />
             ))}
@@ -215,7 +209,6 @@ const page = async () => {
           <EmptyState />
         )}
       </div>
-    </div>
   );
 };
 

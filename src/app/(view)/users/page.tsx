@@ -45,63 +45,43 @@ async function UsersTable({ role, status, search }) {
   
   // Render the table with filtered data
   return (
-    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-800">
+    <div className="card overflow-x-auto">
+      <table className="min-w-full">
+        <thead>
           <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Created At</th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+            <th className="text-title-sm font-semibold text-left">ID</th>
+            <th className="text-title-sm font-semibold text-left">Name</th>
+            <th className="text-title-sm font-semibold text-left">Email</th>
+            <th className="text-title-sm font-semibold text-left">Role</th>
+            <th className="text-title-sm font-semibold text-left">Status</th>
+            <th className="text-title-sm font-semibold text-left">Created At</th>
+            <th className="text-title-sm font-semibold text-left">Actions</th>
           </tr>
         </thead>
-        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+        <tbody>
           {transformedUsers.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{user.id}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{user.name}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{user.email}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-              <span className={`inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium
-                   bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200`}>
-  {user.role.map((role, index) => (
-    <React.Fragment key={index}>
-      {index > 0 && <div className="w-1 h-1 bg-purple-400 rounded-full"></div>}
-      {role}
-    </React.Fragment>
-  ))}
-</span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  user.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                }`}>
-                  {user.status}
+            <tr key={user.id} className="hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant transition-colors">
+              <td className="text-body-md">{user.id}</td>
+              <td className="text-body-md">{user.name}</td>
+              <td className="text-body-md">{user.email}</td>
+              <td>
+                <span className="badge badge-purple">
+                  {user.role.map((role, index) => (
+                    <React.Fragment key={index}>
+                      {index > 0 && <span className="mx-1">•</span>}
+                      {role}
+                    </React.Fragment>
+                  ))}
                 </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{user.lastActive}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <td>
+                <span className={`badge ${user.status === 'Active' ? 'badge-success' : 'badge-error'}`}>{user.status}</span>
+              </td>
+              <td className="text-body-md">{user.lastActive}</td>
+              <td>
                 <div className="flex space-x-2">
-                  <Link 
-                    href={`/users/${user.id}`}
-                    className="text-primary hover:text-primary-light"
-                  >
-                    View
-                  </Link>
-                  
-                  {/* These links would be replaced with client components that have event handlers */}
-                  <Link 
-                    href="#" 
-                    className={`${user.status === 'Active' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}`}
-                    data-user-id={user.id}
-                    data-action={user.status === 'Active' ? 'deactivate' : 'activate'}
-                  >
-                    {user.status === 'Active' ? 'Deactivate' : 'Activate'}
-                  </Link>
+                  <Link href={`/users/${user.id}`} className="btn-text">View</Link>
+                  <Link href="#" className={`btn-text ${user.status === 'Active' ? 'text-error' : 'text-success'}`}>Toggle</Link>
                 </div>
               </td>
             </tr>
@@ -109,8 +89,6 @@ async function UsersTable({ role, status, search }) {
         </tbody>
       </table>
     </div>
- 
-    </table>
   );
 }
 
