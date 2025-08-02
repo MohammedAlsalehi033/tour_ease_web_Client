@@ -117,11 +117,15 @@
      background-color: rgba(var(--surface), 0.8);
   }
 
-  /* Base Button Style */
+  /* Base Button Style with Animation */
   .btn {
     /* Matches _baseButtonStyle: padding & button border radius */
     @apply px-6 py-3 transition-all duration-200;
     border-radius: var(--radius-button);
+  }
+  .btn:active {
+    /* Added press animation */
+    @apply transform scale-95;
   }
   
   /* Primary Button (ElevatedButton) */
@@ -130,6 +134,7 @@
     background-color: rgb(var(--primary));
   }
   .btn-primary:hover {
+     @apply shadow-lg;
      background-color: rgb(var(--primary-dark));
   }
   
@@ -152,12 +157,16 @@
     background-color: rgba(var(--primary), 0.1);
   }
   
-  /* Card Component */
+  /* Card Component with Animation */
   .card {
     /* Matches CardTheme: elevation, margin, shape, color */
-    @apply p-4 m-2 shadow-md dark:shadow-lg transition-shadow duration-200;
+    @apply p-4 m-2 shadow-md dark:shadow-lg transition-all duration-300;
     background-color: rgb(var(--surface));
     border-radius: var(--radius-standard);
+  }
+  .card:hover {
+    /* Added lift animation on hover */
+    @apply shadow-xl transform -translate-y-1;
   }
 
   /* Chat Message (Styled like a card) */
@@ -166,10 +175,10 @@
     border-radius: var(--radius-standard);
   }
   
-  /* Input Field */
+  /* Input Field with Animation */
   .input {
     /* Matches InputDecorationTheme: fill, border, padding */
-    @apply border focus:border-2 focus:outline-none px-4 py-4 text-base;
+    @apply border focus:border-2 focus:outline-none px-4 py-4 text-base transition-all duration-300;
     background-color: rgba(var(--surface), 0.8);
     border-color: rgba(var(--primary), 0.2);
     color: rgb(var(--text));
@@ -180,6 +189,8 @@
   }
   .input:focus {
     border-color: rgb(var(--primary));
+    /* Added glow effect on focus */
+    box-shadow: 0 0 0 3px rgba(var(--primary), 0.2);
   }
   
   /* Divider */
@@ -266,12 +277,17 @@
   .dark .badge-warning {
     color: rgb(var(--warning));
   }
+
+  /* Accordion content for smooth open/close */
+  .accordion-content {
+    @apply overflow-hidden transition-all duration-500 ease-in-out;
+  }
 }
 
 
 /*
 ================================================================================
- UTILITIES LAYER
+ UTILITIES LAYER & ANIMATIONS
 ================================================================================
  This layer contains custom animations and utility classes.
 ================================================================================
@@ -279,6 +295,11 @@
 @layer utilities {
   .animate-pulse-glow {
     animation: pulse-glow 2s infinite;
+  }
+  /* New utility for a fade-in-up entrance animation */
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+    opacity: 0; /* Start hidden */
   }
 }
 
@@ -290,5 +311,17 @@
   50% {
     opacity: 0.9;
     box-shadow: 0 0 10px 4px rgba(var(--primary), 0.2);
+  }
+}
+
+/* New keyframe for the fade-in-up animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
