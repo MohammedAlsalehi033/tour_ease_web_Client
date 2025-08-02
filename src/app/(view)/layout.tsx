@@ -62,14 +62,16 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      {/* <body className={`${myFont.className} ${rounded1cExtraBold.className}`}> */}
-       <body className="font-lina font-rounded">
-       <ThemeProvider attribute="class">
+      <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+      </head>
+      <body className="font-lina font-rounded">
+        <ThemeProvider attribute="class">
           <Suspense fallback={<SidebarSkeleton />}>
             <MySideBar hasActiveRide={false} />
           </Suspense>
           <Providers>
-            <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72 lg:pl-64 p-5  md:p-10">
+            <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72  p-5  md:p-5">
               {children}
             </div>
           </Providers>

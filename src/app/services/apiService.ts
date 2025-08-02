@@ -55,10 +55,10 @@ export class ApiService {
       'Content-Type': 'application/json',
     };
 
-    const token = await this.getAuthToken();
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
+    // const token = await this.getAuthToken();
+    // if (token) {
+    //   headers['Authorization'] = `Bearer ${token}`;
+    // }
 
     return headers;
   }
@@ -69,13 +69,13 @@ export class ApiService {
     options: FetchOptions
   ): Promise<T> {
     try {
+      console.log(`${this.baseUrl}${url}`, options);
       const response = await fetch(`${this.baseUrl}${url}`, options);
-
       // Handle HTTP errors
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          errorData.message || `API request failed with status: ${response.status}`
+          errorData.message || `API request failed with status: ${JSON.stringify(response)}`
         );
       }
 

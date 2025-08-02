@@ -51,9 +51,9 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                 <div className="flex items-center justify-center h-16 border-b border-primary-light">
                     <p className="text-title-lg font-bold">TourEase</p>
                 </div>
-                <nav className="mt-8">
+                <nav className={`mt-8 ${sidebarOpen ? 'px-0' : 'px-6'} xl:px-6`}>
                     {/* Services Section */}
-                    <div className="px-4 mb-4">
+                    <div className="mb-4">
                         <p className="text-title-sm font-semibold text-primary-light uppercase tracking-wider">Services</p>
                         <div className="mt-3 space-y-1">
                             {/* Accommodations */}
@@ -105,7 +105,7 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                                 </div>
                             )}
                             {/* Trip Planner */}
-                            <Link href="/trip-planner"
+                            <Link href="/tripPlanner"
                                 className={`btn-text group flex items-center ${isActive('/trip-planner') ? 'bg-primary-light text-white' : 'text-white hover:bg-primary-light'}`}
                             >
                                 <MapIcon className="mr-3 h-6 w-6" />
@@ -115,7 +115,7 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                     </div>
 
                     {/* Communication Section */}
-                    <div className="px-4 mb-4">
+                    <div className="mb-4">
                         <p className="text-title-sm font-semibold text-primary-light uppercase tracking-wider">Communication</p>
                         <div className="mt-3 space-y-1">
                             {/* Chats */}
@@ -135,7 +135,7 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                         </div>
                     </div>
                     {/* Account Section */}
-                    <div className="px-4 mb-4">
+                    <div className="mb-4">
                         <p className="text-title-sm font-semibold text-primary-light uppercase tracking-wider">Account</p>
                         <div className="mt-3 space-y-1">
                             {/* Profile */}
@@ -148,7 +148,7 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                         </div>
                     </div>
                     {/* Notifications Section */}
-                    <div className="px-4 mb-4">
+                    <div className="mb-4">
                         <p className="text-title-sm font-semibold text-primary-light uppercase tracking-wider">Notifications</p>
                         <div className="mt-3 space-y-1">
                             {/* Notifications Link */}
