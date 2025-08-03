@@ -4,27 +4,76 @@ import { container } from 'tsyringe';
 import { QuestionsController } from '@/app/(controller)/questions/questionsController';
 import { Question } from '@/app/(model)/questions/questionsModel';
 import Link from 'next/link';
+import { FaCity, FaUtensils, FaHotel, FaLandmark, FaCalendarAlt, FaBus, FaShoppingBag, FaFilm, FaMapMarkerAlt, FaStoreAlt } from 'react-icons/fa';
 
 
 function QuestionsList({ questions }: { questions: Question[] }) {
+  // Helper for relative time
+  function timeAgo(dateString: string) {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+    if (diff < 60) return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 2592000) return `${Math.floor(diff / 86400)}d ago`;
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
   return (
-    <div className='flex flex-col gap-4'>
+    <div className="flex flex-col gap-6">
       {questions.map((question: Question) => (
-        <Link key={question.id} href={`/questions/${question.id}`}>
-          <div className="card flex min-h-20 items-center gap-4 shadow-lg border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface">
-            <img
-              src={question.user.mediaUrls[0]}
-              alt="avatar"
-              className="h-14 w-14 rounded-full object-cover object-center border-2 border-primary"
-            />
-            <div className="flex-1">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                <span className="font-semibold text-lg text-light-on-surface dark:text-dark-on-surface">{question.user.username}</span>
-                <span className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">{new Date(question.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+        <Link key={question.id} href={`/questions/${question.id}`} className="no-underline">
+          <div className="card group flex items-center gap-6 p-5 min-h-24 rounded-2xl shadow-lg border border-primary/10 dark:border-dark-outline/40 bg-white dark:bg-dark-surface transition-all duration-200 hover:scale-[1.02] hover:shadow-xl cursor-pointer">
+            <div className="flex-shrink-0">
+              {question.user.mediaUrls && question.user.mediaUrls[0] ? (
+                <img
+                  src={question.user.mediaUrls[0]}
+                  alt="avatar"
+                  className="h-16 w-16 rounded-full object-cover object-center border-2 border-primary shadow"
+                />
+              ) : (
+                <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xl border-2 border-primary shadow">
+                  {question.user.username ? question.user.username[0].toUpperCase() : '?'}
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <span className="font-semibold text-lg text-primary group-hover:text-primary-dark dark:group-hover:text-primary-light transition-colors">
+                  {question.user.username}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {timeAgo(question.createdAt)}
+                </span>
               </div>
-              <span className="mt-2 text-body-md text-light-on-surface dark:text-dark-on-surface">
-                {question.title}
-              </span>
+              <div className="mt-2">
+                <span className="block text-title-md font-bold text-dark-on-surface dark:text-light-on-surface mb-1">
+                  {question.title}
+                </span>
+                {question.description && (
+                  <span className="block text-body-md text-gray-700 dark:text-gray-300 line-clamp-2">
+                    {question.description}
+                  </span>
+                )}
+                {/* Tags */}
+                {Array.isArray(question.tags) && question.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {question.tags.map((tag: string, idx: number) => (
+                      <span key={idx} className="bg-primary/10 text-primary text-xs font-medium px-2 py-1 rounded-full">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-col items-center justify-center gap-2 px-2 min-w-[80px]">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-green-600 font-bold bg-green-100 dark:bg-green-900/30 rounded-full px-2 py-1">▲ {question.upvotes ?? 0}</span>
+                <span className="text-xs text-red-600 font-bold bg-red-100 dark:bg-red-900/30 rounded-full px-2 py-1">▼ {question.downvotes ?? 0}</span>
+              </div>
+              <span className="text-xs text-primary font-semibold bg-primary/10 rounded-full px-2 py-1">{question._count?.comments ?? 0} comments</span>
             </div>
           </div>
         </Link>
@@ -66,74 +115,71 @@ async function QuestionsContent() {
 
 const page = async () => {
   return (
-      <div className="flex flex-col items-center justify-start">
-      <div className="w-full">
-        <AddQuestionComponent />
-        <div className="overflow-x-auto relative py-2">
-          {/* Gradient fade left */}
-          <div className="pointer-events-none absolute left-0 top-0 h-full w-8 z-10 bg-gradient-to-r from-light-background/90 dark:from-dark-background/90 to-transparent" />
-          {/* Gradient fade right */}
-          <div className="pointer-events-none absolute right-0 top-0 h-full w-8 z-10 bg-gradient-to-l from-light-background/90 dark:from-dark-background/90 to-transparent" />
-          <div
-            className="flex gap-4 px-4 whitespace-nowrap scrollbar-thin scrollbar-thumb-primary/40 scrollbar-track-transparent hide-scrollbar"
-            aria-label="Question categories"
-          >
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Islamabad
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Lahore
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Karachi
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Islamabad
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Lahore
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Karachi
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Islamabad
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Lahore
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Karachi
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Food
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Restaurants
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Hotels
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Attractions
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Events
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Transportation
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Shopping
-            </div>
-            <div className="card inline-block text-title-lg font-bold px-8 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none">
-              Entertainment
+    <div className="flex flex-col items-center justify-start min-h-screen w-full bg-light-background dark:bg-dark-background">
+      <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row gap-8 pt-4">
+        {/* Sidebar for categories (desktop only) */}
+        <aside className="hidden md:block md:w-72 flex-shrink-0">
+          <div className="sticky top-8">
+            <div className="card border border-primary/20 dark:border-dark-outline/40 rounded-2xl bg-white dark:bg-dark-surface p-4">
+              <h2 className="text-lg font-bold mb-4 text-primary">Categories</h2>
+              <div className="flex flex-col gap-2">
+                {[
+                  { name: 'Islamabad', icon: <FaMapMarkerAlt className="mr-2 text-primary" /> },
+                  { name: 'Lahore', icon: <FaCity className="mr-2 text-primary" /> },
+                  { name: 'Karachi', icon: <FaCity className="mr-2 text-primary" /> },
+                  { name: 'Food', icon: <FaUtensils className="mr-2 text-primary" /> },
+                  { name: 'Restaurants', icon: <FaStoreAlt className="mr-2 text-primary" /> },
+                  { name: 'Hotels', icon: <FaHotel className="mr-2 text-primary" /> },
+                  { name: 'Attractions', icon: <FaLandmark className="mr-2 text-primary" /> },
+                  { name: 'Events', icon: <FaCalendarAlt className="mr-2 text-primary" /> },
+                  { name: 'Transportation', icon: <FaBus className="mr-2 text-primary" /> },
+                  { name: 'Shopping', icon: <FaShoppingBag className="mr-2 text-primary" /> },
+                  { name: 'Entertainment', icon: <FaFilm className="mr-2 text-primary" /> },
+                ].map((cat, idx) => (
+                  <div key={idx} className="card flex items-center text-title-md font-bold px-5 py-2 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none bg-white dark:bg-dark-surface border border-primary/10 dark:border-dark-outline/40">
+                    {cat.icon}
+                    {cat.name}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-        <Suspense fallback={<QuestionsSkeleton />}>
-          <QuestionsContent />
-        </Suspense>
+        </aside>
+        {/* Main content */}
+        <main className="flex-1 w-full max-w-3xl mx-auto">
+          <AddQuestionComponent />
+          {/* Mobile category selector */}
+          <div className="md:hidden w-full mb-4">
+            <div className="card border border-primary/20 dark:border-dark-outline/40 rounded-2xl bg-white dark:bg-dark-surface p-3">
+              <h2 className="text-md font-bold mb-2 text-primary">Categories</h2>
+              <div className="overflow-x-auto">
+                <div className="flex gap-3 px-1 whitespace-nowrap scrollbar-thin scrollbar-thumb-primary/40 scrollbar-track-transparent hide-scrollbar" aria-label="Question categories">
+                  {[
+                    { name: 'Islamabad', icon: <FaMapMarkerAlt className="mr-2 text-primary" /> },
+                    { name: 'Lahore', icon: <FaCity className="mr-2 text-primary" /> },
+                    { name: 'Karachi', icon: <FaCity className="mr-2 text-primary" /> },
+                    { name: 'Food', icon: <FaUtensils className="mr-2 text-primary" /> },
+                    { name: 'Restaurants', icon: <FaStoreAlt className="mr-2 text-primary" /> },
+                    { name: 'Hotels', icon: <FaHotel className="mr-2 text-primary" /> },
+                    { name: 'Attractions', icon: <FaLandmark className="mr-2 text-primary" /> },
+                    { name: 'Events', icon: <FaCalendarAlt className="mr-2 text-primary" /> },
+                    { name: 'Transportation', icon: <FaBus className="mr-2 text-primary" /> },
+                    { name: 'Shopping', icon: <FaShoppingBag className="mr-2 text-primary" /> },
+                    { name: 'Entertainment', icon: <FaFilm className="mr-2 text-primary" /> },
+                  ].map((cat, idx) => (
+                    <div key={idx} className="card inline-flex items-center text-title-md font-bold px-5 py-2 transition-transform duration-200 hover:scale-105 hover:shadow-lg cursor-pointer select-none bg-white dark:bg-dark-surface border border-primary/10 dark:border-dark-outline/40">
+                      {cat.icon}
+                      {cat.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <Suspense fallback={<QuestionsSkeleton />}>
+            <QuestionsContent />
+          </Suspense>
+        </main>
       </div>
     </div>
   );

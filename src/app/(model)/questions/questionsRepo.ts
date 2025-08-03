@@ -25,4 +25,18 @@ export class QuestionsRepo {
         });
         return response.data;
     }
+
+
+    async addQuestion (question: Question): Promise<Question> {
+        const response = await this.apiService.post<ResponseModel<Question>>(`/questions`, question);
+        console.log(response.data);
+        return response.data[0];
+    }
+    async askAI(question: Question): Promise<Question> {
+
+        const response = await this.apiService.post<ResponseModel<Question>>(`/questions/ai`, { title: question.title, description: question.description });
+        console.log(response.data);
+        return response.data;
+    }
+    
 }
