@@ -68,7 +68,7 @@ const NotificationCard = ({ offer } : { offer: TransportationOffer }) => {
   const routeInfo = isListingOffer ? offer.listing : offer.request;
   
   return (
-    <div className="card p-6 rounded-lg border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface mb-4 hover:shadow-lg transition-shadow duration-200">
+    <div className="card p-6 rounded-lg border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface mb-4 ">
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center">

@@ -5,7 +5,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust path
 
 interface FetchOptions {
   method: string;
-  headers: Record<string, string>;
+  //headers: Record<string, string>;
   body?: string;
 }
 
@@ -49,19 +49,17 @@ export class ApiService {
     }
   }
 
-  // Helper method to prepare request headers
-  private async getHeaders(): Promise<Record<string, string>> {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
+  // Helper method to prepare request //headers
+  // private async getHeaders(): Promise<Record<string, string>> {
+  
 
-    // const token = await this.getAuthToken();
-    // if (token) {
-    //   headers['Authorization'] = `Bearer ${token}`;
-    // }
+  //   // const token = await this.getAuthToken();
+  //   // if (token) {
+  //   //   //headers['Authorization'] = `Bearer ${token}`;
+  //   // }
 
-    return headers;
-  }
+  //   return //headers;
+  // }
 
   // Generic fetch method with error handling
   private async fetchWithErrorHandling<T>(
@@ -92,18 +90,18 @@ export class ApiService {
   async get<T>(url: string): Promise<T> {
     const options: FetchOptions = {
       method: 'GET',
-      headers: await this.getHeaders(),
+      //headers: await this.getHeaders(),
     };
 
     return this.fetchWithErrorHandling<T>(url, options);
   }
 
   // POST request method
-  async post<T>(url: string, body: Record<string, any> = {}): Promise<T> {
+  async post<T>(url: string, body: Record<string, any> = {}, isFormData: boolean = false): Promise<T> {
     const options: FetchOptions = {
       method: 'POST',
-      headers: await this.getHeaders(),
-      body: JSON.stringify(body),
+      // //headers: await this.getHeaders(),
+      body: isFormData ? body : JSON.stringify(body),
     };
 
     return this.fetchWithErrorHandling<T>(url, options);
@@ -113,7 +111,7 @@ export class ApiService {
   async put<T>(url: string, body: Record<string, any> = {}): Promise<T> {
     const options: FetchOptions = {
       method: 'PUT',
-      headers: await this.getHeaders(),
+      //headers: await this.getHeaders(),
       body: JSON.stringify(body),
     };
 
@@ -124,7 +122,7 @@ export class ApiService {
   async patch<T>(url: string, body: Record<string, any> = {}): Promise<T> {
     const options: FetchOptions = {
       method: 'PATCH',
-      headers: await this.getHeaders(),
+      //headers: await this.getHeaders(),
       body: JSON.stringify(body),
     };
 
@@ -135,7 +133,7 @@ export class ApiService {
   async delete<T>(url: string): Promise<T> {
     const options: FetchOptions = {
       method: 'DELETE',
-      headers: await this.getHeaders(),
+      //headers: await this.getHeaders(),
     };
 
     return this.fetchWithErrorHandling<T>(url, options);

@@ -5,6 +5,9 @@ import { redirect } from 'next/navigation';
 import { container } from '@/app/lib/diContainer'; 
 import { SignoutButton } from './components/SignoutButton';
 import { TransformationProviderController } from '@/app/(controller)/rideSharing/transportationProviderContrroller';
+import { UserController } from '@/app/(controller)/user/userController';
+import { User } from '@/app/(model)/user/userModel';
+import AvatarImage from './components/avatarImage';
 
 
 const Profile = async () => {
@@ -14,13 +17,20 @@ const Profile = async () => {
     redirect("/api/auth/signin");
   }
 
-  let transportationProviderData = null;
+  function updateProfile() {
+    // Logic to update the profile
+    console.log("Update profile clicked");
+  }
+
+  let transportationProviderData: any = null;
+  let userData: User | null = null;
   
   try {
     const transportationProviderController = container.resolve(TransformationProviderController);
+    const userController = container.resolve(UserController);
     
     transportationProviderData = await transportationProviderController.getTransformationProviderById(session.user.id);
-    console.log(transportationProviderData);
+    userData = await userController.getUserById(session.user.id);
 
   } catch (error) {
     console.error("Error fetching transportation provider data:", error);
@@ -35,20 +45,8 @@ const Profile = async () => {
         {/* User Profile Card */}
         <div className="card shadow-lg rounded-lg p-6 mb-8 dark:border-dark-outline border border-light-outline">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            {session.user?.image ? (
-              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-indigo-500">
-                <img  
-                  src={session.user.image}  
-                  alt={`${session.user.name}'s profile picture`}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-3xl font-display font-bold text-indigo-600 dark:text-indigo-300 border border-light-outline">
-                {session.user?.name?.charAt(0).toUpperCase() || "U"}
-              </div>
-            )}
-            
+            <AvatarImage media={userData?.mediaUrls || []} userName={session.user.name || "User"} />
+
             <div className="flex-1 text-center md:text-left">
               <h2 className="font-display text-headline-lg font-bold mb-2">{session.user.name || "User"}</h2>
               
@@ -67,6 +65,7 @@ const Profile = async () => {
               </div>
             </div>
           </div>
+          
         </div>
         
         {/* Provider Details Card */}

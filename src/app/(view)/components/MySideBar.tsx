@@ -32,7 +32,9 @@ const UserSidebar = ({ hasActiveRide }) => {
     const slogans = [
         "Your Adventure Awaits.",
         "Travel Made Simple.",
-        "Explore Without Limits."
+        "Explore Without Limits.",
+        "Journey Beyond Borders.",
+
     ];
     const cyclingText = ["TourEase", ...slogans];
 
@@ -114,7 +116,7 @@ const UserSidebar = ({ hasActiveRide }) => {
             >
                 <div className="flex items-center justify-center h-20 border-b border-white/20">
                     {/* Animated Text */}
-                    <p key={textIndex} className="text-2xl font-bold tracking-wider text-center px-2 animate-fade-in-up">
+                    <p key={textIndex} className="text-2xl font-bold tracking-wider text-center px-2 animate-fade-in-up overflow-hidden ">
                         {cyclingText[textIndex]}
                     </p>
                 </div>

@@ -45,9 +45,17 @@ const ChatItem = ({ chat }: { chat: Chat }) => {
         <div className="flex items-center space-x-4 flex-1 p-4">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-display font-medium text-title-lg">
-              {chat.userName?.charAt(0)?.toUpperCase() || "U"}
-            </div>
+            {(chat.avatarUrl) ? (
+              <img
+                src={chat.avatarUrl}
+                alt="avatar"
+                className="h-12 w-12 rounded-full object-cover object-center border-2 border-primary shadow"
+              />
+            ) : (
+              <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-display font-medium text-title-lg">
+                {chat.userName?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+            ) }
             {/* Online status indicator with pulse */}
             {chat.isOnline && (
               <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
@@ -158,7 +166,7 @@ const page = async () => {
   try {
     const chatController = container.resolve(ChatController);
     chats = await chatController.fetchChats(userId);
-    console.log(userId)
+    console.log(chats)
   } catch (error) {
     console.error('Error fetching chats:', error);
   }
