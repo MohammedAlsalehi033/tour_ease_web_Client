@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { Chat } from '../../(model)/chat/chatModel';
+import { Chat, ChatMessage } from '../../(model)/chat/chatModel';
 import { ChatRepo } from '../../(model)/chat/chatRepo';
 @injectable()
 export class ChatController {
@@ -22,6 +22,14 @@ export class ChatController {
             return messages;
         } catch (error) {
             console.error('Error fetching messages:', error);
+            throw error;
+        }
+    }
+        async sendMessage(message: ChatMessage): Promise<ChatMessage> {
+        try {
+            const sentMessage = await this.chatRepo.sendMessage(message);
+            return sentMessage;
+        } catch (error) {
             throw error;
         }
     }

@@ -6,15 +6,15 @@ import React from 'react';
 import { ArrowUpIcon, ArrowDownIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import AddComment from './addComment';
 
-const page = async (params ) => {
+const page = async ({params}: {params: {Questionid: string}}) => {
   const questionController = container.resolve(QuestionsController);
   const question = await questionController.getQuestion(params.Questionid);
   const commentsController = container.resolve(CommentsController);
   const comments: Comment[] = await commentsController.getComments(params.Questionid);
 
   return (
-    <div className="min-h-screen transition-colors duration-300 flex flex-col items-center justify-start pt-16 bg-light-background dark:bg-dark-background">
-      <div className="max-w-2xl w-full px-4">
+    <div className="max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide transition-colors duration-300 flex flex-col items-center justify-start pt-16 bg-light-background dark:bg-dark-background">
+      <div className="w-full px-4">
         {/* Question Card */}
         <div className="relative flex bg-gradient-to-br from-primary/10 to-light-surface dark:to-dark-surface rounded-xl shadow-lg border border-light-outline dark:border-dark-outline mb-10">
           {/* Vertical Accent Bar */}

@@ -104,7 +104,7 @@ body {
   @apply font-sans;
 }
 h1, h2, h3, h4, h5, h6 {
-  @apply font-display;
+  @apply font-display font-bold;
 }
 
 @layer base {
@@ -245,6 +245,67 @@ h1, h2, h3, h4, h5, h6 {
   }
   .badge-purple {
     @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200;
+  }
+
+  /* Text utility classes */
+  .text-display-lg {
+    @apply text-3xl font-bold;
+  }
+  
+  .text-display-md {
+    @apply text-2xl font-bold;
+  }
+  
+  .text-display-sm {
+    @apply text-xl font-bold;
+  }
+  
+  .text-headline-lg {
+    @apply text-lg font-semibold;
+  }
+  
+  .text-headline-md {
+    @apply text-lg font-semibold;
+  }
+  
+  .text-headline-sm {
+    @apply text-lg font-semibold;
+  }
+  
+  .text-title-lg {
+    @apply text-base font-medium;
+  }
+  
+  .text-title-md {
+    @apply text-sm font-medium;
+  }
+  
+  .text-title-sm {
+    @apply text-xs font-medium;
+  }
+  
+  .text-body-lg {
+    @apply text-base font-normal;
+  }
+  
+  .text-body-md {
+    @apply text-sm font-normal;
+  }
+  
+  .text-body-sm {
+    @apply text-xs font-normal;
+  }
+  
+  .text-label-lg {
+    @apply text-sm font-medium;
+  }
+  
+  .text-label-md {
+    @apply text-xs font-medium;
+  }
+  
+  .text-label-sm {
+    @apply text-xs font-medium;
   }
 }
 

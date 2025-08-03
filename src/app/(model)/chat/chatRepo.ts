@@ -25,4 +25,13 @@ export class ChatRepo {
             throw error ;
         }
     }
+
+    async sendMessage(message: ChatMessage): Promise<ResponseModel<ChatMessage>> {
+        try {
+            const response = await this.apiService.post<ResponseModel<ChatMessage>>('/messages', message);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 }

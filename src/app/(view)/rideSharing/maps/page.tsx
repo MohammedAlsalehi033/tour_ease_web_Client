@@ -13,7 +13,6 @@ const router = useRouter();
   const [mode, setMode] = useState('pick'); 
   const modeRef = useRef('pick');
 
-  // New form fields
   const [selectedDate, setSelectedDate] = useState('');
   const [timeRange, setTimeRange] = useState({ start: '09:00', end: '17:00' });
   const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });

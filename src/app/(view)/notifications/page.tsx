@@ -16,6 +16,7 @@ import {
   ArrowRight,
   User
 } from 'lucide-react';
+import { TransportationOffer } from '@/app/(model)/rideSharing/offer/offerModel';
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -61,7 +62,8 @@ const getStatusBadgeStyles = (status) => {
   }
 };
 
-const NotificationCard = ({ offer }) => {
+
+const NotificationCard = ({ offer } : { offer: TransportationOffer }) => {
   const isListingOffer = offer.transportationListingId !== null;
   const routeInfo = isListingOffer ? offer.listing : offer.request;
   
@@ -87,7 +89,7 @@ const NotificationCard = ({ offer }) => {
             {offer.status.toUpperCase()}
           </span>
           <span className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
-            {getTimeAgo(offer.createdAt)}
+            {getTimeAgo(offer.listing?.departureTime)}
           </span>
         </div>
       </div>
@@ -177,7 +179,7 @@ const NotificationCard = ({ offer }) => {
       )}
 
       {/* Action Buttons - Only show for pending offers */}
-      {offer.status === 'pending' && (
+      {offer.status === 'pending' && offer.isOutDated === false && (
         <div className="flex gap-3">
           <form action="/api/offers/accept" method="POST" className="flex-1">
             <input type="hidden" name="offerId" value={offer.id} />
@@ -214,17 +216,23 @@ const page = async () => {
   const offerController = container.resolve(OfferController);
   const session = await getServerSession(authOptions);
   
-  let offers = [];
+  let offers: TransportationOffer[] = [];
   try {
-    offers = await offerController.getReceivedOffers(session?.user?.id);
     console.log('Received offers:', offers);
-  } catch (error) {
+    offers = await offerController.getReceivedOffers(session?.user?.id);
+
+    offers = offers.map(offer => ({
+      ...offer,
+      isOutDated: new Date(offer.listing?.departureTime ?? '') < new Date(Date.now()) 
+        && offer.status === 'pending'
+    }));
+  } catch (error)   {
     console.error('Error fetching offers:', error);
   }
 
   return (
     <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className=" px-4">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center mb-2">

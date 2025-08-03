@@ -1,6 +1,6 @@
 'use client';
 import "reflect-metadata";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSession } from "next-auth/react";
 import { io, Socket } from 'socket.io-client';
 import { ApiService } from "@/app/services/apiService";
@@ -10,8 +10,8 @@ import { ChatController } from "@/app/(controller)/chat/chatController";
 import { useParams } from 'next/navigation'
 
 
-const socket: Socket = io(new ApiService().baseUrl2.split("/api")[0], {
-    autoConnect: false, 
+const socket: Socket = io(new ApiService().baseUrl.split("/api")[0], {
+    autoConnect: false,
 });
 
 export default function Page() {
@@ -20,15 +20,28 @@ export default function Page() {
     const chatController = container.resolve(ChatController);
     const params = useParams();
     const [partnerId, setPartnerId] = useState<string>(params.partnerId as string);
+    const [partnerName, setPartnerName] = useState<string>("Partner");
     const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const messageInputRef = useRef<HTMLInputElement>(null);
+    const messagesEndRef = useRef<null | HTMLDivElement>(null);
+
+  
     useEffect(() => {
-        const fetchMessages = async () => {
-            if (!session?.user?.id) {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
+
+    useEffect(() => {
+        console.log("session changed", session);
+        console.log("partnerId changed", partnerId);
+        if (!session?.user?.id) {
             return;
         }
 
-        const messages = await chatController.fetchMessages(session.user.id, partnerId);
-        setMessages(messages);
+        const fetchMessages = async () => {
+            const initialMessages = await chatController.fetchMessages(session.user.id, partnerId);
+            setMessages(initialMessages);
+            
         }
         fetchMessages();
 
@@ -37,48 +50,107 @@ export default function Page() {
         }
 
         const onConnect = () => {
-                socket.emit('user_connected', session.user.id); // Emitting a custom event
-
+            socket.emit('user_connected', session.user.id);
             setIsConnected(true);
         };
 
-       
+ 
+        const onNewMessage = (message: ChatMessage) => {
+            setMessages(prevMessages => [...prevMessages, message]);
+        };
 
+        // Register socket event listeners
         socket.on('connect', onConnect);
-        socket.on("new_message", (message: ChatMessage)=>{
-            setMessages([...messages, message])
-        })
-
+        socket.on("new_message", onNewMessage);
 
         return () => {
             console.log("Cleaning up socket listeners.");
             socket.off('connect', onConnect);
-            socket.off("new_message", (message: ChatMessage)=>{
-                console.log(message)
-                setMessages([...messages, message])
-            })
+            socket.off("new_message", onNewMessage); // Correctly removes the named listener
             socket.disconnect();
         };
-    }, [session]); 
+    }, [ partnerId, session]);
+
+    const handleSendMessage = async () => {
+            if (!session?.user?.id) {
+            return;
+        }
+
+        if (!messageInputRef.current?.value) {
+            alert("Please enter a message");
+            return;
+        }
+
+        const message : ChatMessage = {
+            senderId: session.user.id,
+            receiverId: partnerId,
+            content: messageInputRef.current?.value || "",
+            sentAt: new Date().toISOString(),
+            id: 0
+        }
+        const sentMessage = await chatController.sendMessage(message);
+        setMessages(prevMessages => [...prevMessages, sentMessage]);
+    }
 
     return (
         <div>
-            <h2>Socket Connection Status</h2>
-            <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
-            {session?.user?.id ? (
-                <p>User is logged in. Attempting to connect...</p>
-            ) : (
-                <p>Waiting for user session...</p>
-            )}
-            <div className="flex flex-col gap-2">
-                {messages.map((message) => (
-                    <div key={message.id} className={`chat-message flex-1 ${message.senderId === session?.user?.id ? 'self-end bg-primary-light' : 'self-start'}`}>
-                        {message.content}
-                        <p>{message.sentAt}</p>
-                        <p>{message.senderId}</p>
-                        <p>{message.receiverId}</p>
+            
+            <div className="flex flex-col gap-3 py-4 max-h-[calc(100vh-10rem)] overflow-y-auto scrollbar-hide">
+                {messages.length === 0 ? (
+                    <div className="text-center text-gray-400 dark:text-gray-500 py-8">
+                        No messages yet. Start the conversation!
                     </div>
-                ))}
+                ) : (
+                    messages.map((message) => {
+                        const isOwnMessage = message.senderId === session?.user?.id;
+                        return (
+                            <div
+                                key={message.id}
+                                className={`chat-message max-w-[70%] p-3 rounded-lg ${ // Added padding for better visuals
+                                    isOwnMessage
+                                        ? 'self-end bg-primary-light text-right text-dark-text'
+                                        : 'self-start bg-light-surface dark:bg-dark-surface text-left'
+                                }`}
+                            >
+                                <div className="flex items-center gap-2 mb-1">
+                                    {!isOwnMessage && (
+                                        <span className="text-xs font-semibold text-primary">
+                                            {partnerName}
+                                        </span>
+                                    )}
+                                    <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto">
+                                        {new Date(message.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                </div>
+                                <div className="whitespace-pre-line break-words text-body-md">
+                                    {message.content}
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
+                <div ref={messagesEndRef} />
+            </div>
+
+            <div className="fixed bottom-0 right-8 w-full lg:w-[calc(100%-20rem)] bg-transparent px-4 py-3 flex gap-2 z-10 ">
+                <input
+                    type="text"
+                    placeholder="Message"
+                    className="input flex-1 min-w-0"
+                    ref={messageInputRef}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && messageInputRef.current) {
+                            handleSendMessage();
+                            messageInputRef.current.focus();
+                        }
+                    }}
+                />
+                <button
+                    className="btn-primary px-6 py-4 text-sm"
+                    onClick={handleSendMessage}
+                >
+                    Send
+                </button>
             </div>
         </div>
     );

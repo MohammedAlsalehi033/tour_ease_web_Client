@@ -63,7 +63,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       {/* <body className={`${myFont.className} ${rounded1cExtraBold.className}`}> */}
-       <body className="font-lina font-rounded">
+       <body className="font-sans">
        <ThemeProvider attribute="class">
           <Suspense fallback={<SidebarSkeleton />}>
             <MySideBar hasActiveRide={false} />

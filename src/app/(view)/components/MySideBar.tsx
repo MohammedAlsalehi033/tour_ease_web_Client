@@ -26,7 +26,6 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
         return pathname === path;
     };
 
-    // Remove rideSharingLinks from here
     return (
         <div>
             <ThemeToggler />
@@ -49,12 +48,12 @@ const UserSidebar = ({ hasActiveRide }: { hasActiveRide: boolean }) => {
                     } xl:translate-x-0 transition-transform duration-300 ease-in-out`}
             >
                 <div className="flex items-center justify-center h-16 border-b border-primary-light">
-                    <p className="text-title-lg font-bold">TourEase</p>
+                    <p className="text-display-sm font-bold !text-white">TourEase</p>
                 </div>
                 <nav className="mt-8">
                     {/* Services Section */}
                     <div className="px-4 mb-4">
-                        <p className="text-title-sm font-semibold text-primary-light uppercase tracking-wider">Services</p>
+                        <p className="text-title-sm font-semibold uppercase tracking-wider">Services</p>
                         <div className="mt-3 space-y-1">
                             {/* Accommodations */}
                             <Link href="/accommodations"

@@ -9,11 +9,15 @@ import { TransportationOffer } from "@/app/(model)/rideSharing/offer/offerModel"
 import { useSession } from "next-auth/react";
 import { RideListing } from '../../../(model)/rideSharing/RideListting/rideListtingModel';
 
+
+
+
 const ListingComponent = ({ rideListings: initialListings }) => {
     const [activeTab, setActiveTab] = useState("listings");
     const [selectedListing, setSelectedListing] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    
+
+
     // State for all listings, including status updates
     const [allListings, setAllListings] = useState(initialListings || []);
     // State for rides the user has booked
@@ -43,7 +47,7 @@ const ListingComponent = ({ rideListings: initialListings }) => {
             ? { ...listing, status: 'pending' } // Mark as pending if it's in myRides
             : listing
         );
-        setAllListings(updatedListings);
+        setAllListings(updatedListings);    
     }, [initialListings, myRides]);
 
     const formatDate = (isoString) => {
@@ -89,7 +93,7 @@ const ListingComponent = ({ rideListings: initialListings }) => {
 
         offerController.createOffer(offer)
             .then(() => {
-                // On successful offer creation, update the local state
+                // On successful offer creation, update the local state 
                 const newMyRides = [...myRides, listingToBook];
                 setMyRides(newMyRides);
                 localStorage.setItem('myRides', JSON.stringify(newMyRides));

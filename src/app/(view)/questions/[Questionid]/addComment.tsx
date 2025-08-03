@@ -36,7 +36,7 @@ const AddComment = ({questionId}: {questionId: string}) => {
     }
 
   return (
-    <div className="card fixed bottom-4 left-1/2 -translate-x-1/2 w-[95vw] max-w-2xl flex items-center gap-3 p-3 rounded-lg border-l-4 border-l-blue-500 shadow-lg border border-light-outline  bg-light-surface dark:bg-dark-surface z-50">
+    <div className="fixed bottom-0 right-8 w-full lg:w-[calc(100%-20rem)] bg-transparent px-4 py-3 flex gap-2 z-10  ">
       {/* User avatar placeholder */}
       <div className="">
         <UserCircleIcon className="w-9 h-9 text-primary/60" />
