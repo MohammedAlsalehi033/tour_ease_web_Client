@@ -230,9 +230,13 @@ const page = async () => {
     console.error('Error fetching offers:', error);
   }
 
+  // Split offers into active and outdated
+  const activeOffers = offers.filter(offer => !offer.isOutDated);
+  const outdatedOffers = offers.filter(offer => offer.isOutDated);
+
   return (
     <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 py-8">
-      <div className=" px-4">
+      <div className="px-4">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center mb-2">
@@ -248,20 +252,19 @@ const page = async () => {
               </p>
             </div>
           </div>
-          
-          {offers.length > 0 && (
+          {activeOffers.length > 0 && (
             <div className="flex items-center mt-4">
               <span className="text-sm font-medium px-3 py-1 bg-primary/10 text-primary rounded-full">
-                {offers.length} {offers.length === 1 ? 'notification' : 'notifications'}
+                {activeOffers.length} {activeOffers.length === 1 ? 'notification' : 'notifications'}
               </span>
             </div>
           )}
         </div>
 
-        {/* Notifications List */}
-        {offers && offers.length > 0 ? (
+        {/* Active Notifications List */}
+        {activeOffers.length > 0 ? (
           <div className="space-y-4">
-            {offers.map(offer => (
+            {activeOffers.map(offer => (
               <NotificationCard key={offer.id} offer={offer} />
             ))}
           </div>
@@ -285,6 +288,20 @@ const page = async () => {
               <button className="btn-outlined py-3 px-6 rounded-full border border-light-outline dark:border-dark-outline text-light-on-surface dark:text-dark-on-surface hover:bg-light-surface-variant/30 dark:hover:bg-dark-surface-variant/30 transition-colors">
                 Create Listing
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Outdated Notifications Section */}
+        {outdatedOffers.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-title-md font-semibold mb-4 text-light-on-surface dark:text-dark-on-surface">
+              Outdated Notifications
+            </h2>
+            <div className="space-y-4">
+              {outdatedOffers.map(offer => (
+                <NotificationCard key={offer.id} offer={offer} />
+              ))}
             </div>
           </div>
         )}
