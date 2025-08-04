@@ -245,6 +245,7 @@
     border-top-right-radius: var(--radius-standard);
   }
 
+  
   /* Badge Components */
   .badge {
     @apply inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium;
@@ -282,6 +283,29 @@
   .accordion-content {
     @apply overflow-hidden transition-all duration-500 ease-in-out;
   }
+
+
+.ride-slider .swiper-button-next,
+.ride-slider .swiper-button-prev {
+    color: var(--primary-color); 
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.ride-slider .swiper-button-next::after,
+.ride-slider .swiper-button-prev::after {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+.dark .ride-slider .swiper-button-next,
+.dark .ride-slider .swiper-button-prev {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+  
 }
 
 

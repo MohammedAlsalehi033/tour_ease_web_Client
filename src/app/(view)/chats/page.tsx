@@ -15,6 +15,7 @@ import {
   Circle
 } from 'lucide-react';
 import Link from 'next/link';
+import { ShieldCheck, MessageSquareText, Users, CheckCircle } from 'lucide-react';
 
 const formatTimestamp = (timestamp: string | number | Date) => {
   const date = new Date(timestamp);
@@ -153,10 +154,59 @@ const LoginPrompt = () => {
 };
 
 
+// Add this component to your page file
+
+const ChatInstructionsPanel = () => {
+  return (
+    <div className="card sticky top-24 p-6 rounded-xl border border-light-outline/70 dark:border-dark-outline/70 bg-light-surface-container dark:bg-dark-surface-container">
+      <div className="flex items-center mb-4">
+        <div className="bg-primary/10 p-3 rounded-full mr-4">
+          <ShieldCheck className="w-6 h-6 text-primary" />
+        </div>
+        <div>
+          <h3 className="font-display text-title-lg font-medium text-light-on-surface dark:text-dark-on-surface">
+            Safe Chatting
+          </h3>
+          <p className="text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            A few friendly reminders.
+          </p>
+        </div>
+      </div>
+      
+      <ul className="space-y-4 font-sans text-body-lg">
+        <li className="flex items-start">
+          <CheckCircle className="w-5 h-5 text-primary mt-1 mr-3 flex-shrink-0" />
+          <span className="text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            Keep conversations focused on ride details and coordination.
+          </span>
+        </li>
+        <li className="flex items-start">
+          <CheckCircle className="w-5 h-5 text-primary mt-1 mr-3 flex-shrink-0" />
+          <span className="text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            Never share sensitive personal info like passwords or financial details.
+          </span>
+        </li>
+        <li className="flex items-start">
+          <CheckCircle className="w-5 h-5 text-primary mt-1 mr-3 flex-shrink-0" />
+          <span className="text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            Be respectful and courteous to your fellow ride-sharers.
+          </span>
+        </li>
+         <li className="flex items-start">
+          <CheckCircle className="w-5 h-5 text-primary mt-1 mr-3 flex-shrink-0" />
+          <span className="text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            Report any suspicious or inappropriate behavior immediately.
+          </span>
+        </li>
+      </ul>
+    </div>
+  );
+};
+
+
 const page = async () => {
   const session = (await getServerSession(authOptions as any)) as any;
   const userId = (session?.user as { id?: string })?.id;
-  
 
   if (!userId) {
     return <LoginPrompt />;
@@ -166,13 +216,16 @@ const page = async () => {
   try {
     const chatController = container.resolve(ChatController);
     chats = await chatController.fetchChats(userId);
-    console.log(chats)
   } catch (error) {
     console.error('Error fetching chats:', error);
   }
 
   return (
-    <div className="">
+    // Main container using Flexbox for columns on large screens
+    <div className="lg:flex lg:gap-8">
+
+      {/* Column 1: Main Content (your existing chat list) */}
+      <div className="lg:w-2/3 flex-shrink-0">
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between">
@@ -182,15 +235,13 @@ const page = async () => {
               </div>
               <div>
                 <h1 className="font-display text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface">
-                  Messages 
+                  Messages
                 </h1>
                 <p className="font-sans text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
                   Stay connected with your ride partners
                 </p>
               </div>
             </div>
-            
-           
           </div>
           {/* Search bar */}
           <div className="mt-6 flex items-center gap-2">
@@ -199,7 +250,6 @@ const page = async () => {
                 type="text"
                 placeholder="Search chats..."
                 className="input w-full pl-10 pr-4 py-3 rounded-xl shadow focus:ring-2 focus:ring-primary/30"
-                // onChange={...} // Add search logic if needed
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary/60" />
             </div>
@@ -209,14 +259,21 @@ const page = async () => {
         {/* Chats List */}
         {chats && chats.length > 0 ? (
           <div className="divide-y divide-light-outline/30 dark:divide-dark-outline/30 rounded-xl overflow-hidden shadow-sm">
-            {chats.map((chat, index) => (
-              <ChatItem key={`${chat.partnerId}-${index}`} chat={chat} />
+            {chats.map((chat) => (
+              <ChatItem key={chat.partnerId} chat={chat} />
             ))}
           </div>
         ) : (
           <EmptyState />
         )}
       </div>
+
+      {/* Column 2: Instructions Sidebar */}
+      <div className="hidden lg:block lg:w-1/3">
+        <ChatInstructionsPanel />
+      </div>
+
+    </div>
   );
 };
 
