@@ -39,38 +39,27 @@ export class UserRepository {
     }
   }
 
-  async getAllUsers(page: number = 1, pageSize: number = 10): Promise<UsersResponse> {
+  async updateUserProfilePicture(userId: string, mediaFile: File): Promise<any> {
     try {
-      const response = await this.apiService.get<UsersResponse>(
-        `/getUsers?page=${page}&limit=${pageSize}`
-      );
-      
-      if (!response.success) {
-        throw new Error('Failed to fetch users');
-      }
-      
-      return response;
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      throw error;
-    }
-  }
+      console.log(mediaFile.name)
+      const formData = new FormData();
+      formData.append('profilePicture', mediaFile);
 
-  async updateUserStatus(userId: string, status: 'active' | 'suspended' | 'blocked'): Promise<User> {
-    try {
-      const response = await this.apiService.put<UserResponse>(`/updateUser`, {
-        id: userId,
-        accountStatus: status
-      });
+
+      const response = await this.apiService.post<UserResponse>(`/profile-picture/${userId}`, formData , true);
       
       if (!response.success) {
-        throw new Error('Failed to update user status');
+              console.log(response)
+
+        throw new Error('Failed to update profile picture');
       }
       
       return response.data;
     } catch (error) {
-      console.error('Error updating user status:', error);
+      console.error('Error updating profile picture:', error);
       throw error;
     }
   }
+
+
 }

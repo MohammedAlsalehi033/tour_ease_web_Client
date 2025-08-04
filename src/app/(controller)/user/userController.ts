@@ -36,4 +36,21 @@ export class UserController {
       };
     }
   }
+
+  async updateUserProfilePicture(id: string, mediaFile: File): Promise<{ success: boolean; message?: string; data?: any }> {
+    try {
+      const updatedUser = await this.userRepository.updateUserProfilePicture(id, mediaFile);
+      return {
+        success: true,
+        message: 'Profile picture updated successfully',
+        data: updatedUser
+      };
+    } catch (error: any) {
+      console.error(`Error in UserController updateUserProfilePicture for ID ${id}:`, error.message);
+      return {
+        success: false,
+        message: `Failed to update profile picture: ${error.message}`
+      };
+    }
+  }
 }
