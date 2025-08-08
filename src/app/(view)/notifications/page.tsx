@@ -1,4 +1,7 @@
+import 'reflect-metadata';
+
 import React from 'react'
+
 import { container } from '@/app/lib/diContainer';
 import { OfferController } from '../../(controller)/rideSharing/offerController';
 import { getServerSession } from 'next-auth';
@@ -17,6 +20,12 @@ import {
   User
 } from 'lucide-react';
 import { TransportationOffer } from '@/app/(model)/rideSharing/offer/offerModel';
+import Link from 'next/link';
+import AcceptButton from './components/acceptButton';
+import RejectButton from './components/rejectButton';
+import { off } from 'process';
+import otherAvatarPic from '../components/otherAvatarPic';
+import OtherAvatarPic from '../components/otherAvatarPic';
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -73,7 +82,11 @@ const NotificationCard = ({ offer } : { offer: TransportationOffer }) => {
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center">
           <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-medium mr-3">
-            {offer.sender?.username?.charAt(0)?.toUpperCase() || "U"}
+            {offer.sender?.mediaUrls?.length > 0 ?
+               <OtherAvatarPic imageUrl={offer.sender?.mediaUrls[0]} otherUserId={offer.senderId} />
+               :
+              <div className='text-2xl'>{offer.sender.username.charAt(0)}</div>
+              }
           </div>
           <div>
             <h3 className="text-title-md font-medium text-light-on-surface dark:text-dark-on-surface">
@@ -180,32 +193,16 @@ const NotificationCard = ({ offer } : { offer: TransportationOffer }) => {
 
       {/* Action Buttons - Only show for pending offers */}
       {offer.status === 'pending' && offer.isOutDated === false && (
-        <div className="flex gap-3">
-          <form action="/api/offers/accept" method="POST" className="flex-1">
-            <input type="hidden" name="offerId" value={offer.id} />
-            <button 
-              type="submit"
-              className="w-full btn-primary py-3 px-4 rounded-full bg-green-600 text-white font-medium flex items-center justify-center hover:bg-green-700 transition-colors"
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              Accept Offer
-            </button>
-          </form>
+        <div className="flex gap-3 flex-row sm:flex-col">
           
-          <form action="/api/offers/reject" method="POST" className="flex-1">
-            <input type="hidden" name="offerId" value={offer.id} />
-            <button 
-              type="submit"
-              className="w-full btn-outlined py-3 px-4 rounded-full border border-red-300 text-red-600 dark:text-red-400 dark:border-red-600 font-medium flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-            >
-              <XCircle className="w-4 h-4 mr-2" />
-              Decline
+          <AcceptButton offer={offer} />
+          <RejectButton offer={offer} />
+
+          <Link href={`/chats/${offer.senderId}`} className="btn-outlined py-3 px-4 rounded-full border border-light-outline dark:border-dark-outline text-light-on-surface dark:text-dark-on-surface font-medium flex items-center justify-center hover:bg-light-surface-variant/30 dark:hover:bg-dark-surface-variant/30 transition-colors">
+            <button>
+              <MessageCircle className="w-4 h-4" />
             </button>
-          </form>
-          
-          <button className="btn-outlined py-3 px-4 rounded-full border border-light-outline dark:border-dark-outline text-light-on-surface dark:text-dark-on-surface font-medium flex items-center justify-center hover:bg-light-surface-variant/30 dark:hover:bg-dark-surface-variant/30 transition-colors">
-            <MessageCircle className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
       )}
     </div>

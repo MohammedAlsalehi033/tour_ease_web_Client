@@ -137,6 +137,16 @@
      @apply shadow-lg;
      background-color: rgb(var(--primary-dark));
   }
+
+  .btn-danger {
+    @apply btn text-white active:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed;
+    background-color: rgb(var(--error));
+  }
+
+  .btn-danger:hover {
+    @apply shadow-lg;
+    background-color: rgb(var(--error) , 0.8);
+  }
   
   /* Outlined Button */
   .btn-outlined {

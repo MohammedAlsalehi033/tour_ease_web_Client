@@ -6,13 +6,15 @@ import React from 'react';
 import { ArrowUpIcon, ArrowDownIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import AddComment from './addComment';
 import VoteComponents from './voteComponents';
+import EditQuestion from './EditQuestion';
+import OtherAvatarPic from '../../components/otherAvatarPic';
 
 const page = async ({ params }: { params: { Questionid: string } }) => {
   const questionController = container.resolve(QuestionsController);
-  console.log(params.Questionid);
   const question = await questionController.getQuestion(params.Questionid);
   const commentsController = container.resolve(CommentsController);
   const comments: Comment[] = await commentsController.getComments(params.Questionid);
+  console.log(question  );
 
   // Helper for relative time
   function timeAgo(dateString: string) {
@@ -26,9 +28,11 @@ const page = async ({ params }: { params: { Questionid: string } }) => {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
+
   return (
     <div className="max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide transition-colors duration-300 flex flex-col items-center justify-start pt-16 bg-light-background dark:bg-dark-background">
       <div className="w-full px-4">
+        
         {/* Question Card */}
         <div className="relative flex bg-gradient-to-br from-primary/10 to-light-surface dark:to-dark-surface rounded-2xl shadow-xl border border-primary/20 dark:border-dark-outline/40 mb-10 overflow-hidden">
           {/* Vertical Accent Bar */}
@@ -42,11 +46,7 @@ const page = async ({ params }: { params: { Questionid: string } }) => {
             {/* User Header */}
             <div className="flex items-center gap-3 mb-2">
               {question.user.mediaUrls && question.user.mediaUrls[0] ? (
-                <img
-                  src={question.user.mediaUrls[0]}
-                  alt="avatar"
-                  className="h-12 w-12 rounded-full object-cover object-center border-2 border-primary shadow"
-                />
+               <OtherAvatarPic imageUrl={question.user.mediaUrls[0]} otherUserId={question.user.id} />
               ) : (
                 <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-lg border-2 border-primary shadow">
                   {question.user.username ? question.user.username[0].toUpperCase() : '?'}
@@ -56,6 +56,7 @@ const page = async ({ params }: { params: { Questionid: string } }) => {
               <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
                 {timeAgo(question.createdAt)}
               </span>
+              <EditQuestion currentDescription={question.description} currentTitle={question.title} questionId={question.id.toString()} />
             </div>
             <div className="border-b border-primary/10 dark:border-dark-outline/30 mb-3" />
             <h1 className="text-title-lg font-bold mb-2 text-dark-on-surface dark:text-light-on-surface">{question.title}</h1>

@@ -40,4 +40,23 @@ export class OfferController {
             throw error;
         }
     }
+    async acceptOffer(offerId: number): Promise<TransportationOffer> {
+        try {
+            const acceptedOffer = await this.offerRepo.acceptOffer(offerId);
+            return acceptedOffer;
+        } catch (error) {
+            console.error('Error accepting offer:', error);
+            throw error;
+        }
+    }
+    async rejectOffer(offerId: number): Promise<TransportationOffer> {
+        try {
+            const rejectedOffer = await this.offerRepo.rejectOffer(offerId);
+            return rejectedOffer;
+        } catch (error) {
+            console.error('Error rejecting offer:', error);
+            throw error;
+        }
+    }
+
 }

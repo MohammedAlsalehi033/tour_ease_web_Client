@@ -48,4 +48,40 @@ export class QuestionsController {
             throw new Error(`Failed to ask AI: ${(error as Error).message}`);
         }
     }
-}
+
+    async editQuestion(questionId: number, questionTitle: string, questionDescription: string): Promise<Question> {
+        try {
+            const question: Question = {
+                id: questionId,
+                title: questionTitle,
+                description: questionDescription,
+                userId: "",
+                upvotes: 0,
+                downvotes: 0,
+                updatedAt: "",
+                createdAt: "",
+                tags: [],
+                user: {
+                    id: "",
+                    username: "",
+                    mediaUrls: []
+                },
+                vote: [],
+                _count: {
+                    comments: 0
+                }
+            };
+            return await this.questionsRepo.editQuestion(question);
+        } catch (error) {
+            throw new Error(`Failed to edit question with id ${questionId}: ${(error as Error).message}`);
+        }
+    }
+
+    async deleteQuestion (questionId : string){
+        try {
+            return await this.questionsRepo.deleteQuestion(questionId);
+        } catch (error) {
+            throw new Error (`failed to delete ${error}`)
+        }
+    }
+    }
