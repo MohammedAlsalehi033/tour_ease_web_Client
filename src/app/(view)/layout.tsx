@@ -13,6 +13,7 @@ import SidebarSkeleton from './components/SidebarSkeleton';
 import { container } from 'tsyringe';
 import { BookingController } from '../(controller)/rideSharing/bookingController';
 import localFont from 'next/font/local';
+import NotificationIcon from './components/notificationIcon';
 
 
 export const myFont = localFont({
@@ -60,6 +61,7 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
   // const { hasActiveRide } = await getActiveRideStatus();
 
+
   return (
     <html lang="en">
       <head>
@@ -69,6 +71,7 @@ export default async function RootLayout({
         <ThemeProvider attribute="class">
           <Suspense fallback={<SidebarSkeleton />}>
             <MySideBar hasActiveRide={false} />
+            <NotificationIcon />
           </Suspense>
           <Providers>
             <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72  p-5  md:p-5">

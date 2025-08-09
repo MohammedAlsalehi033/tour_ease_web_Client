@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -9,6 +9,12 @@ import {
     QuestionMarkCircleIcon, ChevronDownIcon, ChevronRightIcon, BellIcon, Bars3Icon
 } from '@heroicons/react/24/outline';
 import ThemeToggler from './themeToggler';
+
+
+
+
+
+
 
 // Helper component for animated links
 const NavLink = ({ href, icon: Icon, text, isActive, hasActiveRide, isSubLink = false, animationDelay = 0 }) => (
@@ -38,6 +44,9 @@ const UserSidebar = ({ hasActiveRide }) => {
     ];
     const cyclingText = ["TourEase", ...slogans];
 
+
+    useEffect(() => {
+    }, []);
     // Effect for cycling through slogans
     useEffect(() => {
         const intervalId = setInterval(() => {
