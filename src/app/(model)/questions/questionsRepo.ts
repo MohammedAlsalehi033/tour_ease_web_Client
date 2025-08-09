@@ -2,6 +2,8 @@ import { injectable } from "tsyringe";
 import { Question } from "./questionsModel";
 import { ApiService } from "@/app/services/apiService";
 import { ResponseModel } from "@/Types/types";
+import EditQuestion from '../../(view)/questions/[Questionid]/EditQuestion';
+import { promises } from "dns";
 
 @injectable()
 export class QuestionsRepo {
@@ -9,12 +11,12 @@ export class QuestionsRepo {
 
     async getAllQuestions(page: number = 1, limit: number = 10): Promise<Question[]> {
         const response = await this.apiService.get<ResponseModel<Question>>(`/questions?page=${page}&limit=${limit}`);
-        return response.data;
+        return response.data as Question[];
     }
 
     async getQuestion(id: string): Promise<Question> {
         const response = await this.apiService.get<ResponseModel<Question>>(`/questions/${id}`);
-        return response.data;
+        return response.data as Question;
     }
 
     async voteQuestion(id: number, userId: string, isUpVote: boolean): Promise<Question> {
@@ -23,7 +25,7 @@ export class QuestionsRepo {
             userId,
             isUpVote,
         });
-        return response.data;
+        return response.data as Question;
     }
 
 
@@ -38,5 +40,15 @@ export class QuestionsRepo {
         console.log(response.data);
         return response.data;
     }
-    
+
+    async editQuestion (question: Question): Promise<Question>{
+
+        const response = await this.apiService.put<ResponseModel<Question>>(`/questions/${question.id}`, question);
+        return response.data as Question;
+    }
+
+    async deleteQuestion (questionId : string): Promise<Question>{
+        const response = await this.apiService.delete<ResponseModel<Question>>(`/questions/${questionId}`);
+        return response.data as Question;
+    }
 }
