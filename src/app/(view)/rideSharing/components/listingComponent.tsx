@@ -16,6 +16,7 @@ const ListingComponent = ({ rideListings: initialListings }) => {
     const [activeTab, setActiveTab] = useState("listings");
     const [selectedListing, setSelectedListing] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    console.log(initialListings)
 
 
     // State for all listings, including status updates
