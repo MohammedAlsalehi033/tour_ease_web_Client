@@ -71,9 +71,10 @@ export default async function RootLayout({
         <ThemeProvider attribute="class">
           <Suspense fallback={<SidebarSkeleton />}>
             <MySideBar hasActiveRide={false} />
-            <NotificationIcon />
           </Suspense>
           <Providers>
+                        <NotificationIcon />
+
             <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72  p-5  md:p-5">
               {children}
             </div>

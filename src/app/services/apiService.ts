@@ -100,7 +100,7 @@ export class ApiService {
   async post<T>(url: string, body: Record<string, any> = {}, isFormData: boolean = false): Promise<T> {
     const options: FetchOptions = {
       method: 'POST',
-      // //headers: await this.getHeaders(),
+      headers: isFormData ? {} : {"Content-Type": "application/json"},
       body: isFormData ? body : JSON.stringify(body),
     };
 
