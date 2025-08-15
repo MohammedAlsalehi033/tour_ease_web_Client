@@ -5,14 +5,15 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust path
 
 interface FetchOptions {
   method: string;
-  //headers: Record<string, string>;
+  headers: Record<string, string>;
   body?: string;
 }
 
 @injectable()
 export class ApiService {
-  readonly baseUrl: string = 'http://13.201.19.41:3003/api';
-  readonly baseUrl2: string = 'http://localhost:3000/api';
+  readonly baseUrl2: string = 'http://13.201.19.41:3003/api';
+  readonly baseUrl: string = 'http://localhost:3000/api';
+
 
   constructor() {
     // Constructor should be synchronous - we'll get session in methods instead
@@ -30,7 +31,7 @@ export class ApiService {
   }
 
   // Helper method to get token from localStorage (client-side)
-  private getClientAuthToken(): string | null {
+  private  getClientAuthToken(): string | null {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('auth_token');
     }
@@ -49,17 +50,17 @@ export class ApiService {
     }
   }
 
-  // Helper method to prepare request //headers
-  // private async getHeaders(): Promise<Record<string, string>> {
+  private async getHeaders(): Promise<Record<string, string>> {
   
 
-  //   // const token = await this.getAuthToken();
-  //   // if (token) {
-  //   //   //headers['Authorization'] = `Bearer ${token}`;
-  //   // }
+    const token = await this.getAuthToken();
+    let headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
 
-  //   return //headers;
-  // }
+    return headers;
+  }
 
   // Generic fetch method with error handling
   private async fetchWithErrorHandling<T>(
@@ -67,7 +68,7 @@ export class ApiService {
     options: FetchOptions
   ): Promise<T> {
     try {
-      console.log(`${this.baseUrl}${url}`, options);
+      console.log(`${this.baseUrl}${url}`);
       const response = await fetch(`${this.baseUrl}${url}`, options);
       // Handle HTTP errors
       if (!response.ok) {
@@ -90,7 +91,7 @@ export class ApiService {
   async get<T>(url: string): Promise<T> {
     const options: FetchOptions = {
       method: 'GET',
-      //headers: await this.getHeaders(),
+      headers: await this.getHeaders(),
     };
 
     return this.fetchWithErrorHandling<T>(url, options);
@@ -100,7 +101,7 @@ export class ApiService {
   async post<T>(url: string, body: Record<string, any> = {}, isFormData: boolean = false): Promise<T> {
     const options: FetchOptions = {
       method: 'POST',
-      // //headers: await this.getHeaders(),
+      headers: await this.getHeaders(),
       body: isFormData ? body : JSON.stringify(body),
     };
 
@@ -111,7 +112,7 @@ export class ApiService {
   async put<T>(url: string, body: Record<string, any> = {}): Promise<T> {
     const options: FetchOptions = {
       method: 'PUT',
-      //headers: await this.getHeaders(),
+      headers: await this.getHeaders(),
       body: JSON.stringify(body),
     };
 
@@ -122,7 +123,7 @@ export class ApiService {
   async patch<T>(url: string, body: Record<string, any> = {}): Promise<T> {
     const options: FetchOptions = {
       method: 'PATCH',
-      //headers: await this.getHeaders(),
+      headers: await this.getHeaders(),
       body: JSON.stringify(body),
     };
 
@@ -133,7 +134,7 @@ export class ApiService {
   async delete<T>(url: string): Promise<T> {
     const options: FetchOptions = {
       method: 'DELETE',
-      //headers: await this.getHeaders(),
+      headers: await this.getHeaders(),
     };
 
     return this.fetchWithErrorHandling<T>(url, options);
