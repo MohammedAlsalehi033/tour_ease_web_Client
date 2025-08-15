@@ -3,6 +3,7 @@ import { initializeApp, getApps } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
+import { getMessaging, getToken } from "firebase/messaging";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -20,10 +21,11 @@ const firebaseConfig = {
   measurementId: "G-6TS100MM1D"
 };
 
-// Initialize Firebase
+
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
 
-export { app,auth, database  };
+export { app,auth, database };

@@ -12,7 +12,6 @@
 
   const Profile = async () => {
     const session = await getServerSession(authOptions);
-
     if (!session || !session.user) {
       redirect("/api/auth/signin");
     }
