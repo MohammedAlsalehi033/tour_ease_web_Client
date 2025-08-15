@@ -53,7 +53,7 @@
                   <div>
                     <p className="font-sans text-body-sm text-gray-500 dark:text-gray-400">Email</p>
                     <p className="font-sans text-body-lg">{session.user.email || "No email provided"}</p>
-                    <p className="font-sans text-body-lg">{session.user.email || "No email provided"}</p>
+                    <p className="font-sans text-body-lg">{session.user.firebaseToken || "No email provided"}</p>
                   </div>
                   
                   {session.user.id && (

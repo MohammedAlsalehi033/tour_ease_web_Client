@@ -2,6 +2,8 @@
 import { injectable } from 'tsyringe';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust path as needed
+import { auth } from '@/lib/firebase';
+import { getSession } from 'next-auth/react';
 
 interface FetchOptions {
   method: string;
@@ -14,61 +16,52 @@ export class ApiService {
   readonly baseUrl2: string = 'http://13.201.19.41:3003/api';
   readonly baseUrl: string = 'http://localhost:3000/api';
 
-
   constructor() {
-    // Constructor should be synchronous - we'll get session in methods instead
+
   }
 
-  // Helper method to get Firebase token from session (server-side)
-  private async getServerAuthToken(): Promise<string | null> {
-    try {
-      const session = await getServerSession(authOptions);
-      return session?.user?.firebaseToken || null;
-    } catch (error) {
-      console.error('Error getting server session:', error);
-      return null;
-    }
-  }
+   private async getAuthToken(): Promise<string | null> {
 
-  // Helper method to get token from localStorage (client-side)
-  private  getClientAuthToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth_token');
-    }
-    return null;
-  }
-
-  // Get appropriate auth token based on environment
-  private async getAuthToken(): Promise<string | null> {
-    // Check if we're on server or client
     if (typeof window === 'undefined') {
-      // Server-side: get from NextAuth session
-      return await this.getServerAuthToken();
-    } else {
-      // Client-side: get from localStorage
-      return this.getClientAuthToken();
+      try {
+        const session = await getServerSession(authOptions);
+        return session?.user?.firebaseToken || null;
+      } catch (error) {
+        console.error('Error getting server session:', error);
+        return null;
+      }
+    } 
+    
+    else {
+      try {
+          const seestion = await getSession();
+          console.log(seestion)
+          return seestion?.user?.firebaseToken ?? ""
+       
+      } catch (error) {
+        console.error('Error getting client-side Firebase token:', error);
+        return null;
+      }
     }
   }
 
   private async getHeaders(): Promise<Record<string, string>> {
-  
-
     const token = await this.getAuthToken();
-    let headers = {};
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-
     return headers;
   }
-
   // Generic fetch method with error handling
   private async fetchWithErrorHandling<T>(
     url: string,
     options: FetchOptions
   ): Promise<T> {
     try {
-      console.log(`${this.baseUrl}${url}`);
+      console.log(`${this.baseUrl}${url}`, options);
       const response = await fetch(`${this.baseUrl}${url}`, options);
       // Handle HTTP errors
       if (!response.ok) {
@@ -99,9 +92,14 @@ export class ApiService {
 
   // POST request method
   async post<T>(url: string, body: Record<string, any> = {}, isFormData: boolean = false): Promise<T> {
+    let header = await this.getHeaders();
+    console.log(header)
+    if(isFormData){
+     header = {...await this.getHeaders(), "Content-Type": "application/json" }
+    }
     const options: FetchOptions = {
       method: 'POST',
-      headers: await this.getHeaders(),
+      headers: header,
       body: isFormData ? body : JSON.stringify(body),
     };
 
