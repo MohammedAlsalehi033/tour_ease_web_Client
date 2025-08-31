@@ -59,7 +59,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
-  // const { hasActiveRide } = await getActiveRideStatus();
+  const { hasActiveRide } = await getActiveRideStatus();
 
 
   return (
@@ -70,7 +70,7 @@ export default async function RootLayout({
       <body className="font-lina font-rounded">
         <ThemeProvider attribute="class">
           <Suspense fallback={<SidebarSkeleton />}>
-            <MySideBar hasActiveRide={false} />
+            <MySideBar hasActiveRide={hasActiveRide} />
           </Suspense>
           <Providers>
                         <NotificationIcon />

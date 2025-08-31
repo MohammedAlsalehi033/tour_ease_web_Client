@@ -56,6 +56,7 @@ export default function Page() {
 
  
         const onNewMessage = (message: ChatMessage) => {
+            console.log(message)
             setMessages(prevMessages => [...prevMessages, message]);
         };
 
