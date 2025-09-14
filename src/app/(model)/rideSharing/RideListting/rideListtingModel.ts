@@ -25,7 +25,7 @@ export interface RideListing {
   departureTime: string;
   seatsAvailable: number;
   pricePerSeat: string;
-  status: 'active' | 'pending' | 'completed' | 'cancelled';
+  status: 'active' | 'pending' | 'complete' | 'cancelled';
   mediaUrls: string[];
   createdAt: string;
   distance_km: number;

@@ -118,7 +118,7 @@ const ActiveRidePage = () => {
         if (!activeRideDetails) return;
         try {
             const bookingController = container.resolve(BookingController);
-            const response = await bookingController.updateBookingStatus(activeRideDetails.id, 'completed');
+            const response = await bookingController.updateBookingStatus(activeRideDetails.id, 'complete');
             if (response.success) {
                 window.location.reload();
             } else {

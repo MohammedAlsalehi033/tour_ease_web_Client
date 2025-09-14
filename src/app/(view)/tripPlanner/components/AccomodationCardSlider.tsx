@@ -70,7 +70,7 @@ export interface AccommodationListing {
         };
         accountStatus: 'active' | 'blocked' | 'pending';
     };
-    status: 'active' | 'pending' | 'completed' | 'cancelled';
+    status: 'active' | 'pending' | 'complete' | 'cancelled';
     distance_km: number;
 }
 
