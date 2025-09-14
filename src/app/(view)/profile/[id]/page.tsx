@@ -52,9 +52,9 @@ const UserProfilePage = async ({ params }: { params: { id: string } }) => {
       <div className="max-w-4xl mx-auto">
         
         {/* User Profile Card */}
-        <div className="card shadow-lg rounded-lg p-6 mb-8 dark:border-dark-outline border border-light-outline ">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <OtherAvatarPic imageUrl={userData.mediaUrls[0]} otherUserId={userData.id}/>
+          <div className="card shadow-lg rounded-lg p-6 mb-8 dark:border-dark-outline border border-light-outline ">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+              <OtherAvatarPic imageUrl={userData.mediaUrls[0]} otherUserId={userData.id}/>
             <div className="flex-1 text-center md:text-left">
               <h1 className="font-display text-headline-lg font-bold mb-2">{userData.name || "User"}</h1>
               

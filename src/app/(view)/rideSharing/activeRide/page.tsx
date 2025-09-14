@@ -10,6 +10,7 @@ import { container } from '@/app/lib/diContainer';
 import { ResponseModel } from '@/Types/types';
 import { Booking } from "@/app/(model)/rideSharing/booking/bookingModel";
 import ReviewSubmissionModal from '../../components/ReviewSubmissionModal';
+import OtherAvatarPic from '../../components/otherAvatarPic';
 
 // A normalized structure for ride details, making the UI logic clean.
 type NormalizedRideDetails = {
@@ -197,7 +198,7 @@ const ActiveRidePage = () => {
                                 </h2>
                                 <div className="flex items-center space-x-4">
                                     {otherUserDetails.mediaUrls && otherUserDetails.mediaUrls.length > 0 ? (
-                                        <img src={otherUserDetails.mediaUrls[0]} alt="Profile" className="h-16 w-16 rounded-full object-cover" />
+                                        <OtherAvatarPic imageUrl={otherUserDetails.mediaUrls[0]} otherUserId={otherUserDetails.id} />
                                     ) : (
                                         <UserCircleIcon className="h-16 w-16 text-gray-400" />
                                     )}

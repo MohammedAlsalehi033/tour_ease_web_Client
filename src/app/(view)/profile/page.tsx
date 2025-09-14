@@ -9,7 +9,7 @@
   import { User } from '@/app/(model)/user/userModel';
   import ProviderRatingDisplay from '../components/ProviderRatingDisplay';
   import DriverReviewsSection from '../components/DriverReviewsSection';
-  import AvatarImage from './components/avatarImage';
+import AvatarImage from './components/avatarImage';
 
 
   const Profile = async () => {
