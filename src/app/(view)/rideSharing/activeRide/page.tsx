@@ -9,6 +9,7 @@ import { BookingController } from '../../../(controller)/rideSharing/bookingCont
 import { container } from '@/app/lib/diContainer';
 import { ResponseModel } from '@/Types/types';
 import { Booking } from "@/app/(model)/rideSharing/booking/bookingModel";
+import ReviewSubmissionModal from '../../components/ReviewSubmissionModal';
 
 // A normalized structure for ride details, making the UI logic clean.
 type NormalizedRideDetails = {
@@ -38,6 +39,8 @@ const ActiveRidePage = () => {
     const [otherUserId, setOtherUserId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [showReviewModal, setShowReviewModal] = useState<boolean>(false);
+    const [rideData, setRideData] = useState<Booking | null>(null);
 
     useEffect(() => {
         async function fetchActiveRide() {
@@ -92,6 +95,7 @@ const ActiveRidePage = () => {
                         setActiveRideDetails(normalizedDetails);
                         setOtherUserDetails(otherUser);
                         setUserRole(role);
+                        setRideData(rideData);
                     } else {
                         setError("Could not parse ride details.");
                     }
@@ -124,6 +128,22 @@ const ActiveRidePage = () => {
             console.error("Error updating booking status:", err);
             setError("An error occurred while completing the ride.");
         }
+    };
+
+    const handleReviewSubmit = () => {
+        // After review is submitted, mark the ride as complete
+        handleMarkAsComplete();
+    };
+
+    const getReviewTitle = () => {
+        if (!rideData) return '';
+        
+        if (rideData.listing) {
+            return `${rideData.listing.startLocationText} → ${rideData.listing.endLocationText}`;
+        } else if (rideData.request) {
+            return `${rideData.request.startLocationText} → ${rideData.request.endLocationText}`;
+        }
+        return 'Transportation Service';
     };
 
     // --- Helper Functions (formatDate, getStatusColor) ---
@@ -194,7 +214,7 @@ const ActiveRidePage = () => {
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Link href={otherUserId ? `/rideSharing/activeRide/map/${otherUserId}` : '#'} passHref className="flex-1"><button disabled={!otherUserId} className="btn-outlined w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"><MapPinIcon className="h-5 w-5" /><span>Check Location</span></button></Link>
                                 <button disabled={!otherUserId} className="btn-outlined flex-1 w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"><ChatBubbleLeftRightIcon className="h-5 w-5" /><span>Chat with {userRole === 'traveler' ? 'Driver' : 'Traveler'}</span></button>
-                                <button onClick={() => handleMarkAsComplete()} className="btn-primary flex-1 w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-lg bg-success text-white hover:bg-success/90 transition-colors duration-200 font-medium"><CheckCircleIcon className="h-5 w-5" /><span>Mark as Complete</span></button>
+                                <button onClick={() => setShowReviewModal(true)} className="btn-primary flex-1 w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-lg bg-success text-white hover:bg-success/90 transition-colors duration-200 font-medium"><CheckCircleIcon className="h-5 w-5" /><span>Mark as Complete</span></button>
                             </div>
                         </div>
 
@@ -209,6 +229,18 @@ const ActiveRidePage = () => {
                     </div>
                 )}
             </div>
+
+            {/* Review Submission Modal */}
+            {rideData && (
+                <ReviewSubmissionModal
+                    isOpen={showReviewModal}
+                    onClose={() => setShowReviewModal(false)}
+                    onSubmit={handleReviewSubmit}
+                    reviewableType="TRANSPORTATION_BOOKING"
+                    reviewableId={parseInt(rideData.id.toString())}
+                    title={getReviewTitle()}
+                />
+            )}
         </main>
     );
 };

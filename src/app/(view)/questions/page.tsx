@@ -4,11 +4,14 @@ import { container } from 'tsyringe';
 import { QuestionsController } from '@/app/(controller)/questions/questionsController';
 import { Question } from '@/app/(model)/questions/questionsModel';
 import Link from 'next/link';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import ReportQuestionButton from '../components/ReportQuestionButton';
 // Added FaQuestionCircle and FaSearch for the new header and search bar
 import { FaCity, FaUtensils, FaHotel, FaLandmark, FaCalendarAlt, FaBus, FaShoppingBag, FaFilm, FaMapMarkerAlt, FaStoreAlt, FaQuestionCircle, FaSearch } from 'react-icons/fa';
 
 // This component remains unchanged
-function QuestionsList({ questions }: { questions: Question[] }) {
+function QuestionsList({ questions, currentUserId }: { questions: Question[], currentUserId?: string }) {
   // Helper for relative time
   function timeAgo(dateString: string) {
     const now = new Date();
@@ -44,9 +47,17 @@ function QuestionsList({ questions }: { questions: Question[] }) {
                 <span className="font-semibold text-lg text-primary group-hover:text-primary-dark dark:group-hover:text-primary-light transition-colors">
                   {question.user.username}
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {timeAgo(question.createdAt)}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {timeAgo(question.createdAt)}
+                  </span>
+                  <ReportQuestionButton 
+                    questionId={question.id.toString()}
+                    questionTitle={question.title}
+                    currentUserId={currentUserId}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  />
+                </div>
               </div>
               <div className="mt-2">
                 <span className="block text-title-md font-bold text-dark-on-surface dark:text-light-on-surface mb-1">
@@ -107,9 +118,12 @@ function QuestionsSkeleton() {
 // This component remains unchanged
 async function QuestionsContent() {
   try {
+    const session = (await getServerSession(authOptions as any)) as any;
+    const currentUserId = (session?.user as { id?: string })?.id;
+    
     const questionsController = container.resolve(QuestionsController);
     const questions: Question[] = await questionsController.getAllQuestions();
-    return <QuestionsList questions={questions} />;
+    return <QuestionsList questions={questions} currentUserId={currentUserId} />;
   } catch {
     return (
       <div className="card text-center text-red-600 bg-red-50 dark:bg-red-900/20 p-8 rounded-2xl">

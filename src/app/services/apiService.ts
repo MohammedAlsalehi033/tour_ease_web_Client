@@ -13,7 +13,7 @@ interface FetchOptions {
 
 @injectable()
 export class ApiService {
-  readonly baseUrl: string = 'http://13.201.19.41:3003/api';
+  readonly baseUrl: string = 'http://52.66.238.242:3003/api';
   readonly baseUrl2: string = 'http://localhost:3000/api';
 
   constructor() {
@@ -25,7 +25,7 @@ export class ApiService {
     if (typeof window === 'undefined') {
       try {
         const session = await getServerSession(authOptions);
-        return session?.user?.firebaseToken || null;
+        return (session?.user as any)?.firebaseToken || null;
       } catch (error) {
         console.error('Error getting server session:', error);
         return null;
@@ -36,7 +36,7 @@ export class ApiService {
       try {
           const seestion = await getSession();
           console.log(seestion)
-          return seestion?.user?.firebaseToken ?? ""
+          return (seestion?.user as any)?.firebaseToken ?? ""
        
       } catch (error) {
         console.error('Error getting client-side Firebase token:', error);
@@ -100,7 +100,7 @@ export class ApiService {
     const options: FetchOptions = {
       method: 'POST',
       headers: header,
-      body: isFormData ? body : JSON.stringify(body),
+      body: isFormData ? (typeof body === 'string' ? body : JSON.stringify(body)) : JSON.stringify(body),
     };
 
     return this.fetchWithErrorHandling<T>(url, options);
@@ -137,4 +137,5 @@ export class ApiService {
 
     return this.fetchWithErrorHandling<T>(url, options);
   }
+
 }

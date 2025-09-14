@@ -3,13 +3,21 @@ import { QuestionsController } from '@/app/(controller)/questions/questionsContr
 import { Comment } from '@/app/(model)/questions/comments/commentsModel';
 import { container } from '@/app/lib/diContainer';
 import React from 'react';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { ArrowUpIcon, ArrowDownIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import AddComment from './addComment';
 import VoteComponents from './voteComponents';
 import EditQuestion from './EditQuestion';
 import OtherAvatarPic from '../../components/otherAvatarPic';
+import ReportQuestionButton from '../../components/ReportQuestionButton';
+import ReportCommentButton from '../../components/ReportCommentButton';
 
 const page = async ({ params }: { params: { Questionid: string } }) => {
+  // Get current user session
+  const session = (await getServerSession(authOptions as any)) as any;
+  const currentUserId = (session?.user as { id?: string })?.id;
+
   const questionController = container.resolve(QuestionsController);
   const question = await questionController.getQuestion(params.Questionid);
   const commentsController = container.resolve(CommentsController);
@@ -56,7 +64,14 @@ const page = async ({ params }: { params: { Questionid: string } }) => {
               <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
                 {timeAgo(question.createdAt)}
               </span>
-              <EditQuestion currentDescription={question.description} currentTitle={question.title} questionId={question.id.toString()} />
+              <div className="flex items-center gap-2">
+                <ReportQuestionButton 
+                  questionId={question.id.toString()}
+                  questionTitle={question.title}
+                  currentUserId={currentUserId}
+                />
+                <EditQuestion currentDescription={question.description} currentTitle={question.title} questionId={question.id.toString()} />
+              </div>
             </div>
             <div className="border-b border-primary/10 dark:border-dark-outline/30 mb-3" />
             <h1 className="text-title-lg font-bold mb-2 text-dark-on-surface dark:text-light-on-surface">{question.title}</h1>
@@ -101,9 +116,16 @@ const page = async ({ params }: { params: { Questionid: string } }) => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-md text-primary">{comment.user.username}</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
-                    {timeAgo(comment.createdAt)}
-                  </span>
+                  <div className="flex items-center gap-2 ml-auto">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {timeAgo(comment.createdAt)}
+                    </span>
+                    <ReportCommentButton 
+                      commentId={comment.id.toString()}
+                      commentContent={comment.content}
+                      currentUserId={currentUserId}
+                    />
+                  </div>
                 </div>
                 <p className="text-body-md text-gray-700 dark:text-gray-300">{comment.content}</p>
               </div>

@@ -8,8 +8,12 @@ import { OfferController } from '../../../(controller)/rideSharing/offerControll
 import { TransportationOffer } from "@/app/(model)/rideSharing/offer/offerModel";
 import { useSession } from "next-auth/react";
 import { RideListing } from '../../../(model)/rideSharing/RideListting/rideListtingModel';
+import ReportListingButton from '../../components/ReportListingButton';
+import RatingDisplay from '../../components/RatingDisplay';
+import { useReviewStats } from '../../components/useReviewStats';
+import DriverReviewsCompact from '../../components/DriverReviewsCompact';
 
-
+    
 
 
 const ListingComponent = ({ rideListings: initialListings }) => {
@@ -121,6 +125,76 @@ const ListingComponent = ({ rideListings: initialListings }) => {
         }
     };
     
+    // Helper component for individual ride listing with rating
+    const RideListingItem = ({ listing }) => {
+        const { stats } = useReviewStats('TRANSPORTATION_LISTING', listing.id);
+        
+        return (
+                    <div
+                        key={listing.id}
+                        className={`card p-4 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-lg group ${selectedListing?.id === listing.id ? 'border-primary border-2' : 'border border-light-outline dark:border-dark-outline'} bg-light-surface dark:bg-dark-surface`}
+                        onClick={() => setSelectedListing(listing)}
+                    >
+                         <div className="flex justify-between items-start mb-3">
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center mb-1">
+                                    <MapPin className="w-4 h-4 text-primary mr-2 flex-shrink-0" />
+                                    <h3 className="text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">
+                                        {listing.startLocationText}
+                                    </h3>
+                                </div>
+                                <div className="flex items-center">
+                                    <MapPin className="w-4 h-4 text-primary mr-2 flex-shrink-0" />
+                                    <h3 className="text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">
+                                        {listing.endLocationText}
+                                    </h3>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getStatusBadgeStyles(listing.status)}`}>
+                                    {listing.status?.toUpperCase() || 'UNKNOWN'}
+                                </span>
+                                <ReportListingButton 
+                                    listingId={listing.id.toString()}
+                                    listingTitle={`${listing.startLocationText} → ${listing.endLocationText}`}
+                                    currentUserId={userId}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                />
+                            </div>
+                        </div>
+                        <div className="divider my-3 border-t border-light-outline dark:border-dark-outline"></div>
+                        <div className="flex items-center justify-between text-body-sm">
+                             <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-medium">
+                                    {listing.provider?.user?.name?.charAt(0) || "U"}
+                                </div>
+                                <div>
+                                    <p className="text-body-md font-medium text-light-on-surface dark:text-dark-on-surface">{listing.provider?.user?.name || "Driver"}</p>
+                                    <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant capitalize">{listing.provider?.vehicleType || "Vehicle"}</p>
+                                    {/* Rating Display */}
+                                    {stats && stats.totalReviews > 0 && (
+                                        <div className="mt-1">
+                                            <RatingDisplay 
+                                                rating={stats.averageRating} 
+                                                size="sm" 
+                                                showNumber={true}
+                                            />
+                                            <span className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant ml-1">
+                                                ({stats.totalReviews} review{stats.totalReviews !== 1 ? 's' : ''})
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="font-medium text-lg text-primary">{getPriceDisplay(listing.pricePerSeat)}</p>
+                                <p className="text-light-on-surface-variant dark:text-dark-on-surface-variant">per seat</p>
+                            </div>
+                        </div>
+                    </div>
+        );
+    };
+
     // Helper to render a list of rides
     const renderRideList = (rides) => {
          if (!rides || rides.length === 0) {
@@ -139,47 +213,7 @@ const ListingComponent = ({ rideListings: initialListings }) => {
         return (
             <div className="space-y-4">
                 {rides.map(listing => (
-                    <div
-                        key={listing.id}
-                        className={`card p-4 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-lg ${selectedListing?.id === listing.id ? 'border-primary border-2' : 'border border-light-outline dark:border-dark-outline'} bg-light-surface dark:bg-dark-surface`}
-                        onClick={() => setSelectedListing(listing)}
-                    >
-                         <div className="flex justify-between items-start mb-3">
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center mb-1">
-                                    <MapPin className="w-4 h-4 text-primary mr-2 flex-shrink-0" />
-                                    <h3 className="text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">
-                                        {listing.startLocationText}
-                                    </h3>
-                                </div>
-                                <div className="flex items-center">
-                                    <MapPin className="w-4 h-4 text-primary mr-2 flex-shrink-0" />
-                                    <h3 className="text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">
-                                        {listing.endLocationText}
-                                    </h3>
-                                </div>
-                            </div>
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getStatusBadgeStyles(listing.status)}`}>
-                                {listing.status?.toUpperCase() || 'UNKNOWN'}
-                            </span>
-                        </div>
-                        <div className="divider my-3 border-t border-light-outline dark:border-dark-outline"></div>
-                        <div className="flex items-center justify-between text-body-sm">
-                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-medium">
-                                    {listing.provider?.user?.name?.charAt(0) || "U"}
-                                </div>
-                                <div>
-                                    <p className="text-body-md font-medium text-light-on-surface dark:text-dark-on-surface">{listing.provider?.user?.name || "Driver"}</p>
-                                    <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant capitalize">{listing.provider?.vehicleType || "Vehicle"}</p>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <p className="font-medium text-lg text-primary">{getPriceDisplay(listing.pricePerSeat)}</p>
-                                <p className="text-light-on-surface-variant dark:text-dark-on-surface-variant">per seat</p>
-                            </div>
-                        </div>
-                    </div>
+                    <RideListingItem key={listing.id} listing={listing} />
                 ))}
             </div>
         );
@@ -270,7 +304,7 @@ const ListingComponent = ({ rideListings: initialListings }) => {
                                      
                                     <div className="mb-6 p-4 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
                                         <h3 className="text-title-md mb-3 text-light-on-surface dark:text-dark-on-surface">Driver</h3>
-                                        <div className="flex items-center">
+                                        <div className="flex items-center mb-4">
                                             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-medium text-primary">
                                                 {selectedListing.provider?.user?.name?.charAt(0) || "U"}
                                             </div>
@@ -279,6 +313,14 @@ const ListingComponent = ({ rideListings: initialListings }) => {
                                                 <p className="text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant capitalize">{selectedListing.provider?.vehicleType || "Vehicle"}</p>
                                             </div>
                                         </div>
+                                        
+                                        {/* Driver Reviews */}
+                                        <DriverReviewsCompact 
+                                            driverId={selectedListing.providerId}
+                                            driverName={selectedListing.provider?.user?.name || "Driver"}
+                                            showStats={true}
+                                            maxReviews={2}
+                                        />
                                     </div>
                                     
                                      <div className="space-y-3">

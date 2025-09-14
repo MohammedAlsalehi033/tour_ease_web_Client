@@ -6,6 +6,9 @@ import { RideListing } from '@/app/(model)/rideSharing/RideListting/rideListting
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaClock, FaChair, FaCar, FaUserCircle, FaRoute, FaDollarSign, FaCheck, FaTimes, FaArrowAltCircleRight, FaArrowAltCircleLeft } from 'react-icons/fa';
+import RatingDisplay from '../../components/RatingDisplay';
+import { useReviewStats } from '../../components/useReviewStats';
+import DriverReviewsCompact from '../../components/DriverReviewsCompact';
 
 
 interface RideCardProps {
@@ -16,6 +19,7 @@ interface RideCardProps {
 
 const RideCard: React.FC<RideCardProps> = ({ ride, isSelected, onCardClick }) => {
     const imageUrl = ride.mediaUrls?.[0] || ride.provider.vehicleMediaUrls?.[0] || 'https://placehold.co/600x400';
+    const { stats } = useReviewStats('TRANSPORTATION_LISTING', ride.id);
 
     return (
         <motion.div
@@ -51,6 +55,19 @@ const RideCard: React.FC<RideCardProps> = ({ ride, isSelected, onCardClick }) =>
                         </span>
                     </div>
                 </div>
+                {/* Rating Display */}
+                {stats && stats.totalReviews > 0 && (
+                    <div className="mt-2 flex items-center justify-between">
+                        <RatingDisplay 
+                            rating={stats.averageRating} 
+                            size="sm" 
+                            showNumber={true}
+                        />
+                        <span className="text-xs text-[rgba(var(--text),0.6)]">
+                            ({stats.totalReviews} review{stats.totalReviews !== 1 ? 's' : ''})
+                        </span>
+                    </div>
+                )}
             </div>
         </motion.div>
     );
@@ -62,6 +79,8 @@ interface ExpandedRideDetailsProps {
 }
 
 const ExpandedRideDetails: React.FC<ExpandedRideDetailsProps> = ({ ride }) => {
+    const { stats } = useReviewStats('TRANSPORTATION_LISTING', ride.id);
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -78,6 +97,19 @@ const ExpandedRideDetails: React.FC<ExpandedRideDetailsProps> = ({ ride }) => {
                 <li className="flex items-center"><FaRoute className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Distance:</span> {ride.distance_km.toFixed(1)} km</li>
                 <li className="flex items-center"><FaCar className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Vehicle:</span> {ride.provider.vehicleType}</li>
                 <li className="flex items-center"><FaUserCircle className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Provider:</span> {ride.provider.user.name}</li>
+                {stats && stats.totalReviews > 0 && (
+                    <li className="flex items-center">
+                        <RatingDisplay 
+                            rating={stats.averageRating} 
+                            size="sm" 
+                            showNumber={true}
+                            className="ml-4"
+                        />
+                        <span className="text-sm text-[rgba(var(--text),0.6)] ml-2">
+                            ({stats.totalReviews} review{stats.totalReviews !== 1 ? 's' : ''})
+                        </span>
+                    </li>
+                )}
                 <li className="flex items-center"><FaClock className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Departure:</span> {new Date(ride.departureTime).toLocaleString()}</li>
                 <li className="flex items-center"><FaChair className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Seats Available:</span> {ride.seatsAvailable}</li>
                 <li className="flex items-center"><FaDollarSign className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Price per Seat:</span> ${parseFloat(ride.pricePerSeat)}</li>
@@ -86,6 +118,18 @@ const ExpandedRideDetails: React.FC<ExpandedRideDetailsProps> = ({ ride }) => {
                 <li className="flex items-center"><FaArrowAltCircleRight className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">from:</span> from {ride.startLocationText}</li>
                 <li className="flex items-center"><FaArrowAltCircleLeft className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">to:</span> to {ride.endLocationText}</li>
             </ul>
+            
+            {/* Driver Reviews Section */}
+            <div className="mt-6 pt-4 border-t border-[rgba(var(--text),0.1)]">
+                <h4 className="text-body-md font-semibold text-[rgba(var(--text),0.9)] mb-3">Driver Reviews</h4>
+                <DriverReviewsCompact 
+                    driverId={ride.providerId}
+                    driverName={ride.provider.user.name}
+                    showStats={false}
+                    maxReviews={2}
+                />
+            </div>
+            
             {/* REFACTORED: Replaced many utility classes with .btn and .btn-primary. */}
             <button
                 onClick={(e) => { e.stopPropagation(); alert(`Booking ride ${ride.id}`); }}

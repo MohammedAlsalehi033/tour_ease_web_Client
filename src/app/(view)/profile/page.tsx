@@ -7,6 +7,8 @@
   import { TransformationProviderController } from '@/app/(controller)/rideSharing/transportationProviderContrroller';
   import { UserController } from '@/app/(controller)/user/userController';
   import { User } from '@/app/(model)/user/userModel';
+  import ProviderRatingDisplay from '../components/ProviderRatingDisplay';
+  import DriverReviewsSection from '../components/DriverReviewsSection';
   import AvatarImage from './components/avatarImage';
 
 
@@ -96,7 +98,21 @@
                       : "Not specified"}
                   </p>
                 </div>
+                <div>
+                  <p className="font-sans text-body-sm text-gray-500 dark:text-gray-400">Rating</p>
+                  <ProviderRatingDisplay providerId={session.user.id} />
+                </div>
               </div>
+            </div>
+          )}
+
+          {/* Driver Reviews Section */}
+          {transportationProviderData && (
+            <div className="card shadow-lg rounded-lg p-6 mb-8 dark:border-dark-outline border border-light-outline">
+              <DriverReviewsSection 
+                driverId={session.user.id}
+                driverName={userData?.name || "You"}
+              />
             </div>
           )}
 

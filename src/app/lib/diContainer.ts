@@ -15,6 +15,8 @@ import { QuestionsController } from '../(controller)/questions/questionsControll
 import { QuestionsRepo } from '../(model)/questions/questionsRepo';
 import { UserRepository } from '../(model)/user/userRepository';
 import { UserController } from '../(controller)/user/userController';
+import { ReportRepo } from '../(model)/report/reportRepo';
+import { ReportController } from '../(controller)/report/reportController';
 
 
 container.registerSingleton(RideListingRepo)
@@ -31,5 +33,7 @@ container.registerSingleton(QuestionsRepo)
 container.registerSingleton(QuestionsController)
 container.registerSingleton(UserRepository) 
 container.registerSingleton(UserController)
+container.registerSingleton(ReportRepo)
+container.registerSingleton(ReportController)
 
 export { container };

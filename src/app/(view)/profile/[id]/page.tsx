@@ -1,12 +1,21 @@
 import React from 'react';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { container } from '@/app/lib/diContainer'; 
 import { UserController } from '@/app/(controller)/user/userController';
 import { TransformationProviderController } from '@/app/(controller)/rideSharing/transportationProviderContrroller';
 import { User } from '@/app/(model)/user/userModel';
 import OtherAvatarPic from '../../components/otherAvatarPic';
+import ReportUserButton from '../../components/ReportUserButton';
+import ProviderRatingDisplay from '../../components/ProviderRatingDisplay';
+import DriverReviewsSection from '../../components/DriverReviewsSection';
 
 // This is the page that displays another user's profile.
 const UserProfilePage = async ({ params }: { params: { id: string } }) => {
+  // Get current user session
+  const session = await getServerSession(authOptions);
+  const currentUserId = session?.user?.id;
+
   // We will need controllers to fetch user and provider data.
   const userController = container.resolve(UserController);
   const transportationProviderController = container.resolve(TransformationProviderController);
@@ -92,7 +101,21 @@ const UserProfilePage = async ({ params }: { params: { id: string } }) => {
                     : "Not specified"}
                 </p>
               </div>
+              <div>
+                <p className="font-sans text-body-sm text-gray-500 dark:text-gray-400">Rating</p>
+                <ProviderRatingDisplay providerId={params.id} />
+              </div>
             </div>
+          </div>
+        )}
+
+        {/* Driver Reviews Section */}
+        {transportationProviderData && (
+          <div className="card shadow-lg rounded-lg p-6 mb-8 dark:border-dark-outline border border-light-outline">
+            <DriverReviewsSection 
+              driverId={params.id}
+              driverName={userData?.name || "User"}
+            />
           </div>
         )}
 
@@ -101,8 +124,11 @@ const UserProfilePage = async ({ params }: { params: { id: string } }) => {
           <h2 className="font-display text-headline-md font-bold mb-4">Actions</h2>
           <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
           <div className="mt-6 flex justify-start">
-            {/* You would create this button component to handle the reporting logic */}
-            {/* <ReportUserButton userId={params.id} /> */}
+            <ReportUserButton 
+              userId={params.id} 
+              userName={userData?.name || "this user"}
+              currentUserId={currentUserId}
+            />
           </div>
         </div>
 
