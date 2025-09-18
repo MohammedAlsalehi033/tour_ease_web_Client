@@ -2,10 +2,13 @@
 import "reflect-metadata";
 import React, { useEffect, useState } from 'react';
 import { TruckIcon, MapPinIcon, CheckCircleIcon, CalendarIcon, UserIcon, ChatBubbleLeftRightIcon, UserCircleIcon } from '@heroicons/react/24/solid';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 import { BookingController } from '../../../(controller)/rideSharing/bookingController';
+import { ReportController } from '../../../(controller)/report/reportController';
+import type { CreateReportData, ReportableType } from '../../../(model)/report/reportModel';
 import { container } from '@/app/lib/diContainer';
 import { ResponseModel } from '@/Types/types';
 import { Booking } from "@/app/(model)/rideSharing/booking/bookingModel";
@@ -41,6 +44,10 @@ const ActiveRidePage = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [showReviewModal, setShowReviewModal] = useState<boolean>(false);
+    const [showCancelModal, setShowCancelModal] = useState<boolean>(false);
+    const [cancelReason, setCancelReason] = useState<string>('');
+    const [isCancelling, setIsCancelling] = useState<boolean>(false);
+    const [cancelError, setCancelError] = useState<string | null>(null);
     const [rideData, setRideData] = useState<Booking | null>(null);
 
     useEffect(() => {
@@ -57,19 +64,28 @@ const ActiveRidePage = () => {
 
             try {
                 const bookingController = container.resolve(BookingController);
+                // Fetch both as before
                 const travelerResponse = await bookingController.getBookingsForTraveler(userId);
-
                 let rideData: Booking | null = null;
                 let role: 'traveler' | 'driver' | null = null;
 
+                // Find first pending booking for traveler
                 if (travelerResponse.success && travelerResponse.data?.length > 0) {
-                    rideData = travelerResponse.data[0];
-                    role = 'traveler';
-                } else {
+                    const pending = travelerResponse.data.find((b: Booking) => b.status === 'pending');
+                    if (pending) {
+                        rideData = pending;
+                        role = 'traveler';
+                    }
+                }
+                // If not found, check for driver
+                if (!rideData) {
                     const driverResponse = await bookingController.getBookingsForDriver(userId);
                     if (driverResponse.success && driverResponse.data?.length > 0) {
-                        rideData = driverResponse.data[0];
-                        role = 'driver';
+                        const pending = driverResponse.data.find((b: Booking) => b.status === 'pending');
+                        if (pending) {
+                            rideData = pending;
+                            role = 'driver';
+                        }
                     }
                 }
 
@@ -101,7 +117,11 @@ const ActiveRidePage = () => {
                         setError("Could not parse ride details.");
                     }
                 } else {
-                    setError("No active ride found.");
+                    setActiveRideDetails(null);
+                    setOtherUserDetails(null);
+                    setUserRole(null);
+                    setRideData(null);
+                    setError(null); // No error, just no active ride
                 }
             } catch (err) {
                 console.error("Error fetching active ride:", err);
@@ -134,6 +154,47 @@ const ActiveRidePage = () => {
     const handleReviewSubmit = () => {
         // After review is submitted, mark the ride as complete
         handleMarkAsComplete();
+    };
+
+    const handleCancelRide = async () => {
+        if (!activeRideDetails || !userId) return;
+        setIsCancelling(true);
+        setCancelError(null);
+        try {
+            const bookingController = container.resolve(BookingController);
+            const statusResp = await bookingController.updateBookingStatus(activeRideDetails.id, 'cancelled');
+            if (!statusResp?.success) {
+                throw new Error(statusResp?.message || 'Failed to cancel the ride.');
+            }
+
+            // Auto-generate a report for the cancellation
+            const reportController = container.resolve(ReportController) as ReportController;
+            const description = cancelReason && cancelReason.trim().length > 0
+                ? cancelReason.trim()
+                : `Ride was cancelled by ${userRole ?? 'user'}.`;
+            const reportData: CreateReportData = {
+                reporterId: userId,
+                reportableType: 'TRANSPORTATION_BOOKING' as ReportableType,
+                reportReason: 'Ride cancelled',
+                description,
+                transportationBookingId: parseInt(activeRideDetails.id.toString())
+            };
+            const validation = reportController.validateReportData(reportData);
+            if (!validation.isValid) {
+                console.warn('Report validation failed:', validation.errors);
+            } else {
+                await reportController.createReport(reportData);
+            }
+
+            setShowCancelModal(false);
+            setCancelReason('');
+            window.location.reload();
+        } catch (err: any) {
+            console.error('Error cancelling ride:', err);
+            setCancelError(err?.message || 'An error occurred while cancelling.');
+        } finally {
+            setIsCancelling(false);
+        }
     };
 
     const getReviewTitle = () => {
@@ -215,7 +276,10 @@ const ActiveRidePage = () => {
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Link href={otherUserId ? `/rideSharing/activeRide/map/${otherUserId}` : '#'} passHref className="flex-1"><button disabled={!otherUserId} className="btn-outlined w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"><MapPinIcon className="h-5 w-5" /><span>Check Location</span></button></Link>
                                 <button disabled={!otherUserId} className="btn-outlined flex-1 w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"><ChatBubbleLeftRightIcon className="h-5 w-5" /><span>Chat with {userRole === 'traveler' ? 'Driver' : 'Traveler'}</span></button>
-                                <button onClick={() => setShowReviewModal(true)} className="btn-primary flex-1 w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-lg bg-success text-white hover:bg-success/90 transition-colors duration-200 font-medium"><CheckCircleIcon className="h-5 w-5" /><span>Mark as Complete</span></button>
+                                {userRole === 'driver' && (
+                                    <button onClick={() => setShowReviewModal(true)} className="btn-primary flex-1 w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-lg bg-success text-white hover:bg-success/90 transition-colors duration-200 font-medium"><CheckCircleIcon className="h-5 w-5" /><span>Mark as Complete</span></button>
+                                )}
+                                <button onClick={() => setShowCancelModal(true)} className="flex-1 w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors duration-200 font-medium"><ExclamationTriangleIcon className="h-5 w-5" /><span>Cancel Ride</span></button>
                             </div>
                         </div>
 
@@ -241,6 +305,35 @@ const ActiveRidePage = () => {
                     reviewableId={parseInt(rideData.id.toString())}
                     title={getReviewTitle()}
                 />
+            )}
+            {/* Cancel Ride Modal */}
+            {showCancelModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="w-full max-w-lg rounded-md bg-white dark:bg-dark-surface p-6 shadow-xl">
+                        <div className="flex items-start gap-3">
+                            <ExclamationTriangleIcon className="h-6 w-6 text-red-600 mt-1" />
+                            <div>
+                                <h3 className="text-headline-md font-semibold text-light-on-surface dark:text-dark-on-surface">Confirm Cancellation</h3>
+                                <p className="mt-1 text-body-sm text-light-on-surface/70 dark:text-dark-on-surface/70">Cancelling a ride affects trust on the platform. Continuous cancellations may lead to temporary or permanent account restrictions.</p>
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <label className="block mb-2 text-body-sm text-light-on-surface/80 dark:text-dark-on-surface/80">Tell us why you are cancelling (optional)</label>
+                            <textarea
+                                className="w-full rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-dark-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400"
+                                rows={4}
+                                value={cancelReason}
+                                onChange={(e) => setCancelReason(e.target.value)}
+                                placeholder="E.g., emergency, change of plans, incorrect booking, etc."
+                            />
+                            {cancelError && <p className="mt-2 text-sm text-red-600">{cancelError}</p>}
+                        </div>
+                        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-end">
+                            <button onClick={() => { if (!isCancelling) { setShowCancelModal(false); setCancelReason(''); setCancelError(null); } }} className="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 text-light-on-surface dark:text-dark-on-surface hover:bg-gray-50 dark:hover:bg-gray-800">Keep Ride</button>
+                            <button onClick={handleCancelRide} disabled={isCancelling} className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed">{isCancelling ? 'Cancelling...' : 'Yes, Cancel Ride'}</button>
+                        </div>
+                    </div>
+                </div>
             )}
         </main>
     );

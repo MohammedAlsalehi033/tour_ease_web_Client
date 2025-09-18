@@ -102,17 +102,11 @@ const page = async ({ params }: { params: { Questionid: string } }) => {
         <div className="space-y-4 pb-32">
           {comments.map((comment) => (
             <div key={comment.id} className="card p-4 flex items-start gap-4 border-l-4 border-primary/60 bg-white dark:bg-dark-surface rounded-xl shadow">
-              {comment.user.mediaUrls && comment.user.mediaUrls[0] ? (
-                <img
-                  src={comment.user.mediaUrls[0]}
-                  alt="avatar"
-                  className="h-10 w-10 rounded-full object-cover object-center border border-primary shadow"
-                />
-              ) : (
-                <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-md border border-primary shadow">
-                  {comment.user.username ? comment.user.username[0].toUpperCase() : '?'}
-                </div>
-              )}
+              <OtherAvatarPic
+                imageUrl={comment.user.mediaUrls && comment.user.mediaUrls[0]}
+                otherUserId={comment.user.id}
+                userName={comment.user.username}
+              />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-md text-primary">{comment.user.username}</span>

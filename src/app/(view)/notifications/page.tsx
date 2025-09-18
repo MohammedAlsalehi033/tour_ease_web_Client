@@ -24,7 +24,6 @@ import Link from 'next/link';
 import AcceptButton from './components/acceptButton';
 import RejectButton from './components/rejectButton';
 import { off } from 'process';
-import otherAvatarPic from '../components/otherAvatarPic';
 import OtherAvatarPic from '../components/otherAvatarPic';
 
 const formatDate = (dateString) => {
@@ -82,11 +81,7 @@ const NotificationCard = ({ offer } : { offer: TransportationOffer }) => {
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center">
           <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-medium mr-3">
-            {offer.sender?.mediaUrls?.length > 0 ?
-               <OtherAvatarPic imageUrl={offer.sender?.mediaUrls[0]} otherUserId={offer.senderId} />
-               :
-              <div className='text-2xl'>{offer.sender.username.charAt(0)}</div>
-              }
+            <OtherAvatarPic imageUrl={offer.sender?.mediaUrls?.[0]} otherUserId={offer.senderId} userName={offer.sender?.username} />
           </div>
           <div>
             <h3 className="text-title-md font-medium text-light-on-surface dark:text-dark-on-surface">
@@ -258,13 +253,35 @@ const page = async () => {
           )}
         </div>
 
-        {/* Active Notifications List */}
+        {/* Organized Notifications by Category */}
         {activeOffers.length > 0 ? (
-          <div className="space-y-4">
-            {activeOffers.map(offer => (
-              <NotificationCard key={offer.id} offer={offer} />
-            ))}
-          </div>
+          <>
+            {/* Ride Booking Requests */}
+            <div className="mt-8">
+              <h2 className="text-title-md font-semibold mb-4 text-primary">Ride Booking Requests</h2>
+              <div className="space-y-4">
+                {activeOffers.filter(o => o.transportationListingId !== null).length === 0 && (
+                  <div className="text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">No ride booking requests.</div>
+                )}
+                {activeOffers.filter(o => o.transportationListingId !== null).map(offer => (
+                  <NotificationCard key={offer.id} offer={offer} />
+                ))}
+              </div>
+            </div>
+
+            {/* Ride Offers */}
+            <div className="mt-12">
+              <h2 className="text-title-md font-semibold mb-4 text-green-600 dark:text-green-400">Ride Offers</h2>
+              <div className="space-y-4">
+                {activeOffers.filter(o => o.transportationListingId === null).length === 0 && (
+                  <div className="text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">No ride offers.</div>
+                )}
+                {activeOffers.filter(o => o.transportationListingId === null).map(offer => (
+                  <NotificationCard key={offer.id} offer={offer} />
+                ))}
+              </div>
+            </div>
+          </>
         ) : (
           <div className="card p-12 rounded-lg border border-light-outline dark:border-dark-outline text-center bg-light-surface dark:bg-dark-surface">
             <div className="mb-6 flex justify-center">

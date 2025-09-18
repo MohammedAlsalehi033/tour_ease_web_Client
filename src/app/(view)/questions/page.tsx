@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import OtherAvatarPic from '../components/otherAvatarPic';
 import AddQuestionComponent from './addQuestionComponent';
 import { container } from 'tsyringe';
 import { QuestionsController } from '@/app/(controller)/questions/questionsController';
@@ -30,17 +31,11 @@ function QuestionsList({ questions, currentUserId }: { questions: Question[], cu
         <Link key={question.id} href={`/questions/${question.id}`} className="no-underline">
           <div className="card group flex items-center gap-6 p-5 min-h-24 rounded-2xl shadow-lg border border-primary/10 dark:border-dark-outline/40 bg-white dark:bg-dark-surface transition-all duration-200 hover:scale-[1.02] hover:shadow-xl cursor-pointer">
             <div className="flex-shrink-0">
-              {question.user.mediaUrls && question.user.mediaUrls[0] ? (
-                <img
-                  src={question.user.mediaUrls[0]}
-                  alt="avatar"
-                  className="h-16 w-16 rounded-full object-cover object-center border-2 border-primary shadow"
-                />
-              ) : (
-                <div className="h-16 w-16 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xl border-2 border-primary shadow">
-                  {question.user.username ? question.user.username[0].toUpperCase() : '?'}
-                </div>
-              )}
+              <OtherAvatarPic
+                imageUrl={question.user.mediaUrls && question.user.mediaUrls[0]}
+                otherUserId={question.user.id}
+                userName={question.user.username}
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">

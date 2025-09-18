@@ -1,7 +1,9 @@
 // page.tsx (Server Component)
+
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import CompletedRides from '../components/CompletedRides';
 
 export default async function Page() {
   // Get the session on the server
@@ -13,5 +15,10 @@ export default async function Page() {
     redirect("/api/auth/signin");
   }
   
-  return <div>{session.user.id}</div>  ;
+  return (
+    <div className="max-w-4xl mx-auto p-4">
+      <h1 className="text-display-md font-bold mb-8">Dashboard</h1>
+      <CompletedRides />
+    </div>
+  );
 }
