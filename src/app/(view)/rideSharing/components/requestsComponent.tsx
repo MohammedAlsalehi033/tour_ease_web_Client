@@ -78,15 +78,14 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
             recipientId: requestToAccept.travelerId, // The traveler is the recipient
             pricePerSeat: parseFloat(requestToAccept.budget) || 0, // Offer the traveler's budget price
             seatsRequested: requestToAccept.seatsNeeded,
-            rideRequestId: requestToAccept.id, // Link to the original request
+            transportationRequestId: requestToAccept.id, // Link to the original request
             message: "I can fulfill your ride request.",
             status: 'accepted', // Driver accepts
             createdAt: new Date().toISOString(),
         };
 
-        // Here you would call an actual API endpoint
-        // For now, we simulate success and update local state
-
+        
+        console.log("Creating offer:", offer);
         const response = offerController.createOffer(offer)
         setTimeout(() => {
              const newAcceptedOffers = [...myAcceptedOffers, requestToAccept];

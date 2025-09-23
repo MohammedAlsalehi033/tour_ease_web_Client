@@ -2,7 +2,17 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
  images: {
-    remotePatterns: [new URL('https://docs.material-tailwind.com/**')],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'docs.material-tailwind.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'tour-ease.s3.ap-south-1.amazonaws.com',
+        pathname: '/uploads/**'
+      }
+    ]
   },
   typescript: {
     ignoreBuildErrors: true,

@@ -10,9 +10,10 @@ import { ChatController } from "@/app/(controller)/chat/chatController";
 import { useParams } from 'next/navigation'
 
 
-const socket: Socket = io(new ApiService().baseUrl.split("/api")[0], {
+const socket: Socket = io(new ApiService().baseUrl.substring(0, new ApiService().baseUrl.lastIndexOf("/api")), {
     autoConnect: false,
 });
+
 
 export default function Page() {
     const { data: session } = useSession();
@@ -22,6 +23,7 @@ export default function Page() {
     const [partnerId, setPartnerId] = useState<string>(params.partnerId as string);
     const [partnerName, setPartnerName] = useState<string>("Partner");
     const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [isSending, setIsSending] = useState(false);
     const messageInputRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
@@ -82,15 +84,34 @@ export default function Page() {
             return;
         }
 
+        const messageContent = messageInputRef.current.value;
+        // Clear input immediately for better UX
+        messageInputRef.current.value = '';
+        setIsSending(true);
+
         const message : ChatMessage = {
             senderId: session.user.id,
             receiverId: partnerId,
-            content: messageInputRef.current?.value || "",
+            content: messageContent,
             sentAt: new Date().toISOString(),
             id: 0
         }
-        const sentMessage = await chatController.sendMessage(message);
-        setMessages(prevMessages => [...prevMessages, sentMessage]);
+
+        try {
+            const startTime = performance.now();
+            const sentMessage = await chatController.sendMessage(message);
+            const endTime = performance.now();
+            console.log(`[chat] sendMessage took ${endTime - startTime}ms`);
+            setMessages(prevMessages => [...prevMessages, sentMessage]);
+        } catch (error) {
+            console.error('Failed to send message:', error);
+            // Restore message on error
+            if (messageInputRef.current) {
+                messageInputRef.current.value = messageContent;
+            }
+        } finally {
+            setIsSending(false);
+        }
     }
 
     return (
@@ -147,10 +168,11 @@ export default function Page() {
                     }}
                 />
                 <button
-                    className="btn-primary px-6 py-4 text-sm"
+                    className="btn-primary px-6 py-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleSendMessage}
+                    disabled={isSending}
                 >
-                    Send
+                    {isSending ? 'Sending...' : 'Send'}
                 </button>
             </div>
         </div>

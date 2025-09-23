@@ -54,6 +54,7 @@ export class ReviewController {
     }
 
     async getReviewStats(reviewableType: string, reviewableId: number) {
+        console.log(reviewableType, reviewableId);
         try {
             if (!reviewableType || !reviewableId) {
                 throw new Error('Reviewable type and ID are required');

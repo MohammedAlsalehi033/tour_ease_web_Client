@@ -8,7 +8,7 @@ import { getSession } from 'next-auth/react';
 interface FetchOptions {
   method: string;
   headers: Record<string, string>;
-  body?: string;
+  body?: string | FormData;
 }
 
 @injectable()
@@ -91,16 +91,18 @@ export class ApiService {
   }
 
   // POST request method
-  async post<T>(url: string, body: Record<string, any> = {}, isFormData: boolean = false): Promise<T> {
-    let header = await this.getHeaders();
-    console.log(header)
-    if(isFormData){
-     header = {...await this.getHeaders(), "Content-Type": "application/json" }
+  async post<T>(url: string, body: Record<string, any> | FormData = {}, isFormData: boolean = false): Promise<T> {
+    let headers = await this.getHeaders();
+    if(isFormData) {
+      // Remove Content-Type header for FormData to let browser set it automatically with boundary
+      delete headers['Content-Type'];
+      console.log('Uploading file:', body);
+
     }
     const options: FetchOptions = {
       method: 'POST',
-      headers: header,
-      body: isFormData ? (typeof body === 'string' ? body : JSON.stringify(body)) : JSON.stringify(body),
+      headers: headers,
+      body: isFormData ? body as FormData : JSON.stringify(body),
     };
 
     return this.fetchWithErrorHandling<T>(url, options);

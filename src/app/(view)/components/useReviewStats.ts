@@ -1,5 +1,6 @@
-"use client";
 
+"use client";
+import "reflect-metadata"
 import { useState, useEffect } from 'react';
 import { ReviewController } from '@/app/(controller)/review/reviewController';
 import { container } from '@/app/lib/diContainer';
@@ -10,6 +11,7 @@ export const useReviewStats = (reviewableType: string, reviewableId: number) => 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  console.log(reviewableType, reviewableId);
   useEffect(() => {
     const fetchStats = async () => {
       if (!reviewableId) {

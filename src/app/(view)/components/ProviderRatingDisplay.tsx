@@ -13,8 +13,8 @@ const ProviderRatingDisplay: React.FC<ProviderRatingDisplayProps> = ({
   providerId, 
   className = '' 
 }) => {
-  const { stats, loading, error } = useReviewStats('TRANSPORTATION_PROVIDER', parseInt(providerId));
-
+  const { stats, loading, error } = useReviewStats('TRANSPORTATION_PROVIDER', providerId);
+    console.log(stats, loading, error);
   if (loading) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
