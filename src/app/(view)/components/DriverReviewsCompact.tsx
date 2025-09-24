@@ -40,17 +40,15 @@ const DriverReviewsCompact: React.FC<DriverReviewsCompactProps> = ({
       const reviewController = container.resolve(ReviewController);
       
       // Fetch reviews for this driver (assuming they're reviews for transportation bookings)
-      const reviewsResponse = await reviewController.getReviewsByReviewer(driverId, {
-        limit: showAll ? 10 : maxReviews
-      });
+      const reviewsResponse = await reviewController.getReviewsForItem('TRANSPORTATION_PROVIDER', driverId);
       
       if (reviewsResponse.success) {
-        setReviews(reviewsResponse.data);
+        setReviews(reviewsResponse.data?.reviews || []);
       }
 
       // Fetch stats for this driver
       if (showStats) {
-        const statsResponse = await reviewController.getReviewStats('TRANSPORTATION_PROVIDER', parseInt(driverId));
+        const statsResponse = await reviewController.getReviewStats('TRANSPORTATION_PROVIDER', driverId);
         if (statsResponse.success) {
           setStats(statsResponse.data);
         }

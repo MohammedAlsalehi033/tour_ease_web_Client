@@ -12,7 +12,7 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
     const [activeTab, setActiveTab] = useState("requests");
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const [allRequests, setAllRequests] = useState(initialRequests || []);
     const [myAcceptedOffers, setMyAcceptedOffers] = useState([]);
 
@@ -84,17 +84,17 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
             createdAt: new Date().toISOString(),
         };
 
-        
+
         console.log("Creating offer:", offer);
         const response = offerController.createOffer(offer)
         setTimeout(() => {
-             const newAcceptedOffers = [...myAcceptedOffers, requestToAccept];
-             setMyAcceptedOffers(newAcceptedOffers);
-             localStorage.setItem('myAcceptedOffers', JSON.stringify(newAcceptedOffers));
-             
-             setIsLoading(false);
-             setSelectedRequest(null);
-             alert("You have accepted the ride request! The traveler will be notified.");
+            const newAcceptedOffers = [...myAcceptedOffers, requestToAccept];
+            setMyAcceptedOffers(newAcceptedOffers);
+            localStorage.setItem('myAcceptedOffers', JSON.stringify(newAcceptedOffers));
+
+            setIsLoading(false);
+            setSelectedRequest(null);
+            alert("You have accepted the ride request! The traveler will be notified.");
         }, 1500);
     };
 
@@ -103,16 +103,16 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
             case 'accepted':
                 return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
             case 'pending':
-                 return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100';
+                return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100';
             default:
                 return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100';
         }
     };
-    
+
     const renderRequestList = (requests) => {
         if (!requests || requests.length === 0) {
             return (
-                 <div className="card p-8 rounded-lg border border-light-outline dark:border-dark-outline text-center bg-light-surface dark:bg-dark-surface">
+                <div className="card p-8 rounded-lg border border-light-outline dark:border-dark-outline text-center bg-light-surface dark:bg-dark-surface">
                     <div className="mb-4 flex justify-center"><div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center"><Users className="w-8 h-8 text-primary" /></div></div>
                     <p className="text-body-lg mb-4 text-light-on-surface dark:text-dark-on-surface">No ride requests here.</p>
                 </div>
@@ -124,7 +124,7 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
                 {requests.map(request => (
                     <div key={request.id} className={`card p-4 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-lg ${selectedRequest?.id === request.id ? 'border-primary border-2' : 'border border-light-outline dark:border-dark-outline'} bg-light-surface dark:bg-dark-surface`} onClick={() => setSelectedRequest(request)}>
                         <div className="flex justify-between items-start mb-3">
-                             <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0">
                                 <div className="flex items-center mb-1"><MapPin className="w-4 h-4 text-primary mr-2 flex-shrink-0" /><h3 className="text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">{request.startLocationText}</h3></div>
                                 <div className="flex items-center"><MapPin className="w-4 h-4 text-primary mr-2 flex-shrink-0" /><h3 className="text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">{request.endLocationText}</h3></div>
                             </div>
@@ -150,7 +150,7 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
     };
 
     return (
-            <div className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-start bg-light-background dark:bg-dark-background`}>
+        <div className={`min-h-screen transition-colors duration-300 flex flex-col items-center justify-start bg-light-background dark:bg-dark-background`}>
             <div className="w-full">
                 <div className="mb-6 border-b border-light-outline dark:border-dark-outline">
                     <div className="flex space-x-1">
@@ -197,7 +197,7 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
                                     <button className="btn-primary py-3 px-6 rounded-full bg-green-500 text-white font-medium w-full flex items-center justify-center hover:bg-green-600 transition-colors disabled:opacity-70" onClick={() => handleAcceptRequest(selectedRequest)} disabled={isLoading || myAcceptedOffers.some(r => r.id === selectedRequest.id)}>
                                         {isLoading ? 'Processing...' : (myAcceptedOffers.some(r => r.id === selectedRequest.id) ? 'Offer Sent' : 'Accept & Offer Ride')}
                                     </button>
-                                     <button className="btn-outlined py-2 px-4 rounded-full border border-light-outline dark:border-dark-outline text-light-on-surface dark:text-dark-on-surface font-medium flex items-center justify-center w-full"><MessageCircle className="w-4 h-4 mr-2" />Chat with Traveler</button>
+                                    <button className="btn-outlined py-2 px-4 rounded-full border border-light-outline dark:border-dark-outline text-light-on-surface dark:text-dark-on-surface font-medium flex items-center justify-center w-full"><MessageCircle className="w-4 h-4 mr-2" />Chat with Traveler</button>
                                 </div>
                             </div>
                         </div>

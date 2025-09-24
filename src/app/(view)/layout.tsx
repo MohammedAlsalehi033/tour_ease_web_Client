@@ -75,7 +75,7 @@ export default async function RootLayout({
           <Providers>
                         <NotificationIcon />
 
-            <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72  p-5  md:p-5">
+            <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72 p-5 md:p-5">
               {children}
             </div>
           </Providers>

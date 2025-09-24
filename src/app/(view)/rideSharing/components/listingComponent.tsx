@@ -12,6 +12,7 @@ import ReportListingButton from '../../components/ReportListingButton';
 import RatingDisplay from '../../components/RatingDisplay';
 import { useReviewStats } from '../../components/useReviewStats';
 import DriverReviewsCompact from '../../components/DriverReviewsCompact';
+import OtherAvatarPic from '../../components/otherAvatarPic';
 
     
 
@@ -165,11 +166,10 @@ const ListingComponent = ({ rideListings: initialListings }) => {
                         <div className="divider my-3 border-t border-light-outline dark:border-dark-outline"></div>
                         <div className="flex items-center justify-between text-body-sm">
                              <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-medium">
-                                    {listing.provider?.user?.name?.charAt(0) || "U"}
-                                </div>
+
+                                <OtherAvatarPic otherUserId={listing.provider?.user?.id} imageUrl={listing.provider?.user?.mediaUrls[0]} userName={listing.provider?.user?.username || "Driver"} />
                                 <div>
-                                    <p className="text-body-md font-medium text-light-on-surface dark:text-dark-on-surface">{listing.provider?.user?.name || "Driver"}</p>
+                                    <p className="text-body-md font-medium text-light-on-surface dark:text-dark-on-surface">{listing.provider?.user?.username || "Driver"}</p>
                                     <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant capitalize">{listing.provider?.vehicleType || "Vehicle"}</p>
                                     {/* Rating Display */}
                                     {stats && stats.totalReviews > 0 && (
@@ -305,9 +305,7 @@ const ListingComponent = ({ rideListings: initialListings }) => {
                                     <div className="mb-6 p-4 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
                                         <h3 className="text-title-md mb-3 text-light-on-surface dark:text-dark-on-surface">Driver</h3>
                                         <div className="flex items-center mb-4">
-                                            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-medium text-primary">
-                                                {selectedListing.provider?.user?.name?.charAt(0) || "U"}
-                                            </div>
+                                            <OtherAvatarPic otherUserId={selectedListing.provider?.user?.id} imageUrl={selectedListing.provider?.user?.mediaUrls[0]} userName={selectedListing.provider?.user?.username || "Driver"} />
                                             <div className="ml-4">
                                                 <p className="text-body-lg font-medium text-light-on-surface dark:text-dark-on-surface">{selectedListing.provider?.user?.name || "Driver"}</p>
                                                 <p className="text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant capitalize">{selectedListing.provider?.vehicleType || "Vehicle"}</p>
@@ -316,8 +314,8 @@ const ListingComponent = ({ rideListings: initialListings }) => {
                                         
                                         {/* Driver Reviews */}
                                         <DriverReviewsCompact 
-                                            driverId={selectedListing.providerId}
-                                            driverName={selectedListing.provider?.user?.name || "Driver"}
+                                            driverId={selectedListing.provider?.user?.id}
+                                            driverName={selectedListing.provider?.user?.username || "Driver"}
                                             showStats={true}
                                             maxReviews={2}
                                         />

@@ -1,5 +1,5 @@
 "use client";
-
+import "reflect-metadata"
 import React, { useState, useEffect } from 'react';
 import { Star, MessageSquare, User, Calendar, Edit, Trash2, MapPin } from 'lucide-react';
 import { ReviewController } from '@/app/(controller)/review/reviewController';

@@ -3,6 +3,7 @@
 import React from 'react';
 import { useReviewStats } from './useReviewStats';
 import RatingDisplay from './RatingDisplay';
+import ReviewList from './ReviewList';
 
 interface ProviderRatingDisplayProps {
   providerId: string;
@@ -13,8 +14,7 @@ const ProviderRatingDisplay: React.FC<ProviderRatingDisplayProps> = ({
   providerId, 
   className = '' 
 }) => {
-  const { stats, loading, error } = useReviewStats('TRANSPORTATION_PROVIDER', providerId);
-    console.log(stats, loading, error);
+  const { stats, reviews, loading, error } = useReviewStats('TRANSPORTATION_PROVIDER', providerId);
   if (loading) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
@@ -39,15 +39,20 @@ const ProviderRatingDisplay: React.FC<ProviderRatingDisplayProps> = ({
   }
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <RatingDisplay 
-        rating={stats.averageRating} 
-        size="sm" 
-        showNumber={true}
-      />
-      <span className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-        ({stats.totalReviews} review{stats.totalReviews !== 1 ? 's' : ''})
-      </span>
+    <div className="space-y-4">
+      <div className={`flex items-center gap-2 ${className}`}>
+        <RatingDisplay 
+          rating={stats.averageRating} 
+          size="sm" 
+          showNumber={true}
+        />
+        <span className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+          ({stats.totalReviews} review{stats.totalReviews !== 1 ? 's' : ''})
+        </span>
+      </div>
+      {reviews && reviews.length > 0 && (
+        <ReviewList reviews={reviews} className="mt-4" />
+      )}
     </div>
   );
 };

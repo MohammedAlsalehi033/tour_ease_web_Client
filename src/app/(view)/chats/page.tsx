@@ -47,13 +47,9 @@ const ChatItem = ({ chat }: { chat: Chat }) => {
         <div className="flex items-center space-x-4 flex-1 p-4">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            {chat.avatarUrl && chat.userId ? (
-              <OtherAvatarPic imageUrl={chat.avatarUrl} otherUserId={chat.userId} />
-            ) : (
-              <div className="h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center font-display font-medium text-title-lg">
-                {chat.userName?.charAt(0)?.toUpperCase() || "U"}
-              </div>
-            ) }
+           
+              <OtherAvatarPic imageUrl={chat.avatarUrl} otherUserId={chat.userId} userName={chat.userName} />
+             
             {/* Online status indicator with pulse */}
             {chat.isOnline && (
               <span className="absolute -bottom-1 -right-1 flex h-4 w-4">

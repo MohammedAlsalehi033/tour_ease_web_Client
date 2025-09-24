@@ -6,7 +6,9 @@ import { usePathname } from 'next/navigation';
 import {
     HomeIcon, ChatBubbleLeftRightIcon, UserIcon,
     MapIcon, TruckIcon, BuildingOfficeIcon,
-    QuestionMarkCircleIcon, ChevronDownIcon, ChevronRightIcon, BellIcon, Bars3Icon
+    QuestionMarkCircleIcon, ChevronDownIcon, ChevronRightIcon, BellIcon, Bars3Icon,
+    EyeIcon, PlusCircleIcon, ClipboardDocumentListIcon, MagnifyingGlassIcon,
+    CalendarDaysIcon, ChartBarIcon
 } from '@heroicons/react/24/outline';
 import ThemeToggler from './themeToggler';
 
@@ -71,6 +73,13 @@ const UserSidebar = ({ hasActiveRide }) => {
 
     const navSections = [
         {
+            title: 'Main',
+            links: [
+                { href: '/', text: 'Home', icon: HomeIcon },
+                { href: '/dashboard', text: 'Dashboard', icon: ChartBarIcon },
+            ]
+        },
+        {
             title: 'Services',
             links: [
                 { href: '/accommodations', text: 'Accommodations', icon: BuildingOfficeIcon },
@@ -78,13 +87,24 @@ const UserSidebar = ({ hasActiveRide }) => {
                     text: 'Ride Sharing', icon: TruckIcon, isCollapsible: true,
                     isOpen: rideSharingOpen,
                     setOpen: setRideSharingOpen,
-                    subLinks: [
-                        { href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/maps', text: 'View Listings' },
-                        { href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/listing/maps', text: 'Create Listing' },
-                        { href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/request/maps', text: 'Create Request' },
+                    subSections: [
+                        {
+                            title: 'Find Rides',
+                            links: [
+                                { href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/maps', text: 'Browse Listings', icon: MagnifyingGlassIcon },
+                                { href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/request/maps', text: 'Post Request', icon: PlusCircleIcon },
+                            ]
+                        },
+                        {
+                            title: 'Offer Rides',
+                            links: [
+                                { href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/listing/maps', text: 'Create Listing', icon: PlusCircleIcon },
+                                { href: '/rideSharing/my-listings', text: 'My Listings', icon: ClipboardDocumentListIcon },
+                            ]
+                        }
                     ]
                 },
-                { href: '/tripPlanner', text: 'Trip Planner', icon: MapIcon },
+                { href: '/tripPlanner', text: 'Trip Planner', icon: CalendarDaysIcon },
             ]
         },
         {
@@ -125,7 +145,7 @@ const UserSidebar = ({ hasActiveRide }) => {
             >
                 <div className="flex items-center justify-center h-20 border-b border-white/20">
                     {/* Animated Text */}
-                    <p key={textIndex} className="text-2xl font-bold tracking-wider text-center px-2 animate-fade-in-up overflow-hidden ">
+                    <p key={textIndex} className="text-2xl font-bold tracking-wider text-center px-2 animate-fade-in-up overflow-hidden">
                         {cyclingText[textIndex]}
                     </p>
                 </div>
@@ -152,17 +172,26 @@ const UserSidebar = ({ hasActiveRide }) => {
                                                     <span className="truncate">{link.text}</span>
                                                     <ChevronDownIcon className={`ml-auto h-5 w-5 transition-transform duration-300 ${link.isOpen ? 'rotate-180' : ''}`} />
                                                 </button>
-                                                <div className={`accordion-content ${link.isOpen ? 'max-h-40' : 'max-h-0'}`}>
-                                                    <div className="pt-2 space-y-1">
-                                                        {link.subLinks.map((subLink, subIndex) => (
-                                                            <NavLink
-                                                                key={subLink.text}
-                                                                href={subLink.href}
-                                                                text={subLink.text}
-                                                                isActive={pathname === subLink.href}
-                                                                isSubLink
-                                                                animationDelay={animationDelay + (subIndex + 1) * 50}
-                                                            />
+                                                <div className={`accordion-content ${link.isOpen ? 'max-h-96' : 'max-h-0'}`}>
+                                                    <div className="pt-2 space-y-3">
+                                                        {link.subSections?.map((subSection, subSectionIndex) => (
+                                                            <div key={subSection.title} className="space-y-1">
+                                                                <p className="px-3 text-xs font-medium text-white/50 uppercase tracking-wider">
+                                                                    {subSection.title}
+                                                                </p>
+                                                                {subSection.links.map((subLink, subIndex) => (
+                                                                    <NavLink
+                                                                        key={subLink.text}
+                                                                        href={subLink.href}
+                                                                        text={subLink.text}
+                                                                        icon={subLink.icon}
+                                                                        isActive={pathname === subLink.href}
+                                                                        hasActiveRide={hasActiveRide}
+                                                                        isSubLink
+                                                                        animationDelay={animationDelay + (subSectionIndex * 2 + subIndex + 1) * 50}
+                                                                    />
+                                                                ))}
+                                                            </div>
                                                         ))}
                                                     </div>
                                                 </div>
