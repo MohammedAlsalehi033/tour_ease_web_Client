@@ -1,5 +1,5 @@
 import React from 'react'
-import GoogleMapComponent from '../../components/mapComForListing';
+import CreateRideListingWizard from '../../components/CreateRideListingWizard';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -25,7 +25,7 @@ const page = async () => {
 
   return (
     <div>
-      <GoogleMapComponent/>
+      <CreateRideListingWizard />
     </div>
   )
 }

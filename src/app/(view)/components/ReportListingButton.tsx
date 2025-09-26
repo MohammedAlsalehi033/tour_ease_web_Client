@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Flag, AlertTriangle, X } from 'lucide-react';
 import { ReportController } from '@/app/(controller)/report/reportController';
 import { container } from '@/app/lib/diContainer';
@@ -158,9 +159,10 @@ const ReportListingButton: React.FC<ReportListingButtonProps> = ({
       </button>
 
       {/* Report Modal */}
-      {isModalOpen && (
+      {isModalOpen && createPortal(
         <div 
-          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[9999] backdrop-blur-sm"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[99999] backdrop-blur-sm"
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
           onClick={handleBackdropClick}
         >
           <div 
@@ -281,7 +283,8 @@ const ReportListingButton: React.FC<ReportListingButtonProps> = ({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

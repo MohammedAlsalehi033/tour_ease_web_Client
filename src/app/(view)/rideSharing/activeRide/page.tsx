@@ -218,7 +218,7 @@ const ActiveRidePage = () => {
     // --- Main Render ---
     return (
         <main className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 p-4">
-            <div className="max-w-4xl mx-auto pt-8">
+            <div className=" pt-8">
                 {activeRideDetails ? (
                     <div className="space-y-8">
                         {/* Header */}

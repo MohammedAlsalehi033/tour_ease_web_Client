@@ -49,7 +49,7 @@ const UserProfilePage = async ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="font-sans text-gray-900 dark:text-gray-100 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="">
         
         {/* User Profile Card */}
           <div className="card shadow-lg rounded-lg p-6 mb-8 dark:border-dark-outline border border-light-outline ">

@@ -108,7 +108,7 @@ const MyReviewsPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-light-background dark:bg-dark-background p-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="">
           <div className="animate-pulse space-y-4">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="card p-6">
@@ -125,7 +125,7 @@ const MyReviewsPage = () => {
 
   return (
     <div className="min-h-screen bg-light-background dark:bg-dark-background p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-display-sm font-bold text-light-on-background dark:text-dark-on-background mb-2">

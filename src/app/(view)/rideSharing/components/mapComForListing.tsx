@@ -32,6 +32,12 @@ export default function GoogleMapComponent() {
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
+    // Check if API key is available
+    if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
+      console.error('Google Maps API key is not configured. Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your environment variables.');
+      return;
+    }
+
     if (window.google?.maps) {
       initMap();
       return;
@@ -42,6 +48,9 @@ export default function GoogleMapComponent() {
     script.async = true;
     script.defer = true;
     script.onload = initMap;
+    script.onerror = (error) => {
+      console.error('Failed to load Google Maps API:', error);
+    };
 
     document.head.appendChild(script);
 

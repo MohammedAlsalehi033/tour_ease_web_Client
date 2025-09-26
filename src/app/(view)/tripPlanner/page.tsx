@@ -1,168 +1,152 @@
-"use client"
-import React, { useState } from 'react'
-import NewPlanForm from './NewPlanForm'
-import CurrentPlans from './CurrentPlans'
+"use client";
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { MapPin, Calendar, Users, Star, ArrowRight, Trash2, Plus } from 'lucide-react';
+import TripPlannerWizard from './components/TripPlannerWizard';
+import CurrentPlans from './components/CurrentPlans';
 
-type PlanDetails = {
-    fromLocation: string;
-    toLocation: string;
-    budget: string;
-    startDate: string;
-    endDate: string;
-    travelers: number;
-    requirements: string;
-};
-
-type Errors = {
-    fromLocation?: string;
-    toLocation?: string;
-    budget?: string;
-    startDate?: string;
-    endDate?: string;
-    travelers?: string;
-    activities?: string;
-};
-
-const TripPlanner = () => {
-    const [activeTab, setActiveTab] = useState<'newPlan' | 'currentPlans'>('newPlan');
-
-    // State for all form inputs
-    const [planDetails, setPlanDetails] = useState<PlanDetails>({
-        fromLocation: '',
-        toLocation: '',
-        budget: '',
-        startDate: '',
-        endDate: '',
-        travelers: 1,
-        requirements: '',
-    });
-
-    // State to hold validation errors
-    const [errors, setErrors] = useState<Errors>({});
-
-    // State for the activities
-    const [activities, setActivities] = useState([
-        { name: 'Sightseeing', selected: false , icon: 'fa-solid fa-eye'},
-        { name: 'Hiking', selected: false , icon: 'fa-solid fa-mountain'},
-        { name: 'Dining', selected: false , icon: 'fa-solid fa-utensils'},
-        { name: 'Shopping', selected: false , icon: 'fa-solid fa-bag-shopping'},
-        { name: 'Cultural Tours', selected: false , icon: 'fa-solid fa-theater-masks'},
-        { name: 'Adventure Sports', selected: false , icon: 'fa-solid fa-bolt'},
-        { name: 'Relaxation', selected: false , icon: 'fa-solid fa-spa'},
-        { name: 'Wildlife Safari', selected: false , icon: 'fa-solid fa-paw'},
-    ]);
-
-    // A single handler for all standard input fields
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setPlanDetails(prevDetails => ({
-            ...prevDetails,
-            [name]: name === 'travelers' ? Number(value) : value
-        }));
-        // Optional: Clear error when user starts typing
-        if (errors[name as keyof Errors]) {
-            setErrors(prevErrors => ({ ...prevErrors, [name]: undefined }));
-        }
-    };
-
-    // A dedicated handler for toggling activity selection
-    const handleActivityToggle = (index: number) => {
-        const newActivities = [...activities];
-        newActivities[index].selected = !newActivities[index].selected;
-        setActivities(newActivities);
-        // Optional: Clear error when user selects an activity
-        if (errors.activities) {
-            setErrors(prevErrors => ({ ...prevErrors, activities: undefined }));
-        }
-    };
-    
-    // --- VALIDATION LOGIC ---
-    const validateForm = () => {
-        const newErrors: Errors = {};
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Get start of today for comparison
-
-        // Required fields
-        if (!planDetails.fromLocation.trim()) newErrors.fromLocation = 'Starting location is required.';
-        if (!planDetails.toLocation.trim()) newErrors.toLocation = 'Destination is required.';
-        if (!planDetails.budget) newErrors.budget = 'Budget is required.';
-        if (!planDetails.travelers) newErrors.travelers = 'Number of travelers is required.';
-        if (!planDetails.startDate) newErrors.startDate = 'Start date is required.';
-        if (!planDetails.endDate) newErrors.endDate = 'End date is required.';
-
-        // Logical validations
-        if (planDetails.fromLocation.trim() && planDetails.fromLocation.trim().toLowerCase() === planDetails.toLocation.trim().toLowerCase()) {
-            newErrors.toLocation = 'Destination cannot be the same as the start.';
-        }
-        if (planDetails.budget && parseFloat(planDetails.budget) <= 0) {
-            newErrors.budget = 'Budget must be a positive number.';
-        }
-        if (planDetails.travelers && planDetails.travelers < 1) {
-            newErrors.travelers = 'Must have at least 1 traveler.';
-        }
-        if (planDetails.startDate && new Date(planDetails.startDate).setHours(0,0,0,0) < today.getTime()) {
-            newErrors.startDate = 'Start date cannot be in the past.';
-        }
-        if (planDetails.startDate && planDetails.endDate && new Date(planDetails.endDate) < new Date(planDetails.startDate)) {
-            newErrors.endDate = 'End date cannot be before the start date.';
-        }
-        if (!activities.some(activity => activity.selected)) {
-            newErrors.activities = 'Please select at least one activity.';
-        }
-
-        return newErrors;
-    };
-
-
-    // Handle form submission
-    const handleSubmit = (e) => {
-        e.preventDefault(); 
-        const validationErrors = validateForm();
-        setErrors(validationErrors);
-
-        // If there are no errors, proceed with submission
-        if (Object.keys(validationErrors).length === 0) {
-            const selectedActivities = activities
-                .filter(activity => activity.selected)
-                .map(activity => activity.name);
-            
-            const submissionData = {
-                ...planDetails,
-                selectedActivities
-            };
-    
-        } else {
-            console.log("Validation failed. Please correct the errors.", validationErrors);
-        }
-    };
-
-    return (
-        <div>
-            {/* Tab navigation */}
-            <div className="flex flex-row w-full bg-gray-100 rounded-lg overflow-hidden tabs">
-                <button type="button" className={`w-1/2 p-4 md:p-6 tab text-center font-semibold transition-colors duration-300 ${activeTab === 'newPlan' ? '!bg-primary text-white' : 'hover:bg-gray-200'}`} onClick={() => setActiveTab('newPlan')}>Make a New Plan</button>
-                <button type="button" className={`w-1/2 p-4 md:p-6 tab text-center font-semibold transition-colors duration-300 ${activeTab === 'currentPlans' ? '!bg-primary text-white' : 'hover:bg-gray-200'}`} onClick={() => setActiveTab('currentPlans')}>Your Current Plans</button>
-            </div>
-            
-            {activeTab === 'newPlan' && (
-                <NewPlanForm
-                    planDetails={planDetails}
-                    setPlanDetails={setPlanDetails}
-                    activities={activities}
-                    setActivities={setActivities}
-                    errors={errors}
-                    setErrors={setErrors}
-                    handleInputChange={handleInputChange}
-                    handleActivityToggle={handleActivityToggle}
-                    handleSubmit={handleSubmit}
-                />
-            )}
-
-            {activeTab === 'currentPlans' && (
-                <CurrentPlans />
-            )}
-        </div>
-    )
+interface Plan {
+  id: string;
+  from: string;
+  to: string;
+  startDate: string;
+  endDate: string;
+  budget: number;
+  activities: string[];
+  travelers: number;
+  createdAt: string;
+  status: 'planned' | 'active' | 'completed';
 }
 
-export default TripPlanner;
+const mockPlans: Plan[] = [
+  {
+    id: '1',
+    from: 'New York, NY',
+    to: 'Paris, France',
+    startDate: '2024-06-15',
+    endDate: '2024-06-25',
+    budget: 3500,
+    activities: ['Sightseeing', 'Dining', 'Museums'],
+    travelers: 2,
+    createdAt: '2024-01-15',
+    status: 'planned'
+  },
+  {
+    id: '2',
+    from: 'Los Angeles, CA',
+    to: 'Tokyo, Japan',
+    startDate: '2024-08-10',
+    endDate: '2024-08-20',
+    budget: 4200,
+    activities: ['Cultural Tours', 'Dining', 'Shopping'],
+    travelers: 1,
+    createdAt: '2024-02-20',
+    status: 'planned'
+  }
+];
+
+export default function TripPlanner() {
+  const searchParams = useSearchParams();
+  const [showWizard, setShowWizard] = useState(false);
+  const [plans, setPlans] = useState<Plan[]>(mockPlans);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Check for success parameter
+  useEffect(() => {
+    const success = searchParams.get('success');
+    if (success === 'plan-created') {
+      setSuccessMessage('Your trip plan has been created successfully!');
+      setShowWizard(false);
+      setTimeout(() => setSuccessMessage(''), 5000);
+    }
+  }, [searchParams]);
+
+  const handleDeletePlan = (planId: string) => {
+    setPlans(prev => prev.filter(plan => plan.id !== planId));
+  };
+
+  const handleUpdatePlan = (planId: string, updates: Partial<Plan>) => {
+    setPlans(prev => prev.map(plan => 
+      plan.id === planId ? { ...plan, ...updates } : plan
+    ));
+  };
+
+  if (showWizard) {
+    return <TripPlannerWizard />;
+  }
+
+  return (
+    <div className="min-h-screen bg-[rgb(var(--background))] py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Success Message */}
+        {successMessage && (
+          <div className="mb-6 p-4 bg-[rgba(var(--success),0.1)] border border-[rgb(var(--success))] rounded-lg">
+            <p className="text-[rgb(var(--success))] font-medium">{successMessage}</p>
+          </div>
+        )}
+
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-[rgb(var(--text))] mb-2">
+            Trip Planner
+          </h1>
+          <p className="text-[rgb(var(--text-secondary))] mb-6">
+            Plan your perfect getaway with personalized recommendations
+          </p>
+          
+          {/* Create New Plan Button */}
+          <button
+            onClick={() => setShowWizard(true)}
+            className="btn btn-primary text-lg px-8 py-3 inline-flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Plan New Trip
+          </button>
+        </div>
+
+        {/* Current Plans Section */}
+        <div className="mt-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-[rgb(var(--text))]">
+              Your Trip Plans
+            </h2>
+            {plans.length > 0 && (
+              <span className="bg-[rgba(var(--primary),0.1)] text-[rgb(var(--primary))] px-3 py-1 rounded-full text-sm font-medium">
+                {plans.length} {plans.length === 1 ? 'plan' : 'plans'}
+              </span>
+            )}
+          </div>
+          
+          <CurrentPlans 
+            plans={plans}
+            onDeletePlan={handleDeletePlan}
+            onUpdatePlan={handleUpdatePlan}
+          />
+        </div>
+
+        {/* Empty State */}
+        {plans.length === 0 && (
+          <div className="text-center py-12">
+            <div className="bg-[rgb(var(--surface))] rounded-lg p-8 max-w-md mx-auto">
+              <div className="w-16 h-16 bg-[rgba(var(--primary),0.1)] rounded-full flex items-center justify-center mx-auto mb-4">
+                <MapPin className="text-[rgb(var(--primary))]" size={24} />
+              </div>
+              <h3 className="text-lg font-medium text-[rgb(var(--text))] mb-2">
+                No trips planned yet
+              </h3>
+              <p className="text-[rgb(var(--text-secondary))] mb-6">
+                Start planning your next adventure by creating your first trip plan.
+              </p>
+              <button
+                onClick={() => setShowWizard(true)}
+                className="btn btn-primary"
+              >
+                Plan Your First Trip
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
