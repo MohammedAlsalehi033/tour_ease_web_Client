@@ -70,7 +70,7 @@ const page = async ({ params }: { params: { Questionid: string } }) => {
                   questionTitle={question.title}
                   currentUserId={currentUserId}
                 />
-                <EditQuestion currentDescription={question.description} currentTitle={question.title} questionId={question.id.toString()} />
+                <EditQuestion currentDescription={question.description} currentTitle={question.title} questionId={question.id.toString()} isDisabled={question.user.id !== currentUserId} />
               </div>
             </div>
             <div className="border-b border-primary/10 dark:border-dark-outline/30 mb-3" />

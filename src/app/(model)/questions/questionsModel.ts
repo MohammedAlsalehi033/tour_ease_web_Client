@@ -13,7 +13,10 @@ export interface Question {
         username: string;
         mediaUrls: string[];
     };
-    vote: []; // If you know the type, replace [] with the correct type
+    vote: Array<{
+        userId: string;
+        type: 'UPVOTE' | 'DOWNVOTE';
+    }>;
     _count: {
         comments: number;
     };

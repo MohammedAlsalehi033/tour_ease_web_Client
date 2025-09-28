@@ -12,9 +12,10 @@ interface EditQuestionProps {
   questionId: string; 
   currentTitle: string;
   currentDescription: string;
+  isDisabled?: boolean;
 }
 
-const EditQuestion: React.FC<EditQuestionProps> = ({ questionId, currentTitle, currentDescription }) => {
+const EditQuestion: React.FC<EditQuestionProps> = ({ questionId, currentTitle, currentDescription, isDisabled = true }) => {
   // State to control the modal's visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +30,8 @@ const EditQuestion: React.FC<EditQuestionProps> = ({ questionId, currentTitle, c
       setIsLoading(true);
       const questionsController = container.resolve(QuestionsController);
       questionsController.editQuestion(parseInt(questionId), title, description)
-      window.location.reload(); 
+      window.location.reload();
+      alert("question edited successfully")
     }
     catch{
       alert("something went wrong try again")
@@ -65,7 +67,8 @@ setIsModalOpen(false)
       {/* The button that triggers the modal */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="btn-primary flex items-center gap-2" // Use your existing button style
+        className="btn-primary flex items-center gap-2"
+        disabled={isDisabled} // Use your existing button style
         aria-label="Edit Question"
       >
         <FaEdit />

@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { withPublicRoute } from "@/components/auth/withAuth";
 
-export default function Login() {
+function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Get the callback URL from query params, default to dashboard
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +27,8 @@ export default function Login() {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.push("/");
+        // Redirect to the callback URL or dashboard after successful login
+        router.push(callbackUrl);
       }
     } catch (err) {
       setError("Failed to sign in");
@@ -90,3 +96,6 @@ return (
   </div>
 );
 }
+
+// Export the component wrapped with the public route HOC
+export default withPublicRoute(LoginPage);
