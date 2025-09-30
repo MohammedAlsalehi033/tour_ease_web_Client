@@ -32,6 +32,7 @@ export type ReportableType =
   | 'MESSAGE'
   | 'OFFER'
   | 'TRANSPORTATION_BOOKING'
+  | 'TRANSPORTATION_REQUEST'
   | 'ACCOMMODATION_BOOKING';
 
 export type ReportStatus = 
@@ -54,6 +55,7 @@ export interface CreateReportData {
   messageId?: number;
   offerId?: number;
   transportationBookingId?: number;
+  transportationRequestId?: number;
   accommodationBookingId?: number;
 }
 

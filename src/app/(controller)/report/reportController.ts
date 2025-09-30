@@ -128,6 +128,7 @@ export class ReportController {
             data.messageId,
             data.offerId,
             data.transportationBookingId,
+            data.transportationRequestId,
             data.accommodationBookingId,
         ];
 
@@ -144,6 +145,7 @@ export class ReportController {
     // Helper method to get reportable type display name
     getReportableTypeDisplayName(type: ReportableType): string {
         const displayNames: Record<ReportableType, string> = {
+            'TRANSPORTATION_REQUEST': 'Transportation Request',
             'USER': 'User',
             'TRANSPORTATION_LISTING': 'Transportation Listing',
             'ACCOMMODATION': 'Accommodation',

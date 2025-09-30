@@ -1,7 +1,7 @@
 "use client";
 
 import "reflect-metadata";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MapPin, 
@@ -19,7 +19,9 @@ import {
   CheckCircle,
   AlertCircle,
   User,
-  Zap
+  Zap,
+  RefreshCw,
+  Flag
 } from 'lucide-react';
 import { RideRequest } from '../../../(model)/rideSharing/RideRequest/rideRequestModel';
 import { useSession } from 'next-auth/react';
@@ -27,6 +29,7 @@ import { useRouter } from 'next/navigation';
 import { OfferController } from "@/app/(controller)/rideSharing/offerController";
 import { container } from "@/app/lib/diContainer";
 import { TransportationOffer } from "@/app/(model)/rideSharing/offer/offerModel";
+import ReportRequestButton from '../../components/ReportRequestButton';
 
 interface EnhancedRideRequestsProps {
   rideRequests: RideRequest[];
@@ -36,7 +39,8 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
   const [selectedRequest, setSelectedRequest] = useState<RideRequest | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [allRequests, setAllRequests] = useState(initialRequests || []);
-  const [myAcceptedOffers, setMyAcceptedOffers] = useState<RideRequest[]>([]);
+  const [sentOffers, setSentOffers] = useState<TransportationOffer[]>([]);
+  const [loadingOffers, setLoadingOffers] = useState(true);
 
   const { data: session } = useSession();
   const router = useRouter();
@@ -58,28 +62,55 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
     }
   }, [selectedRequest]);
 
-  // Load accepted offers from localStorage
-  useEffect(() => {
-    try {
-      const storedOffers = JSON.parse(localStorage.getItem('myAcceptedOffers') || '[]');
-      if (Array.isArray(storedOffers)) {
-        setMyAcceptedOffers(storedOffers);
-      }
-    } catch (error) {
-      console.error("Failed to parse myAcceptedOffers from localStorage", error);
+  // Load sent offers from backend
+  const loadSentOffers = useCallback(async () => {
+    if (!userId) {
+      setLoadingOffers(false);
+      return;
     }
-  }, []);
+    
+    try {
+      const offerController = container.resolve(OfferController);
+      const offers = await offerController.getSentOffers(userId);
+      setSentOffers(offers);
+    } catch (error) {
+      console.error("Failed to load sent offers:", error);
+      // Don't show alert for initial load failures
+    } finally {
+      setLoadingOffers(false);
+    }
+  }, [userId]);
 
-  // Update requests with accepted status
   useEffect(() => {
-    const acceptedRequestIds = new Set(myAcceptedOffers.map(r => r.id));
+    loadSentOffers();
+  }, [loadSentOffers]);
+
+  // Refresh offers every 30 seconds to check for status updates
+  useEffect(() => {
+    if (!userId) return;
+    
+    const interval = setInterval(() => {
+      loadSentOffers();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [userId, loadSentOffers]);
+
+  // Update requests with accepted status based on sent offers
+  useEffect(() => {
+    const acceptedRequestIds = new Set(
+      sentOffers
+        .filter(offer => offer.status === 'accepted' && offer.transportationRequestId)
+        .map(offer => offer.transportationRequestId!)
+    );
+    
     const updatedRequests = (initialRequests || []).map(request =>
       acceptedRequestIds.has(request.id)
         ? { ...request, status: 'accepted' as any }
         : request
     );
     setAllRequests(updatedRequests);
-  }, [initialRequests, myAcceptedOffers]);
+  }, [initialRequests, sentOffers]);
 
   // Filter logic (no search functionality)
   const filteredRequests = allRequests;
@@ -110,8 +141,12 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
     switch (status) {
       case 'accepted':
         return 'badge badge-success';
+      case 'rejected':
+        return 'badge badge-error';
       case 'pending':
         return 'badge badge-warning';
+      case 'open':
+        return 'badge badge-info';
       default:
         return 'badge badge-info';
     }
@@ -119,24 +154,72 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
 
   const handleAcceptOffer = async (requestToAccept: RideRequest) => {
     if (!userId) {
-      alert("Please log in to accept this offer.");
+      alert("Please log in to send an offer.");
+      return;
+    }
+
+    // Check if user has already sent an offer for this request
+    const existingOffer = sentOffers.find(
+      offer => offer.transportationRequestId === requestToAccept.id && offer.senderId === userId
+    );
+    
+    if (existingOffer) {
+      alert("You have already sent an offer for this request.");
+      return;
+    }
+
+    // Validate that the request is not from the current user
+    if (requestToAccept.travelerId === userId) {
+      alert("You cannot send an offer to your own ride request.");
       return;
     }
 
     setIsLoading(true);
     
     try {
-      // Simulate API call - replace with actual offer acceptance logic
-      const newAcceptedOffers = [...myAcceptedOffers, requestToAccept];
-      setMyAcceptedOffers(newAcceptedOffers);
-      localStorage.setItem('myAcceptedOffers', JSON.stringify(newAcceptedOffers));
+      const offerController = container.resolve(OfferController);
       
+      // Extract price from budget string, default to "0" if not a valid number
+      const budgetNumeric = requestToAccept.budget.replace(/[^0-9.]/g, '');
+      const pricePerSeat = budgetNumeric || "0";
+      
+      // Create a new offer for this ride request
+      const newOffer: Omit<TransportationOffer, 'id' | 'createdAt'> = {
+        senderId: userId,
+        recipientId: requestToAccept.travelerId,
+        pricePerSeat: pricePerSeat,
+        seatsRequested: requestToAccept.seatsNeeded,
+        message: `I can help you with your ride from ${requestToAccept.startLocationText} to ${requestToAccept.endLocationText}. I have ${requestToAccept.seatsNeeded} seat${requestToAccept.seatsNeeded > 1 ? 's' : ''} available.`,
+        status: 'pending',
+        transportationListingId: null,
+        transportationRequestId: requestToAccept.id
+      };
+      
+      const createdOffer = await offerController.createOffer(newOffer as TransportationOffer);
+      
+      // Update the sent offers state
+      setSentOffers(prev => [...prev, createdOffer]);
+      
+      alert("Offer sent successfully! The traveler will be notified and can accept or decline your offer.");
+    } catch (error: any) {
+      console.error("Error creating offer:", error);
+      
+      // Provide more specific error messages based on the error
+      let errorMessage = "There was an error sending your offer. Please try again.";
+      
+      if (error?.response?.status === 401) {
+        errorMessage = "You need to be logged in to send offers.";
+      } else if (error?.response?.status === 400) {
+        errorMessage = "Invalid offer data. Please check your details and try again.";
+      } else if (error?.response?.status === 409) {
+        errorMessage = "You have already sent an offer for this request.";
+      } else if (error?.response?.status >= 500) {
+        errorMessage = "Server error. Please try again later.";
+      }
+      
+      alert(errorMessage);
+    } finally {
       setIsLoading(false);
-      alert("Offer accepted successfully!");
-    } catch (error) {
-      console.error("Error accepting offer:", error);
-      setIsLoading(false);
-      alert("There was an error accepting the offer. Please try again.");
     }
   };
 
@@ -154,7 +237,12 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
 
   // Enhanced Request Card Component
   const RequestCard = ({ request }: { request: RideRequest }) => {
-    const isAccepted = myAcceptedOffers.some(offer => offer.id === request.id);
+    const hasOfferForRequest = sentOffers.some(
+      offer => offer.transportationRequestId === request.id && offer.senderId === userId
+    );
+    const offerStatus = sentOffers.find(
+      offer => offer.transportationRequestId === request.id && offer.senderId === userId
+    )?.status;
     const isSelected = selectedRequest?.id === request.id;
 
     return (
@@ -178,21 +266,46 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
         {/* Header with Status and Budget */}
         <div className="p-6 pb-4">
           <div className="flex justify-between items-start mb-4">
-            <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium ${getStatusBadgeStyles(isAccepted ? 'accepted' : 'open')}`}>
-              <div className={`w-2 h-2 rounded-full ${isAccepted ? 'bg-success' : 'bg-primary animate-pulse'}`}></div>
-              <span>{isAccepted ? 'ACCEPTED' : 'OPEN REQUEST'}</span>
+            <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs font-medium ${getStatusBadgeStyles(hasOfferForRequest ? offerStatus || 'pending' : 'open')}`}>
+              <div className={`w-2 h-2 rounded-full ${
+                hasOfferForRequest 
+                  ? offerStatus === 'accepted' 
+                    ? 'bg-success' 
+                    : offerStatus === 'rejected'
+                    ? 'bg-error'
+                    : 'bg-warning animate-pulse'
+                  : 'bg-primary animate-pulse'
+              }`}></div>
+              <span>
+                {hasOfferForRequest 
+                  ? offerStatus === 'accepted' 
+                    ? 'OFFER ACCEPTED' 
+                    : offerStatus === 'rejected'
+                    ? 'OFFER REJECTED'
+                    : 'OFFER PENDING'
+                  : 'OPEN REQUEST'
+                }
+              </span>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="btn-outlined p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all"
-              style={{
-                backgroundColor: 'rgba(var(--surface), 0.8)',
-                color: 'rgba(var(--text), 0.6)'
-              }}
-            >
-              <Heart size={16} />
-            </motion.button>
+            <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-all">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="btn-outlined p-2 rounded-full"
+                style={{
+                  backgroundColor: 'rgba(var(--surface), 0.8)',
+                  color: 'rgba(var(--text), 0.6)'
+                }}
+              >
+                <Heart size={16} />
+              </motion.button>
+              <ReportRequestButton
+                requestId={request.id.toString()}
+                requestTitle={`ride request from ${request.startLocationText} to ${request.endLocationText}`}
+                currentUserId={userId}
+                className="p-2 rounded-full opacity-80 hover:opacity-100"
+              />
+            </div>
           </div>
 
           {/* Route with Enhanced Design */}
@@ -234,7 +347,7 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
               </div>
               <div className="min-w-0">
                 <p className="font-semibold text-light-on-surface dark:text-dark-on-surface">
-                  Traveler
+                  { request.sender?.username || 'Traveler'}
                 </p>
                 <div className="flex items-center space-x-2">
                   <Shield size={12} className="text-success" />
@@ -273,7 +386,14 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
               <div className="flex items-center space-x-1 text-xs bg-light-surface dark:bg-dark-surface px-2 py-1 rounded-lg">
                 <Zap size={12} className="text-primary" />
                 <span className="text-light-on-surface dark:text-dark-on-surface">
-                  {isAccepted ? 'Accepted' : 'Help Needed'}
+                  {hasOfferForRequest 
+                    ? offerStatus === 'accepted' 
+                      ? 'Offer Accepted' 
+                      : offerStatus === 'rejected'
+                      ? 'Offer Rejected'
+                      : 'Offer Sent'
+                    : 'Help Needed'
+                  }
                 </span>
               </div>
               {isSelected && (
@@ -293,9 +413,38 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
   return (
     <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-200px)]">
       <div className={`flex-1 lg:max-w-2xl ${selectedRequest ? 'hidden lg:block' : ''}`}>
+        {/* Header with refresh button */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-headline-md font-semibold text-light-on-surface dark:text-dark-on-surface">
+            Available Ride Requests
+          </h2>
+          <button
+            onClick={() => loadSentOffers()}
+            disabled={loadingOffers}
+            className="btn-outlined p-2 rounded-full transition-all hover:bg-primary/10 disabled:opacity-50"
+            title="Refresh offers"
+          >
+            <RefreshCw 
+              size={20} 
+              className={`text-primary ${loadingOffers ? 'animate-spin' : ''}`} 
+            />
+          </button>
+        </div>
+        
+        {/* Loading state for offers */}
+        {loadingOffers && sentOffers.length === 0 && (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="ml-3 text-light-on-surface-variant dark:text-dark-on-surface-variant">
+              Loading offers...
+            </span>
+          </div>
+        )}
+        
         {/* Requests Grid */}
-        <div className="space-y-4 overflow-y-auto max-h-full pr-2 scrollbar-hide">
-          <AnimatePresence>
+        {(!loadingOffers || sentOffers.length > 0) && (
+          <div className="space-y-4 overflow-y-auto max-h-full pr-2 scrollbar-hide">
+            <AnimatePresence>
             {filteredRequests.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -326,7 +475,8 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
               ))
             )}
           </AnimatePresence>
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Right Side - Details Panel */}
@@ -442,7 +592,7 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
                     </div>
                     <div className="ml-4">
                       <p className="text-xl font-semibold text-light-on-surface dark:text-dark-on-surface">
-                        Anonymous Traveler
+                        { selectedRequest?.travelerId || 'Traveler'}
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
                         <Shield size={16} className="text-success" />
@@ -469,25 +619,69 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
                     whileTap={{ scale: 0.98 }}
                     className="w-full bg-primary text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleAcceptOffer(selectedRequest)}
-                    disabled={isLoading || myAcceptedOffers.some(offer => offer.id === selectedRequest.id)}
+                    disabled={isLoading || sentOffers.some(offer => offer.transportationRequestId === selectedRequest.id && offer.senderId === userId)}
                   >
                     {isLoading ? (
                       <>
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                        Processing...
+                        Sending Offer...
                       </>
-                    ) : myAcceptedOffers.some(offer => offer.id === selectedRequest.id) ? (
-                      <>
-                        <CheckCircle className="w-5 h-5 mr-2" />
-                        Offer Accepted
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-5 h-5 mr-2" />
-                        Accept This Request
-                      </>
-                    )}
+                    ) : (() => {
+                      const existingOffer = sentOffers.find(offer => 
+                        offer.transportationRequestId === selectedRequest.id && offer.senderId === userId
+                      );
+                      
+                      if (existingOffer) {
+                        switch (existingOffer.status) {
+                          case 'accepted':
+                            return (
+                              <>
+                                <CheckCircle className="w-5 h-5 mr-2" />
+                                Offer Accepted
+                              </>
+                            );
+                          case 'rejected':
+                            return (
+                              <>
+                                <X className="w-5 h-5 mr-2" />
+                                Offer Rejected
+                              </>
+                            );
+                          case 'pending':
+                            return (
+                              <>
+                                <Clock className="w-5 h-5 mr-2" />
+                                Offer Pending
+                              </>
+                            );
+                          default:
+                            return (
+                              <>
+                                <AlertCircle className="w-5 h-5 mr-2" />
+                                Offer Sent
+                              </>
+                            );
+                        }
+                      }
+                      
+                      return (
+                        <>
+                          <Zap className="w-5 h-5 mr-2" />
+                          Send Transportation Offer
+                        </>
+                      );
+                    })()}
                   </motion.button>
+                  
+                  {/* Report Button */}
+                  <div className="flex justify-center">
+                    <ReportRequestButton
+                      requestId={selectedRequest.id.toString()}
+                      requestTitle={`ride request from ${selectedRequest.startLocationText} to ${selectedRequest.endLocationText}`}
+                      currentUserId={userId}
+                      className="text-sm"
+                    />
+                  </div>
                   
                   <div className="grid grid-cols-2 gap-3">
                     <motion.button 

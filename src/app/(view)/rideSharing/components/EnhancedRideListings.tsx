@@ -559,6 +559,16 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
                     )}
                   </motion.button>
                   
+                  {/* Report Button */}
+                  <div className="flex justify-center">
+                    <ReportListingButton
+                      listingId={selectedListing.id.toString()}
+                      listingTitle={`ride from ${selectedListing.startLocationText} to ${selectedListing.endLocationText}`}
+                      currentUserId={userId}
+                      className="text-sm"
+                    />
+                  </div>
+                  
                   <div className="grid grid-cols-2 gap-3">
                     <motion.button 
                       whileHover={{ scale: 1.05 }}
