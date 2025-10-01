@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { ApiService } from "@/app/services/apiService";
 import { ResponseModel } from "@/Types/types";
 import { injectable } from "tsyringe";

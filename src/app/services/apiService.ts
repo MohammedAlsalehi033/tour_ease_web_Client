@@ -1,4 +1,5 @@
 // src/app/services/apiService.ts
+import 'reflect-metadata';
 import { injectable } from 'tsyringe';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'; // Adjust path as needed

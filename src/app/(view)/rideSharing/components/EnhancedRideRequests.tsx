@@ -30,6 +30,7 @@ import { OfferController } from "@/app/(controller)/rideSharing/offerController"
 import { container } from "@/app/lib/diContainer";
 import { TransportationOffer } from "@/app/(model)/rideSharing/offer/offerModel";
 import ReportRequestButton from '../../components/ReportRequestButton';
+import { openRouteOnMap } from '@/app/lib/mapUtils';
 
 interface EnhancedRideRequestsProps {
   rideRequests: RideRequest[];
@@ -309,14 +310,29 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
           </div>
 
           {/* Route with Enhanced Design */}
-          <div className="space-y-3 mb-4">
+          <div 
+            className="space-y-3 mb-4 cursor-pointer group/route hover:bg-secondary/5 dark:hover:bg-secondary/10 rounded-lg p-2 -m-2 transition-all duration-200"
+            onClick={(e) => {
+              e.stopPropagation();
+              openRouteOnMap({
+                startLocationText: request.startLocationText,
+                endLocationText: request.endLocationText,
+                startLocationLat: request.startLocationLat,
+                startLocationLng: request.startLocationLng,
+                endLocationLat: request.endLocationLat,
+                endLocationLng: request.endLocationLng
+              });
+            }}
+            title="Click to view route on Google Maps"
+          >
             <div className="flex items-center space-x-3">
               <div className="w-3 h-3 bg-secondary rounded-full shadow-sm"></div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate">
+                <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate group-hover/route:text-secondary transition-colors">
                   {request.startLocationText}
                 </p>
               </div>
+              <MapPin size={14} className="text-secondary opacity-0 group-hover/route:opacity-100 transition-opacity" />
             </div>
             <div className="flex items-center space-x-3">
               <div className="w-px h-8 bg-secondary ml-1.5"></div>
@@ -330,7 +346,7 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
             <div className="flex items-center space-x-3">
               <div className="w-3 h-3 bg-warning rounded-full shadow-sm"></div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate">
+                <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate group-hover/route:text-secondary transition-colors">
                   {request.endLocationText}
                 </p>
               </div>
@@ -514,14 +530,38 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
               {/* Content */}
               <div className="p-6 space-y-6">
                 {/* Route */}
-                <div className="space-y-4">
+                <div 
+                  className="space-y-4 cursor-pointer hover:bg-secondary/5 dark:hover:bg-secondary/10 rounded-lg p-3 -m-3 transition-all duration-200 group/route-detail"
+                  onClick={() => {
+                    if (selectedRequest) {
+                      openRouteOnMap({
+                        startLocationText: selectedRequest.startLocationText,
+                        endLocationText: selectedRequest.endLocationText,
+                        startLocationLat: selectedRequest.startLocationLat,
+                        startLocationLng: selectedRequest.startLocationLng,
+                        endLocationLat: selectedRequest.endLocationLat,
+                        endLocationLng: selectedRequest.endLocationLng
+                      });
+                    }
+                  }}
+                  title="Click to view route on Google Maps"
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-light-on-surface dark:text-dark-on-surface flex items-center">
+                      <Navigation className="w-5 h-5 mr-2 text-secondary" />
+                      Route Details
+                    </h3>
+                    <div className="text-xs text-secondary opacity-0 group-hover/route-detail:opacity-100 transition-opacity bg-secondary/10 px-2 py-1 rounded-full">
+                      View on Map
+                    </div>
+                  </div>
                   <div className="flex items-start">
                     <div className="bg-secondary/10 p-3 rounded-full mr-4">
                       <MapPin className="w-6 h-6 text-secondary" />
                     </div>
                     <div>
                       <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">Pickup Location</p>
-                      <p className="text-lg font-semibold" style={{ color: 'rgb(var(--text))' }}>
+                      <p className="text-lg font-semibold text-light-on-surface dark:text-dark-on-surface group-hover/route-detail:text-secondary transition-colors">
                         {selectedRequest?.startLocationText}
                       </p>
                     </div>
@@ -532,7 +572,7 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
                     </div>
                     <div>
                       <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">Destination</p>
-                      <p className="text-lg font-semibold" style={{ color: 'rgb(var(--text))' }}>
+                      <p className="text-lg font-semibold text-light-on-surface dark:text-dark-on-surface group-hover/route-detail:text-secondary transition-colors">
                         {selectedRequest?.endLocationText}
                       </p>
                     </div>

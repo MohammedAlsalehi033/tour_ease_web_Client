@@ -14,6 +14,7 @@ import { container } from 'tsyringe';
 import { BookingController } from '../(controller)/rideSharing/bookingController';
 import localFont from 'next/font/local';
 import NotificationIcon from './components/notificationIcon';
+import { ActiveRideProvider } from '@/app/components/ActiveRideProvider';
 
 
 export const myFont = localFont({
@@ -69,15 +70,16 @@ export default async function RootLayout({
       </head>
       <body className="font-lina font-rounded">
         <ThemeProvider attribute="class">
-          <Suspense fallback={<SidebarSkeleton />}>
-            <MySideBar hasActiveRide={hasActiveRide} />
-          </Suspense>
           <Providers>
-                        <NotificationIcon />
-
-            <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72 p-5 md:p-5">
-              {children}
-            </div>
+            <ActiveRideProvider>
+              <Suspense fallback={<SidebarSkeleton />}>
+                <MySideBar hasActiveRide={hasActiveRide} />
+              </Suspense>
+              <NotificationIcon />
+              <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72 p-5 md:p-5">
+                {children}
+              </div>
+            </ActiveRideProvider>
           </Providers>
         </ThemeProvider>
       </body>

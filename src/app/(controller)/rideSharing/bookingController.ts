@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { BookingRepo } from "@/app/(model)/rideSharing/booking/bookingRepo";
 import { inject, injectable } from "tsyringe";
 

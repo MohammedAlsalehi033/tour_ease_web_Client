@@ -20,6 +20,7 @@ import { TransportationOffer } from '@/app/(model)/rideSharing/offer/offerModel'
 import AcceptButton from './acceptButton';
 import RejectButton from './rejectButton';
 import OtherAvatarPic from '../../components/otherAvatarPic';
+import { openRouteOnMap } from '@/app/lib/mapUtils';
 
 interface EnhancedNotificationCardProps {
   offer: TransportationOffer & {
@@ -158,14 +159,37 @@ const EnhancedNotificationCard: React.FC<EnhancedNotificationCardProps> = ({
       </div>
 
       {/* Route Information */}
-      <div className="mb-4 p-4 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30 ml-9">
+      <div 
+        className="mb-4 p-4 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30 ml-9 cursor-pointer hover:bg-primary/5 dark:hover:bg-primary/10 transition-all duration-200 group/route"
+        onClick={() => {
+          if (routeInfo) {
+            openRouteOnMap({
+              startLocationText: routeInfo.startLocationText,
+              endLocationText: routeInfo.endLocationText,
+              startLocationLat: routeInfo.startLocationLat,
+              startLocationLng: routeInfo.startLocationLng,
+              endLocationLat: routeInfo.endLocationLat,
+              endLocationLng: routeInfo.endLocationLng
+            });
+          }
+        }}
+        title="Click to view route on Google Maps"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface">
+            Route Details
+          </h4>
+          <div className="text-xs text-primary opacity-0 group-hover/route:opacity-100 transition-opacity bg-primary/10 px-2 py-1 rounded-full">
+            View on Map
+          </div>
+        </div>
         <div className="flex items-start mb-3">
           <div className="bg-primary/10 p-2 rounded-full mr-3">
             <MapPin className="w-4 h-4 text-primary" />
           </div>
           <div className="flex-1">
             <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">From</p>
-            <p className="text-body-md font-medium text-light-on-surface dark:text-dark-on-surface">
+            <p className="text-body-md font-medium text-light-on-surface dark:text-dark-on-surface group-hover/route:text-primary transition-colors">
               {highlightSearchTerm(routeInfo?.startLocationText || '', searchTerm)}
             </p>
           </div>
@@ -181,7 +205,7 @@ const EnhancedNotificationCard: React.FC<EnhancedNotificationCardProps> = ({
           </div>
           <div className="flex-1">
             <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">To</p>
-            <p className="text-body-md font-medium text-light-on-surface dark:text-dark-on-surface">
+            <p className="text-body-md font-medium text-light-on-surface dark:text-dark-on-surface group-hover/route:text-primary transition-colors">
               {highlightSearchTerm(routeInfo?.endLocationText || '', searchTerm)}
             </p>
           </div>

@@ -1,4 +1,5 @@
 // src/lib/diContainer.ts
+import 'reflect-metadata';
 import { container } from 'tsyringe';
 
 import { RideListingRepo } from '../(model)/rideSharing/RideListting/rideListtingRepo';

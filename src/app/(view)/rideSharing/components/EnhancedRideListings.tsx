@@ -32,6 +32,7 @@ import RatingDisplay from '../../components/RatingDisplay';
 import { useReviewStats } from '../../components/useReviewStats';
 import DriverReviewsCompact from '../../components/DriverReviewsCompact';
 import OtherAvatarPic from '../../components/otherAvatarPic';
+import { openRouteOnMap } from '@/app/lib/mapUtils';
 
 interface EnhancedRideListingsProps {
   rideListings: RideListing[];
@@ -232,14 +233,29 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
           </div>
 
           {/* Route with Enhanced Design */}
-          <div className="space-y-3 mb-4">
+          <div 
+            className="space-y-3 mb-4 cursor-pointer group/route hover:bg-primary/5 dark:hover:bg-primary/10 rounded-lg p-2 -m-2 transition-all duration-200"
+            onClick={(e) => {
+              e.stopPropagation();
+              openRouteOnMap({
+                startLocationText: listing.startLocationText,
+                endLocationText: listing.endLocationText,
+                startLocationLat: listing.startLocationLat,
+                startLocationLng: listing.startLocationLng,
+                endLocationLat: listing.endLocationLat,
+                endLocationLng: listing.endLocationLng
+              });
+            }}
+            title="Click to view route on Google Maps"
+          >
             <div className="flex items-center space-x-3">
               <div className="w-3 h-3 bg-primary rounded-full shadow-sm"></div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate">
+                <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate group-hover/route:text-primary transition-colors">
                   {listing.startLocationText}
                 </p>
               </div>
+              <MapPin size={14} className="text-primary opacity-0 group-hover/route:opacity-100 transition-opacity" />
             </div>
             <div className="flex items-center space-x-3">
               <div className="w-px h-8 bg-light-outline dark:bg-dark-outline ml-1.5"></div>
@@ -253,7 +269,7 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
             <div className="flex items-center space-x-3">
               <div className="w-3 h-3 bg-error rounded-full shadow-sm"></div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate">
+                <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate group-hover/route:text-primary transition-colors">
                   {listing.endLocationText}
                 </p>
               </div>
@@ -432,14 +448,36 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
               {/* Content */}
               <div className="p-6 space-y-6">
                 {/* Route */}
-                <div className="space-y-4">
+                <div 
+                  className="space-y-4 cursor-pointer hover:bg-primary/5 dark:hover:bg-primary/10 rounded-lg p-3 -m-3 transition-all duration-200 group/route-detail"
+                  onClick={() => {
+                    openRouteOnMap({
+                      startLocationText: selectedListing.startLocationText,
+                      endLocationText: selectedListing.endLocationText,
+                      startLocationLat: selectedListing.startLocationLat,
+                      startLocationLng: selectedListing.startLocationLng,
+                      endLocationLat: selectedListing.endLocationLat,
+                      endLocationLng: selectedListing.endLocationLng
+                    });
+                  }}
+                  title="Click to view route on Google Maps"
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-light-on-surface dark:text-dark-on-surface flex items-center">
+                      <Navigation className="w-5 h-5 mr-2 text-primary" />
+                      Route Details
+                    </h3>
+                    <div className="text-xs text-primary opacity-0 group-hover/route-detail:opacity-100 transition-opacity bg-primary/10 px-2 py-1 rounded-full">
+                      View on Map
+                    </div>
+                  </div>
                   <div className="flex items-start">
                     <div className="bg-primary/10 p-3 rounded-full mr-4">
                       <MapPin className="w-6 h-6 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">From</p>
-                      <p className="text-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
+                      <p className="text-lg font-semibold text-light-on-surface dark:text-dark-on-surface group-hover/route-detail:text-primary transition-colors">
                         {selectedListing.startLocationText}
                       </p>
                     </div>
@@ -450,7 +488,7 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
                     </div>
                     <div>
                       <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">To</p>
-                      <p className="text-lg font-semibold text-light-on-surface dark:text-dark-on-surface">
+                      <p className="text-lg font-semibold text-light-on-surface dark:text-dark-on-surface group-hover/route-detail:text-primary transition-colors">
                         {selectedListing.endLocationText}
                       </p>
                     </div>
