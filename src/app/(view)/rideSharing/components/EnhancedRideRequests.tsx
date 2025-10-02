@@ -42,12 +42,12 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
   const [allRequests, setAllRequests] = useState(initialRequests || []);
   const [sentOffers, setSentOffers] = useState<TransportationOffer[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
-
   const { data: session } = useSession();
   const router = useRouter();
   const userId = (session?.user as any)?.id;
 
-  // Body scroll lock for mobile detail view
+console.log("Initial Requests:", initialRequests);
+
   useEffect(() => {
     if (selectedRequest) {
       // Only lock scroll on mobile (when lg breakpoint is not active)
@@ -363,7 +363,7 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
               </div>
               <div className="min-w-0">
                 <p className="font-semibold text-light-on-surface dark:text-dark-on-surface">
-                  { request.sender?.username || 'Traveler'}
+                  { request.user?.username || 'Traveler'}
                 </p>
                 <div className="flex items-center space-x-2">
                   <Shield size={12} className="text-success" />
@@ -632,7 +632,7 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
                     </div>
                     <div className="ml-4">
                       <p className="text-xl font-semibold text-light-on-surface dark:text-dark-on-surface">
-                        { selectedRequest?.travelerId || 'Traveler'}
+                        { selectedRequest?.user?.username || 'Traveler'}
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
                         <Shield size={16} className="text-success" />
@@ -646,7 +646,7 @@ const EnhancedRideRequests: React.FC<EnhancedRideRequestsProps> = ({ rideRequest
                     <ul className="space-y-1 text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
                       <li>• {selectedRequest?.seatsNeeded} passenger{(selectedRequest?.seatsNeeded || 0) > 1 ? 's' : ''}</li>
                       <li>• Budget: {formatBudget(selectedRequest.budget)}</li>
-                      <li>• Flexible with timing</li>
+                      
                       <li>• Non-smoking preferred</li>
                     </ul>
                   </div>

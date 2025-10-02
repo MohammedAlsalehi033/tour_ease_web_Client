@@ -13,10 +13,11 @@ import TransportationProviderForm from "./components/newProviderForm";
 import RideRequestComponent from "./components/requestsComponent";
 import { OfferController } from "@/app/(controller)/rideSharing/offerController";
 import ListingComponent from "./components/listingComponent";
-import RideOrlistingSelector from './components/rideOrlistingSelector';
+import SimplifiedRideHub from './components/SimplifiedRideHub';
 import Link from "next/link";
 
 interface SearchData {
+  userMode: 'driver' | 'traveler';
   pickupLocation: {
     coordinates: {
       lat: number;
@@ -137,7 +138,12 @@ export default async function Page(
       throw new Error('Invalid luggage count (0-20)');
     }
 
+    // Get user mode from search params
+    const userModeParam = safeGetString(searchParams.userMode, 'traveler');
+    const userMode: 'driver' | 'traveler' = userModeParam === 'driver' ? 'driver' : 'traveler';
+
     searchData = {
+      userMode: userMode,
       pickupLocation: {
         coordinates: {
           lat: pickLat,
@@ -235,9 +241,17 @@ export default async function Page(
     const offers = await offerController.getReceivedOffers(session.user.id);
 
 
+    // Check if user is a transportation provider
+    const isTransportationProvider = userData.roles.some(role => role === "transportationProvider");
+
     return (
       <div>
-        <RideOrlistingSelector rideListings={rideListings} rideRequests={rideRequests} />
+        <SimplifiedRideHub 
+          rideListings={rideListings} 
+          rideRequests={rideRequests}
+          initialMode={searchData.userMode}
+          isTransportationProvider={isTransportationProvider}
+        />
       </div>
     );
 

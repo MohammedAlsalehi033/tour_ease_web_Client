@@ -44,7 +44,7 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'pending'>('all');
   const [allListings, setAllListings] = useState(initialListings || []);
   const [myRides, setMyRides] = useState<RideListing[]>([]);
-
+console.log(allListings);
   const { data: session } = useSession();
   const router = useRouter();
   const userId = (session?.user as any)?.id;
@@ -261,9 +261,7 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
               <div className="w-px h-8 bg-light-outline dark:bg-dark-outline ml-1.5"></div>
               <div className="flex-1 flex items-center space-x-2 text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
                 <Navigation size={12} />
-                <span>{listing.distance_km} km journey</span>
-                <span>•</span>
-                <span>{Math.ceil(listing.distance_km / 60)} hr</span>
+                <span>{Math.round(listing.route_distance_km)+1} km journey</span>
               </div>
             </div>
             <div className="flex items-center space-x-3">
@@ -283,12 +281,12 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
             <div className="flex items-center space-x-3">
               <OtherAvatarPic 
                 otherUserId={listing.provider?.user?.id} 
-                imageUrl={listing.provider?.user?.image || undefined} 
-                userName={listing.provider?.user?.name || "Driver"} 
+                imageUrl={listing.provider?.user?.mediaUrls[0] || undefined} 
+                userName={listing.provider?.user?.username || "Driver"} 
               />
               <div className="min-w-0">
                 <p className="font-semibold text-light-on-surface dark:text-dark-on-surface truncate">
-                  {listing.provider?.user?.name || "Driver"}
+                  {listing.provider?.user?.username || "Driver"}
                 </p>
                 <div className="flex items-center space-x-2">
                   <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant capitalize">
@@ -545,12 +543,12 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
                   <div className="flex items-center mb-4">
                     <OtherAvatarPic 
                       otherUserId={selectedListing.provider?.user?.id} 
-                      imageUrl={selectedListing.provider?.user?.image || undefined} 
-                      userName={selectedListing.provider?.user?.name || "Driver"} 
+                      imageUrl={selectedListing.provider?.user?.mediaUrls[0] || undefined} 
+                      userName={selectedListing.provider?.user?.username || "Driver"} 
                     />
                     <div className="ml-4">
                       <p className="text-xl font-semibold text-light-on-surface dark:text-dark-on-surface">
-                        {selectedListing.provider?.user?.name || "Driver"}
+                        {selectedListing.provider?.user?.username || "Driver"}
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
                         <Car size={16} className="text-primary" />

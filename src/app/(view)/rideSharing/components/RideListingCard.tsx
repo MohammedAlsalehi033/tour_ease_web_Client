@@ -97,26 +97,55 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
   const statusBadge = getStatusBadge();
   const StatusIcon = statusBadge.icon;
 
-  const driverName = listing.provider?.user?.name || 'Driver';
-  const driverInitial = driverName.charAt(0).toUpperCase();
+  // Enhanced user data extraction
+  const driverData = {
+    name: listing.provider?.user?.name || 'Anonymous Driver',
+    email: listing.provider?.user?.email || '',
+    profileImage: listing.provider?.user?.profileImage || null,
+    rating: listing.provider?.rating || 4.5,
+    reviewCount: listing.provider?.reviewCount || 0,
+    joinDate: listing.provider?.user?.createdAt || null,
+    verificationStatus: listing.provider?.verificationStatus || 'pending'
+  };
+
+  const driverInitial = driverData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  const formattedRating = driverData.rating.toFixed(1);
+  const isVerified = driverData.verificationStatus === 'verified';
+
+  // Handle specific click actions
+  const handleDetailsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onClick();
+  };
+
+  const handleLocationClick = (e: React.MouseEvent, location: string) => {
+    e.stopPropagation();
+    // Could open map or location details
+    console.log(`Clicked location: ${location}`);
+  };
+
+  const handleDriverClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Could open driver profile
+    console.log(`Clicked driver: ${driverData.name}`);
+  };
 
   return (
     <motion.div
-      whileHover={{ y: -4, scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className="group cursor-pointer"
-      onClick={onClick}
+      whileHover={{ y: -2, scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      className="group"
     >
-      <div className="bg-light-surface dark:bg-dark-surface rounded-2xl border border-light-outline dark:border-dark-outline shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
+      <div className="bg-light-surface dark:bg-dark-surface rounded-xl sm:rounded-2xl border border-light-outline dark:border-dark-outline shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
         {/* Header with status */}
-        <div className="p-4 pb-0">
+        <div className="p-3 sm:p-4 pb-0">
           <div className="flex justify-between items-start mb-3">
-            <div className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium ${statusBadge.className}`}>
+            <div className={`flex items-center space-x-1 px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${statusBadge.className}`}>
               <StatusIcon size={12} />
-              <span>{statusBadge.text}</span>
+              <span className="hidden xs:inline">{statusBadge.text}</span>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-primary">
+              <div className="text-xl sm:text-2xl font-bold text-primary">
                 {formatPrice(listing.pricePerSeat)}
               </div>
               <div className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
@@ -126,28 +155,40 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
           </div>
         </div>
 
-        {/* Route */}
-        <div className="px-4 pb-4">
+        {/* Route - Improved click areas */}
+        <div className="px-3 sm:px-4 pb-3 sm:pb-4">
           <div className="space-y-2">
-            <div className="flex items-start space-x-3">
+            <button
+              onClick={(e) => handleLocationClick(e, listing.startLocationText)}
+              className="w-full flex items-start space-x-3 p-2 rounded-lg hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant transition-colors duration-200"
+            >
               <div className="w-3 h-3 bg-primary rounded-full mt-1.5 flex-shrink-0"></div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate">
                   {listing.startLocationText}
                 </p>
+                <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                  Pickup location
+                </p>
               </div>
-            </div>
+            </button>
             <div className="flex items-center space-x-3">
               <div className="w-px h-4 bg-light-outline dark:bg-dark-outline ml-1.5"></div>
             </div>
-            <div className="flex items-start space-x-3">
+            <button
+              onClick={(e) => handleLocationClick(e, listing.endLocationText)}
+              className="w-full flex items-start space-x-3 p-2 rounded-lg hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant transition-colors duration-200"
+            >
               <div className="w-3 h-3 bg-error rounded-full mt-1.5 flex-shrink-0"></div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate">
                   {listing.endLocationText}
                 </p>
+                <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                  Destination
+                </p>
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -155,25 +196,46 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
         <div className="border-t border-light-outline dark:border-dark-outline"></div>
 
         {/* Details */}
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           <div className="flex items-center justify-between mb-4">
-            {/* Driver info */}
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-primary font-semibold text-sm">{driverInitial}</span>
+            {/* Enhanced Driver info */}
+            <button
+              onClick={handleDriverClick}
+              className="flex items-center space-x-3 p-2 rounded-lg hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant transition-colors duration-200"
+            >
+              <div className="relative">
+                {driverData.profileImage ? (
+                  <img
+                    src={driverData.profileImage}
+                    alt={driverData.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-primary font-semibold text-sm">{driverInitial}</span>
+                  </div>
+                )}
+                {isVerified && (
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full flex items-center justify-center">
+                    <CheckCircle size={10} className="text-white" />
+                  </div>
+                )}
               </div>
-              <div>
+              <div className="text-left">
                 <p className="font-medium text-sm text-light-on-surface dark:text-dark-on-surface">
-                  {driverName}
+                  {driverData.name}
                 </p>
                 <div className="flex items-center space-x-1">
                   <Star size={12} className="text-yellow-400 fill-current" />
                   <span className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                    4.8 (23)
+                    {formattedRating} ({driverData.reviewCount})
                   </span>
+                  {isVerified && (
+                    <span className="text-xs text-success">• Verified</span>
+                  )}
                 </div>
               </div>
-            </div>
+            </button>
 
             {/* Available seats */}
             <div className="flex items-center space-x-2 bg-light-surface-variant dark:bg-dark-surface-variant rounded-lg px-3 py-2">
@@ -185,7 +247,7 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
           </div>
 
           {/* Trip details */}
-          <div className="grid grid-cols-2 gap-4 text-xs">
+          <div className="grid grid-cols-2 gap-4 text-xs mb-4">
             <div className="flex items-center space-x-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
               <Calendar size={12} />
               <span>{formatDate(listing.departureTime)}</span>
@@ -200,13 +262,23 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
             </div>
             <div className="flex items-center space-x-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
               <Shield size={12} />
-              <span>Verified</span>
+              <span className={isVerified ? 'text-success' : 'text-warning'}>
+                {isVerified ? 'Verified' : 'Pending'}
+              </span>
             </div>
           </div>
+
+          {/* Action button */}
+          <button
+            onClick={handleDetailsClick}
+            className="w-full bg-primary hover:bg-primary/90 text-white py-2.5 px-4 rounded-lg font-medium text-sm transition-colors duration-200"
+          >
+            View Details & Book
+          </button>
         </div>
 
         {/* Hover overlay */}
-        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none"></div>
+        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl sm:rounded-2xl pointer-events-none"></div>
       </div>
     </motion.div>
   );

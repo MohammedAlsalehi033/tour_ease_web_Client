@@ -79,9 +79,7 @@ const TransportationProviderForm = () => {
   
   return (
     <div className="min-h-screen transition-colors duration-300 flex flex-col items-center justify-start pt-12 bg-light-background dark:bg-dark-background">
-      <div className="app-bar w-full fixed top-0 left-0 z-10 bg-light-surface dark:bg-dark-surface p-4 shadow-md">
-        <h1 className="text-headline-md font-semibold text-light-on-surface dark:text-dark-on-surface">Transportation Provider Registration</h1>
-      </div>
+      
       
       <div className="max-w-3xl w-full px-6 mt-16">
         <div className="card bg-light-surface dark:bg-dark-surface p-6 rounded-lg shadow-md mb-8">
@@ -120,7 +118,7 @@ const TransportationProviderForm = () => {
                 placeholder="Number of available seats"
                 className="input w-full p-3 border border-light-outline dark:border-dark-outline rounded-md bg-light-surface dark:bg-dark-surface text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 min="1"
-                max="100"
+                max="8"
                 required
               />
             </div>
@@ -139,7 +137,7 @@ const TransportationProviderForm = () => {
                   onChange={handleFileChange}
                   className="block w-full text-body-md file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-primary file:text-white hover:file:bg-primary/90 transition-colors"
                   accept="image/*"
-                  multiple
+                  
                   required
                 />
                 {formData.licenseMedia.length > 0 && (
@@ -162,7 +160,7 @@ const TransportationProviderForm = () => {
                   onChange={handleFileChange}
                   className="block w-full text-body-md file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-primary file:text-white hover:file:bg-primary/90 transition-colors"
                   accept="image/*"
-                  multiple
+                  
                   required
                 />
                 {formData.vehicleMedia.length > 0 && (
