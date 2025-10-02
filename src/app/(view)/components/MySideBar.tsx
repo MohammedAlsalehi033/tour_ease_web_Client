@@ -126,7 +126,6 @@ const UserSidebar = ({ hasActiveRide: hasActiveRideProp }) => {
                                     icon: hasActiveRide ? TruckIcon : PlusCircleIcon,
                                     showActiveRideBadge: hasActiveRide
                                 },
-                                { href: '/rideSharing/my-listings', text: 'My Listings', icon: ClipboardDocumentListIcon },
                             ]
                         }
                     ]

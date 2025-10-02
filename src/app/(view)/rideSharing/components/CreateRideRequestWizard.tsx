@@ -598,8 +598,8 @@ export default function CreateRideRequestWizard() {
         createdAt: new Date().toISOString(),
         distance_km: 0,
       } as unknown as RideRequest);
-
-      router.push('/rideSharing?success=request-created');
+        alert('Ride request created successfully!');
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error creating ride request:', error);
     } finally {
@@ -892,7 +892,7 @@ export default function CreateRideRequestWizard() {
                     <input
                       type="number"
                       min="1"
-                      max="4"
+                      max="8"
                       value={formData.seatsNeeded}
                       onChange={(e) => handleInputChange('seatsNeeded', parseInt(e.target.value))}
                       className="input w-full pl-8"
@@ -950,7 +950,7 @@ export default function CreateRideRequestWizard() {
                 </div>
               </div>
 
-              <div>
+              <div className='hiddine'>
                 <label className="block text-sm font-medium text-[rgb(var(--text))] mb-2">
                   Additional Notes (Optional)
                 </label>

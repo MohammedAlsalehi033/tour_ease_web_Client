@@ -597,7 +597,8 @@ export default function CreateRideListingWizard() {
         createdAt: new Date().toISOString(),
       } as unknown as RideListing);
 
-      router.push('/rideSharing?success=listing-created');
+      alert('Ride listing created successfully!');
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error creating ride listing:', error);
     } finally {
@@ -881,27 +882,16 @@ export default function CreateRideListingWizard() {
                       onChange={(e) => handleInputChange('luggageSpace', parseInt(e.target.value))}
                       className="input w-full"
                     >
-                      <option value={1}>Small bags only</option>
-                      <option value={2}>Medium bags</option>
-                      <option value={3}>Large bags</option>
-                      <option value={4}>Extra large</option>
+                      <option value={1}>one bag</option>
+                      <option value={2}>two bags</option>
+                      <option value={3}>three bags</option>
+                      <option value={4}>four bags</option>
                     </select>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text))] mb-2">
-                  Additional Information (Optional)
-                </label>
-                <textarea
-                  placeholder="Any additional details about your ride..."
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  rows={3}
-                  className="input w-full resize-none"
-                />
-              </div>
+            
             </div>
           )}
 
