@@ -1,7 +1,7 @@
 "use client";
 
 import "reflect-metadata";
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MapPin, 
@@ -113,10 +113,10 @@ console.log("Initial Requests:", initialRequests);
     setAllRequests(updatedRequests);
   }, [initialRequests, sentOffers]);
 
-  // Filter logic (no search functionality)
-  const filteredRequests = allRequests;
+  // Filter logic (no search functionality) - optimized with useMemo
+  const filteredRequests = useMemo(() => allRequests, [allRequests]);
 
-  const formatDate = (isoString: string) => {
+  const formatDate = useCallback((isoString: string) => {
     if (!isoString) return "TBD";
     const date = new Date(isoString);
     return date.toLocaleDateString(undefined, { 
@@ -124,21 +124,21 @@ console.log("Initial Requests:", initialRequests);
       month: 'short', 
       day: 'numeric' 
     });
-  };
+  }, []);
 
-  const formatTime = (isoString: string) => {
+  const formatTime = useCallback((isoString: string) => {
     if (!isoString) return "";
     return new Date(isoString).toLocaleTimeString(undefined, { 
       hour: '2-digit', 
       minute: '2-digit' 
     });
-  };
+  }, []);
 
-  const formatBudget = (budget: string) => {
+  const formatBudget = useCallback((budget: string) => {
     return budget.replace(/[^0-9.]/g, '') ? `$${budget.replace(/[^0-9.]/g, '')}` : 'Flexible';
-  };
+  }, []);
 
-  const getStatusBadgeStyles = (status: string) => {
+  const getStatusBadgeStyles = useCallback((status: string) => {
     switch (status) {
       case 'accepted':
         return 'badge badge-success';
@@ -151,7 +151,7 @@ console.log("Initial Requests:", initialRequests);
       default:
         return 'badge badge-info';
     }
-  };
+  }, []);
 
   const handleAcceptOffer = async (requestToAccept: RideRequest) => {
     if (!userId) {

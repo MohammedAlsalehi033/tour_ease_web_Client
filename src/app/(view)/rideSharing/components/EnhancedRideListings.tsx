@@ -1,7 +1,7 @@
 "use client";
 
 import "reflect-metadata";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MapPin, 
@@ -29,8 +29,8 @@ import { container } from "@/app/lib/diContainer";
 import { TransportationOffer } from "@/app/(model)/rideSharing/offer/offerModel";
 import ReportListingButton from '../../components/ReportListingButton';
 import RatingDisplay from '../../components/RatingDisplay';
-import { useReviewStats } from '../../components/useReviewStats';
-import DriverReviewsCompact from '../../components/DriverReviewsCompact';
+import { useReviewStatsOptimized, preloadReviewStats } from '../../components/useReviewStatsOptimized';
+import DriverReviewsCompactOptimized from '../../components/DriverReviewsCompactOptimized';
 import OtherAvatarPic from '../../components/otherAvatarPic';
 import { openRouteOnMap } from '@/app/lib/mapUtils';
 
@@ -44,6 +44,8 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'pending'>('all');
   const [allListings, setAllListings] = useState(initialListings || []);
   const [myRides, setMyRides] = useState<RideListing[]>([]);
+  const [reviewsPreloaded, setReviewsPreloaded] = useState(false);
+
 console.log(allListings);
   const { data: session } = useSession();
   const router = useRouter();
@@ -64,6 +66,34 @@ console.log(allListings);
       };
     }
   }, [selectedListing]);
+
+  // Preload review stats for better performance
+  useEffect(() => {
+    const preloadReviews = async () => {
+      if (!allListings.length || reviewsPreloaded) return;
+      
+      try {
+        // Extract unique listing IDs for preloading
+        const reviewItems = allListings
+          .filter(listing => listing.id && !isNaN(Number(listing.id)))
+          .map(listing => ({ 
+            type: 'TRANSPORTATION_LISTING', 
+            id: Number(listing.id) 
+          }));
+        
+        if (reviewItems.length > 0) {
+          await preloadReviewStats(reviewItems);
+          setReviewsPreloaded(true);
+        }
+      } catch (error) {
+        console.warn('Failed to preload review stats:', error);
+      }
+    };
+
+    // Debounce preloading to avoid excessive calls
+    const timeoutId = setTimeout(preloadReviews, 500);
+    return () => clearTimeout(timeoutId);
+  }, [allListings, reviewsPreloaded]);
 
   // Load myRides from localStorage
   useEffect(() => {
@@ -89,13 +119,15 @@ console.log(allListings);
     setAllListings(updatedListings);
   }, [initialListings, myRides]);
 
-  // Filter logic (removed search functionality)
-  const filteredListings = allListings.filter(listing => {
-    const matchesFilter = filterStatus === 'all' || listing.status === filterStatus;
-    return matchesFilter;
-  });
+  // Filter logic (removed search functionality) - optimized with useMemo
+  const filteredListings = useMemo(() => {
+    return allListings.filter(listing => {
+      const matchesFilter = filterStatus === 'all' || listing.status === filterStatus;
+      return matchesFilter;
+    });
+  }, [allListings, filterStatus]);
 
-  const formatDate = (isoString: string) => {
+  const formatDate = useCallback((isoString: string) => {
     if (!isoString) return "TBD";
     const date = new Date(isoString);
     return date.toLocaleDateString(undefined, { 
@@ -103,21 +135,21 @@ console.log(allListings);
       month: 'short', 
       day: 'numeric' 
     });
-  };
+  }, []);
 
-  const formatTime = (isoString: string) => {
+  const formatTime = useCallback((isoString: string) => {
     if (!isoString) return "";
     return new Date(isoString).toLocaleTimeString(undefined, { 
       hour: '2-digit', 
       minute: '2-digit' 
     });
-  };
+  }, []);
 
-  const getPriceDisplay = (price: string) => {
+  const getPriceDisplay = useCallback((price: string) => {
     return price.replace(/[^0-9.]/g, '') ? `$${price.replace(/[^0-9.]/g, '')}` : 'Free';
-  };
+  }, []);
 
-  const getStatusBadgeStyles = (status: string) => {
+  const getStatusBadgeStyles = useCallback((status: string) => {
     switch (status) {
       case 'active':
         return 'badge badge-success';
@@ -128,9 +160,9 @@ console.log(allListings);
       default:
         return 'badge';
     }
-  };
+  }, []);
 
-  const handleBookRide = async (listingToBook: RideListing) => {
+  const handleBookRide = useCallback(async (listingToBook: RideListing) => {
     if (!userId) {
       alert("Please log in to book a ride.");
       return;
@@ -166,9 +198,9 @@ console.log(allListings);
       setIsLoading(false);
       alert("There was an error sending your ride request. Please try again.");
     }
-  };
+  }, [userId, myRides]);
 
-  const handleMessageDriver = (driverId: string | undefined) => {
+  const handleMessageDriver = useCallback((driverId: string | undefined) => {
     if (!driverId) {
       alert("Unable to find driver information.");
       return;
@@ -178,11 +210,11 @@ console.log(allListings);
       return;
     }
     router.push(`/chats/${driverId}`);
-  };
+  }, [userId, router]);
 
   // Enhanced Ride Card Component
-  const RideCard = ({ listing }: { listing: RideListing }) => {
-    const { stats } = useReviewStats('TRANSPORTATION_LISTING', listing.id);
+  const RideCard = React.memo(({ listing }: { listing: RideListing }) => {
+    const { stats } = useReviewStatsOptimized('TRANSPORTATION_LISTING', listing.id);
     const isBooked = myRides.some(ride => ride.id === listing.id);
     const isSelected = selectedListing?.id === listing.id;
 
@@ -347,7 +379,9 @@ console.log(allListings);
         </div>
       </motion.div>
     );
-  };
+  });
+  
+  RideCard.displayName = 'RideCard';
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-200px)]">
@@ -560,7 +594,7 @@ console.log(allListings);
                   </div>
                   
                   {/* Driver Reviews */}
-                  <DriverReviewsCompact 
+                  <DriverReviewsCompactOptimized 
                     driverId={selectedListing.provider?.user?.id}
                     driverName={selectedListing.provider?.user?.name || "Driver"}
                     showStats={true}
