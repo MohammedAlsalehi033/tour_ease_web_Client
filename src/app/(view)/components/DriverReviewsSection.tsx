@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Star, MessageSquare, User, Calendar, MapPin, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { ReviewController } from '@/app/(controller)/review/reviewController';
 import { container } from '@/app/lib/diContainer';
@@ -30,18 +30,19 @@ const DriverReviewsSection: React.FC<DriverReviewsSectionProps> = ({
   useEffect(() => {
     fetchDriverReviews();
     fetchStats();
-  }, [driverId, sortBy, page]);
+  }, [driverId, sortBy, page, showAll]);
 
-  const fetchDriverReviews = async () => {
+  const fetchDriverReviews = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const reviewController = container.resolve(ReviewController);
       
-      // Get reviews where this driver is the reviewer (reviews they wrote)
-      const reviewsResponse = await reviewController.getReviewsByReviewer(driverId, {
+      // Get reviews FOR this transportation provider (reviews about their service)
+      const reviewsResponse = await reviewController.getReviewsForReviewable('TRANSPORTATION_PROVIDER', parseInt(driverId), {
         page,
-        limit: showAll ? 20 : limit
+        limit: showAll ? 20 : limit,
+        sortBy
       });
       
       if (reviewsResponse.success) {
@@ -54,9 +55,9 @@ const DriverReviewsSection: React.FC<DriverReviewsSectionProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [driverId, page, showAll, limit, sortBy]);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const reviewController = container.resolve(ReviewController);
       const statsResponse = await reviewController.getReviewStats('TRANSPORTATION_PROVIDER', parseInt(driverId));
@@ -67,7 +68,7 @@ const DriverReviewsSection: React.FC<DriverReviewsSectionProps> = ({
     } catch (err: any) {
       console.error('Failed to fetch review stats:', err);
     }
-  };
+  }, [driverId]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

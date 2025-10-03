@@ -4,9 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     HomeIcon, ChatBubbleLeftRightIcon, UserIcon,
-    MapIcon, TruckIcon, BuildingOfficeIcon,
-    QuestionMarkCircleIcon, ChevronDownIcon, ChevronRightIcon, BellIcon, Bars3Icon,
-    EyeIcon, PlusCircleIcon, ClipboardDocumentListIcon, MagnifyingGlassIcon,
+    TruckIcon, BuildingOfficeIcon,
+    QuestionMarkCircleIcon, BellIcon, Bars3Icon,
     CalendarDaysIcon, ChartBarIcon
 } from '@heroicons/react/24/outline';
 import ThemeToggler from './themeToggler';
@@ -41,7 +40,6 @@ const NavLink = ({ href, icon: Icon, text, isActive, hasActiveRide, isSubLink = 
 
 const UserSidebar = ({ hasActiveRide: hasActiveRideProp }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [rideSharingOpen, setRideSharingOpen] = useState(false);
     const [textIndex, setTextIndex] = useState(0);
     const pathname = usePathname();
 
@@ -95,40 +93,11 @@ const UserSidebar = ({ hasActiveRide: hasActiveRideProp }) => {
             title: 'Services',
             links: [
                 { href: '/accommodations', text: 'Accommodations', icon: BuildingOfficeIcon },
-                {
-                    text: 'Ride Sharing', icon: TruckIcon, isCollapsible: true,
-                    isOpen: rideSharingOpen,
-                    setOpen: setRideSharingOpen,
-                    subSections: [
-                        {
-                            title: 'Find Rides',
-                            links: [
-                                { 
-                                    href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/maps', 
-                                    text: hasActiveRide ? 'Active Ride' : 'Browse Listings', 
-                                    icon: hasActiveRide ? TruckIcon : MagnifyingGlassIcon,
-                                    showActiveRideBadge: hasActiveRide
-                                },
-                                { 
-                                    href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/request/maps', 
-                                    text: hasActiveRide ? 'Active Ride' : 'Post Request', 
-                                    icon: hasActiveRide ? TruckIcon : PlusCircleIcon,
-                                    showActiveRideBadge: hasActiveRide
-                                },
-                            ]
-                        },
-                        {
-                            title: 'Offer Rides',
-                            links: [
-                                { 
-                                    href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/listing/maps', 
-                                    text: hasActiveRide ? 'Active Ride' : 'Create Listing', 
-                                    icon: hasActiveRide ? TruckIcon : PlusCircleIcon,
-                                    showActiveRideBadge: hasActiveRide
-                                },
-                            ]
-                        }
-                    ]
+                { 
+                    href: hasActiveRide ? '/rideSharing/activeRide' : '/rideSharing/maps', 
+                    text: hasActiveRide ? 'Active Ride' : 'Ride Hub', 
+                    icon: TruckIcon,
+                    showActiveRideBadge: hasActiveRide
                 },
                 { href: '/tripPlanner', text: 'Trip Planner', icon: CalendarDaysIcon },
             ]
@@ -183,48 +152,6 @@ const UserSidebar = ({ hasActiveRide: hasActiveRideProp }) => {
                                 {section.links.map((link, linkIndex) => {
                                     const totalPreviousLinks = navSections.slice(0, sectionIndex).reduce((acc, sec) => acc + sec.links.length, 0);
                                     const animationDelay = (totalPreviousLinks + linkIndex) * 50 + 100;
-
-                                    if (link.isCollapsible) {
-                                        return (
-                                            <div key={link.text}>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => link.setOpen(!link.isOpen)}
-                                                    style={{ animationDelay: `${animationDelay}ms` }}
-                                                    className={`btn-text group flex items-center w-full transform transition-all duration-300 ${isActive('/rideSharing') ? 'bg-primary-light/90 text-white shadow-lg' : 'text-white hover:bg-primary-light/70 hover:translate-x-2'} animate-fade-in-up`}
-                                                    aria-expanded={link.isOpen}
-                                                >
-                                                    <link.icon className="mr-3 h-6 w-6 transition-transform duration-300 group-hover:scale-110" />
-                                                    <span className="truncate">{link.text}</span>
-                                                    <ChevronDownIcon className={`ml-auto h-5 w-5 transition-transform duration-300 ${link.isOpen ? 'rotate-180' : ''}`} />
-                                                </button>
-                                                <div className={`accordion-content ${link.isOpen ? 'max-h-96' : 'max-h-0'}`}>
-                                                    <div className="pt-2 space-y-3">
-                                                        {link.subSections?.map((subSection, subSectionIndex) => (
-                                                            <div key={subSection.title} className="space-y-1">
-                                                                <p className="px-3 text-xs font-medium text-white/50 uppercase tracking-wider">
-                                                                    {subSection.title}
-                                                                </p>
-                                                                {subSection.links.map((subLink, subIndex) => (
-                                                                    <NavLink
-                                                                        key={subLink.text}
-                                                                        href={subLink.href}
-                                                                        text={subLink.text}
-                                                                        icon={subLink.icon}
-                                                                        isActive={pathname === subLink.href}
-                                                                        hasActiveRide={hasActiveRide}
-                                                                        isSubLink
-                                                                        animationDelay={animationDelay + (subSectionIndex * 2 + subIndex + 1) * 50}
-                                                                        showActiveRideBadge={(subLink as any).showActiveRideBadge || false}
-                                                                    />
-                                                                ))}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    }
 
                                     return (
                                         <NavLink
