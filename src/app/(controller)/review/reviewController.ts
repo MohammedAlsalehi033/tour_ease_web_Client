@@ -39,7 +39,7 @@ export class ReviewController {
         }
     }
 
-    async getReviewsForItem(reviewableType: string, reviewableId: number, filters?: { page?: number; limit?: number }) {
+    async getReviewsForItem(reviewableType: string, reviewableId: any, filters?: { page?: number; limit?: number }) {
         try {
             if (!reviewableType || !reviewableId) {
                 throw new Error('Reviewable type and ID are required');

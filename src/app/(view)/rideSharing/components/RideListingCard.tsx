@@ -54,7 +54,7 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
   };
 
   const formatPrice = (price: string) => {
-    return price.replace(/[^0-9.]/g, '') ? `$${price.replace(/[^0-9.]/g, '')}` : 'Free';
+    return price.replace(/[^0-9.]/g, '') ? `PKR ${price.replace(/[^0-9.]/g, '')}` : 'Free';
   };
 
   const getStatusBadge = () => {

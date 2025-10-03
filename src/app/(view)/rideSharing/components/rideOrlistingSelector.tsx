@@ -34,39 +34,39 @@ const RideOrlistingSelector: React.FC<RideOrListingSelectorProps> = ({
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'rgb(var(--background))' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Enhanced Header */}
+    <div className="h-[calc(100vh-80px)] overflow-hidden" style={{ backgroundColor: 'rgb(var(--background))' }}>
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-3 h-full flex flex-col">
+        {/* Compact Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-4"
         >
-          <h1 className="text-display-lg text-primary mb-3">
+          <h1 className="text-2xl lg:text-3xl font-bold text-primary mb-1">
             RideShare Hub
           </h1>
-          <p className="text-body-lg" style={{ color: 'rgba(var(--text), 0.7)' }}>
-            Connect with fellow travelers and share your journey
+          <p className="text-sm lg:text-base" style={{ color: 'rgba(var(--text), 0.7)' }}>
+            Connect with fellow travelers
           </p>
         </motion.div>
 
-        {/* Enhanced Tab Navigation */}
+        {/* Compact Tab Navigation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-8"
+          className="mb-4 flex-shrink-0"
         >
-          <div className="card rounded-large p-2 shadow-lg">
+          <div className="card rounded-xl p-1.5 shadow-md">
             <div className="flex relative">
               {/* Animated Background */}
               <motion.div
-                className="absolute top-1 bottom-1 rounded-button shadow-md"
+                className="absolute top-1 bottom-1 rounded-lg shadow-sm"
                 style={{ backgroundColor: 'rgb(var(--primary))' }}
                 initial={false}
                 animate={{
-                  left: activeTab === 'listings' ? '4px' : '50%',
-                  width: activeTab === 'listings' ? 'calc(50% - 4px)' : 'calc(50% - 8px)',
+                  left: activeTab === 'listings' ? '2px' : '50%',
+                  width: activeTab === 'listings' ? 'calc(50% - 2px)' : 'calc(50% - 4px)',
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
@@ -75,7 +75,7 @@ const RideOrlistingSelector: React.FC<RideOrListingSelectorProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as 'listings' | 'requests')}
-                  className={`relative flex-1 flex items-center justify-center space-x-3 px-6 py-4 rounded-button font-semibold transition-all duration-300 ${
+                  className={`relative flex-1 flex items-center justify-center space-x-2 px-3 py-2.5 rounded-lg font-medium transition-all duration-300 text-sm lg:text-base ${
                     activeTab === tab.id
                       ? 'text-white z-10'
                       : 'hover:bg-opacity-10'
@@ -84,12 +84,13 @@ const RideOrlistingSelector: React.FC<RideOrListingSelectorProps> = ({
                     color: 'rgba(var(--text), 0.6)',
                   }}
                 >
-                  <span className="text-xl">{tab.icon}</span>
-                  <span>{tab.label}</span>
-                  <span className={`badge badge-info px-2 py-1 text-xs rounded-full ${
+                  <span className="text-base lg:text-lg">{tab.icon}</span>
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+                  <span className={`px-1.5 py-0.5 text-xs rounded-full font-medium ${
                     activeTab === tab.id 
                       ? 'bg-white/20 text-white' 
-                      : ''
+                      : 'bg-light-surface-variant dark:bg-dark-surface-variant text-light-on-surface dark:text-dark-on-surface'
                   }`}>
                     {tab.count}
                   </span>
@@ -99,22 +100,25 @@ const RideOrlistingSelector: React.FC<RideOrListingSelectorProps> = ({
           </div>
         </motion.div>
 
-        {/* Content Area with AnimatePresence */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            {activeTab === 'listings' ? (
-              <EnhancedRideListings rideListings={rideListings} />
-            ) : (
-              <EnhancedRideRequests rideRequests={rideRequests} />
-            )}
-          </motion.div>
-        </AnimatePresence>
+        {/* Content Area - Takes remaining space */}
+        <div className="flex-1 min-h-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="h-full"
+            >
+              {activeTab === 'listings' ? (
+                <EnhancedRideListings rideListings={rideListings} />
+              ) : (
+                <EnhancedRideRequests rideRequests={rideRequests} />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

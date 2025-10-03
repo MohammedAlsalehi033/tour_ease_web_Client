@@ -7,7 +7,7 @@ import { RideListing } from '@/app/(model)/rideSharing/RideListting/rideListting
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion, AnimatePresence } from 'framer-motion';
 // Updated icons for accommodation
-import { FaClock, FaUserCircle, FaDollarSign, FaCheck, FaTimes, FaMapMarkerAlt, FaBed, FaCalendarAlt } from 'react-icons/fa';
+import { FaClock, FaUserCircle, FaMoneyBill, FaCheck, FaTimes, FaMapMarkerAlt, FaBed, FaCalendarAlt } from 'react-icons/fa';
 
 
 // --- Accommodation Card Component ---
@@ -39,7 +39,7 @@ const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, is
                 </div>
                 <div className="mt-3 flex justify-between items-center">
                     <p className="text-xl font-bold text-[rgb(var(--primary))]">
-                        ${parseFloat(accommodation.pricePerNight).toFixed(2)}
+                        PKR {parseFloat(accommodation.pricePerNight).toFixed(2)}
                         <span className="text-sm font-normal text-[rgba(var(--text),0.6)]"> / night</span>
                     </p>
                     <div className="flex items-center px-3 py-1 bg-[rgba(var(--primary),0.1)] dark:bg-[rgba(var(--primary),0.2)] rounded-full">
@@ -92,7 +92,7 @@ const ExpandedAccommodationDetails: React.FC<ExpandedAccommodationDetailsProps> 
             <ul className="space-y-3 text-sm text-[rgba(var(--text),0.9)]">
                 <li className="flex items-center"><FaMapMarkerAlt className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-28">Location:</span> {accommodation.location}</li>
                 <li className="flex items-center"><FaUserCircle className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-28">Provider:</span> {accommodation.provider.user.name}</li>
-                <li className="flex items-center"><FaDollarSign className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-28">Price per Night:</span> ${parseFloat(accommodation.pricePerNight)}</li>
+                <li className="flex items-center"><FaMoneyBill className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-28">Price per Night:</span> PKR {parseFloat(accommodation.pricePerNight)}</li>
                 <li className="flex items-center"><FaCalendarAlt className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-28">Available From:</span> {new Date(accommodation.availableFrom).toLocaleDateString()}</li>
                 <li className="flex items-center"><FaCalendarAlt className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-28">Available To:</span> {new Date(accommodation.availableTo).toLocaleDateString()}</li>
                 <li className="flex items-center"><FaCheck className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-28">Provider Status:</span> <span className="capitalize">{accommodation.provider.accountStatus}</span></li>

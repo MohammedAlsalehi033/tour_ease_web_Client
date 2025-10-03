@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, MessageSquare, ChevronDown, ChevronUp, User, Calendar } from 'lucide-react';
 import { ReviewController } from '@/app/(controller)/review/reviewController';
 import { container } from '@/app/lib/diContainer';
@@ -13,12 +13,8 @@ interface DriverReviewsCompactOptimizedProps {
   className?: string;
   showStats?: boolean;
   maxReviews?: number;
-  preloadedStats?: ReviewStats | null; // Accept preloaded stats to avoid duplicate requests
+  preloadedStats?: ReviewStats | null;
 }
-
-// Cache for driver reviews to prevent duplicate requests
-const driverReviewsCache = new Map<string, { data: Review[]; stats: ReviewStats | null; timestamp: number }>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 const DriverReviewsCompactOptimized: React.FC<DriverReviewsCompactOptimizedProps> = ({ 
   driverId, 
@@ -28,109 +24,63 @@ const DriverReviewsCompactOptimized: React.FC<DriverReviewsCompactOptimizedProps
   maxReviews = 3,
   preloadedStats = null
 }) => {
+  
   const [reviews, setReviews] = useState<Review[]>([]);
   const [stats, setStats] = useState<ReviewStats | null>(preloadedStats);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
-  const [dataFetched, setDataFetched] = useState(false);
 
-  // Memoize cache key
-  const cacheKey = useMemo(() => `driver-${driverId}`, [driverId]);
-
-  const fetchDriverReviews = useCallback(async () => {
-    if (!driverId || dataFetched) return;
-
-    // Check cache first
-    const cached = driverReviewsCache.get(cacheKey);
-    if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-      setReviews(cached.data);
-      if (!preloadedStats) {
-        setStats(cached.stats);
-      }
-      setDataFetched(true);
-      return;
-    }
+  const fetchDriverReviews = async () => {
+    if (!driverId) return;
 
     try {
       setLoading(true);
       setError(null);
       const reviewController = container.resolve(ReviewController);
       
-      // Fetch reviews for this driver
-      const reviewsResponse = await reviewController.getReviewsForItem('TRANSPORTATION_PROVIDER', driverId);
+      const reviewsResponse = await reviewController.getReviewsForItem('TRANSPORTATION_PROVIDER', driverId, { page: 1, limit: 10 });
       
-      let fetchedReviews: Review[] = [];
-      let fetchedStats: ReviewStats | null = null;
-
       if (reviewsResponse.success) {
-        fetchedReviews = reviewsResponse.data?.reviews || [];
-        setReviews(fetchedReviews);
-      }
+        const fetchedReviews = Array.isArray(reviewsResponse.data) ? 
+          reviewsResponse.data.flatMap(item => item.reviews) : 
+          reviewsResponse.data?.reviews || [];
 
-      // Only fetch stats if not preloaded and showStats is true
-      if (showStats && !preloadedStats) {
-        const statsResponse = await reviewController.getReviewStats('TRANSPORTATION_PROVIDER', driverId);
-        if (statsResponse.success) {
-          fetchedStats = statsResponse.data;
-          setStats(fetchedStats);
+        setReviews(fetchedReviews);
+
+        // If stats are included in the response, set them
+        if (reviewsResponse.data && !Array.isArray(reviewsResponse.data) && reviewsResponse.data.stats) {
+          setStats(reviewsResponse.data.stats);
         }
       }
-
-      // Cache the results
-      driverReviewsCache.set(cacheKey, {
-        data: fetchedReviews,
-        stats: preloadedStats || fetchedStats,
-        timestamp: Date.now()
-      });
-
-      setDataFetched(true);
     } catch (err: any) {
       setError(err.message || 'Failed to fetch reviews');
     } finally {
       setLoading(false);
     }
-  }, [driverId, cacheKey, showStats, preloadedStats, dataFetched]);
+  };
 
-  // Only fetch when component becomes visible (intersection observer could be added here)
-  React.useEffect(() => {
-    if (driverId && !dataFetched) {
-      fetchDriverReviews();
-    }
-  }, [driverId, dataFetched, fetchDriverReviews]);
+  // Fetch reviews when component mounts
+  useEffect(() => {
+    fetchDriverReviews();
+  }, [driverId]);
 
-  const formatDate = useCallback((dateString: string) => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric'
     });
-  }, []);
+  };
 
-  const getReviewableTitle = useCallback((review: Review) => {
-    if (review.transportationListing) {
-      return `${review.transportationListing.startLocationText} → ${review.transportationListing.endLocationText}`;
-    }
-    if (review.transportationBooking) {
-      return `${review.transportationBooking.startLocationText} → ${review.transportationBooking.endLocationText}`;
-    }
-    return 'Transportation Service';
-  }, []);
+ 
 
-  // Memoize display reviews
-  const displayReviews = useMemo(() => {
-    return expanded ? reviews : reviews.slice(0, maxReviews);
-  }, [reviews, expanded, maxReviews]);
-
-  const hasMoreReviews = useMemo(() => {
-    return reviews.length > maxReviews;
-  }, [reviews.length, maxReviews]);
-
+  
   // Early return conditions
   if (!driverId) {
     return null;
   }
 
-  if (loading && !dataFetched) {
+  if (loading) {
     return (
       <div className={`${className}`}>
         <div className="animate-pulse space-y-2">
@@ -141,7 +91,7 @@ const DriverReviewsCompactOptimized: React.FC<DriverReviewsCompactOptimizedProps
     );
   }
 
-  if (error || (!stats && reviews.length === 0 && dataFetched)) {
+  if (error || reviews.length === 0) {
     return (
       <div className={`${className}`}>
         <div className="text-center py-2">
@@ -153,10 +103,13 @@ const DriverReviewsCompactOptimized: React.FC<DriverReviewsCompactOptimizedProps
     );
   }
 
+  const displayReviews = expanded ? reviews : reviews.slice(0, maxReviews);
+  const hasMoreReviews = reviews.length > maxReviews;
+
   return (
     <div className={`${className}`}>
       {/* Stats Summary */}
-      {showStats && stats && stats.totalReviews > 0 && (
+      {stats && stats.totalReviews > 0 && (
         <div className="mb-3">
           <div className="flex items-center gap-2 mb-1">
             <RatingDisplay rating={stats.averageRating} size="sm" showNumber={true} />
@@ -166,7 +119,7 @@ const DriverReviewsCompactOptimized: React.FC<DriverReviewsCompactOptimizedProps
           </div>
         </div>
       )}
-
+       
       {/* Reviews List */}
       {reviews.length > 0 && (
         <div className="space-y-2">
@@ -179,9 +132,7 @@ const DriverReviewsCompactOptimized: React.FC<DriverReviewsCompactOptimizedProps
                     {formatDate(review.createdAt)}
                   </span>
                 </div>
-                <span className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                  {getReviewableTitle(review)}
-                </span>
+                
               </div>
               
               <p className="text-body-sm text-light-on-surface dark:text-dark-on-surface line-clamp-2">

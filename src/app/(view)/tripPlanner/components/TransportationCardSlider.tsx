@@ -5,7 +5,7 @@ import { RideListing } from '@/app/(model)/rideSharing/RideListting/rideListting
 
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClock, FaChair, FaCar, FaUserCircle, FaRoute, FaDollarSign, FaCheck, FaTimes, FaArrowAltCircleRight, FaArrowAltCircleLeft } from 'react-icons/fa';
+import { FaClock, FaChair, FaCar, FaUserCircle, FaRoute, FaMoneyBill, FaCheck, FaTimes, FaArrowAltCircleRight, FaArrowAltCircleLeft } from 'react-icons/fa';
 import RatingDisplay from '../../components/RatingDisplay';
 import { useReviewStats } from '../../components/useReviewStats';
 import DriverReviewsCompact from '../../components/DriverReviewsCompact';
@@ -44,7 +44,7 @@ const RideCard: React.FC<RideCardProps> = ({ ride, isSelected, onCardClick }) =>
                 <div className="mt-3 flex justify-between items-center">
                     {/* REFACTORED: Price color uses the primary theme color. */}
                     <p className="text-xl font-bold text-[rgb(var(--primary))]">
-                        ${parseFloat(ride.pricePerSeat).toFixed(2)}
+                        PKR {parseFloat(ride.pricePerSeat).toFixed(2)}
                         <span className="text-sm font-normal text-[rgba(var(--text),0.6)]"> / seat</span>
                     </p>
                     {/* REFACTORED: This "badge" now uses theme colors for its background and text. */}
@@ -112,7 +112,7 @@ const ExpandedRideDetails: React.FC<ExpandedRideDetailsProps> = ({ ride }) => {
                 )}
                 <li className="flex items-center"><FaClock className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Departure:</span> {new Date(ride.departureTime).toLocaleString()}</li>
                 <li className="flex items-center"><FaChair className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Seats Available:</span> {ride.seatsAvailable}</li>
-                <li className="flex items-center"><FaDollarSign className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Price per Seat:</span> ${parseFloat(ride.pricePerSeat)}</li>
+                <li className="flex items-center"><FaMoneyBill className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Price per Seat:</span> PKR {parseFloat(ride.pricePerSeat)}</li>
                 <li className="flex items-center"><FaCheck className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Status:</span> {ride.status.charAt(0).toUpperCase() + ride.status.slice(1)}</li>
                 <li className="flex items-center"><FaTimes className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">Created At:</span> {new Date(ride.createdAt).toLocaleDateString()}</li>
                 <li className="flex items-center"><FaArrowAltCircleRight className="mr-4 text-lg text-[rgba(var(--text),0.6)] w-5" /> <span className="font-semibold w-24">from:</span> from {ride.startLocationText}</li>
