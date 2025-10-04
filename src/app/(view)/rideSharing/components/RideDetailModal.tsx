@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { RideListing } from '@/app/(model)/rideSharing/RideListting/rideListtingModel';
 import { RideRequest } from '@/app/(model)/rideSharing/RideRequest/rideRequestModel';
+import { formatExactTime, formatLocalDate } from '@/app/lib/timeUtils';
 
 interface RideDetailModalProps {
   item: RideListing | RideRequest;
@@ -44,21 +45,12 @@ const RideDetailModal: React.FC<RideDetailModalProps> = ({
 
   const formatDate = (isoString: string) => {
     if (!isoString) return "TBD";
-    const date = new Date(isoString);
-    return date.toLocaleDateString(undefined, { 
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    return formatLocalDate(isoString);
   };
 
   const formatTime = (isoString: string) => {
     if (!isoString) return "";
-    return new Date(isoString).toLocaleTimeString(undefined, { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    return formatExactTime(isoString); // Use exact time without timezone conversion
   };
 
   const formatPrice = (price: string) => {

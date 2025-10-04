@@ -28,6 +28,7 @@ import { OfferController } from "@/app/(controller)/rideSharing/offerController"
 import { container } from "@/app/lib/diContainer";
 import { TransportationOffer } from "@/app/(model)/rideSharing/offer/offerModel";
 import ReportListingButton from '../../components/ReportListingButton';
+import { formatExactTime, formatLocalDate } from '@/app/lib/timeUtils';
 import RatingDisplay from '../../components/RatingDisplay';
 import { useReviewStatsOptimized, preloadReviewStats } from '../../components/useReviewStatsOptimized';
 import DriverReviewsCompactOptimized from '../../components/DriverReviewsCompactOptimized';
@@ -103,20 +104,12 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
 
   const formatDate = useCallback((isoString: string) => {
     if (!isoString) return "TBD";
-    const date = new Date(isoString);
-    return date.toLocaleDateString(undefined, { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
-    });
+    return formatLocalDate(isoString);
   }, []);
 
   const formatTime = useCallback((isoString: string) => {
     if (!isoString) return "";
-    return new Date(isoString).toLocaleTimeString(undefined, { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    return formatExactTime(isoString); // Use exact time without timezone conversion
   }, []);
 
   const getPriceDisplay = useCallback((price: string) => {

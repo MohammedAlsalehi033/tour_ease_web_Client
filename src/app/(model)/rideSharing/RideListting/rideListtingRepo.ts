@@ -2,6 +2,7 @@ import { injectable, inject } from 'tsyringe';
 import { ApiService } from '@/app/services/apiService';
 import { RideListing } from './rideListtingModel';
 import { ResponseModel } from '@/Types/types';
+import { createExactDateTime } from '@/app/lib/timeUtils';
 
 @injectable()
 export class RideListingRepo {
@@ -34,15 +35,11 @@ export class RideListingRepo {
       if (priceRange && priceRange.max) {
         endpoint += `&maxPrice=${priceRange.max}`;
       }
-      // Combine date and time to create ISO 8601 formatted strings
-      if (date && timeRange.start) {
-        // Force UTC interpretation to avoid timezone conversion issues
-        const departureAfter = new Date(`${date}T${timeRange.start}:00.000Z`).toISOString();
+      // Combine date and time to create exact time filters (no timezone conversion)
+      if (date && timeRange.start && timeRange.end) {
+        const departureAfter = createExactDateTime(date, timeRange.start);
+        const departureBefore = createExactDateTime(date, timeRange.end);
         endpoint += `&departureAfter=${encodeURIComponent(departureAfter)}`;
-      }
-      if (date && timeRange.end) {
-        // Force UTC interpretation to avoid timezone conversion issues
-        const departureBefore = new Date(`${date}T${timeRange.end}:00.000Z`).toISOString();
         endpoint += `&departureBefore=${encodeURIComponent(departureBefore)}`;
       }
       console.log('Fetching nearby listings with endpoint:', endpoint);

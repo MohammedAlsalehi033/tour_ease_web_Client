@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import { OfferController } from "@/app/(controller)/rideSharing/offerController";
 import { container } from "@/app/lib/diContainer";
 import { TransportationOffer } from "@/app/(model)/rideSharing/offer/offerModel";
+import { formatExactTime } from '@/lib/timeUtils';
 
 const RideRequestComponent = ({ rideRequests: initialRequests }) => {
     const [activeTab, setActiveTab] = useState("requests");
@@ -51,8 +52,7 @@ const RideRequestComponent = ({ rideRequests: initialRequests }) => {
 
     const formatTime = (isoString) => {
         if (!isoString) return "N/A";
-        const date = new Date(isoString);
-        return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        return formatExactTime(isoString);
     };
 
     const formatBudget = (budget) => {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { formatExactTime, formatLocalDate } from '@/lib/timeUtils';
 
 export default function RideSharingDashboard({ rideRequests, rideListings, userData }) {
   const [theme, setTheme] = useState();
@@ -8,8 +9,7 @@ export default function RideSharingDashboard({ rideRequests, rideListings, userD
 
   const formatDateTime = (isoString) => {
     if (!isoString) return "N/A";
-    const date = new Date(isoString);
-    return date.toLocaleString();
+    return `${formatLocalDate(isoString)} at ${formatExactTime(isoString)}`;
   };
 
   const getPriceDisplay = (priceOrBudget) => {

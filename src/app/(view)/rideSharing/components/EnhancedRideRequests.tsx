@@ -30,6 +30,7 @@ import { OfferController } from "@/app/(controller)/rideSharing/offerController"
 import { container } from "@/app/lib/diContainer";
 import { TransportationOffer } from "@/app/(model)/rideSharing/offer/offerModel";
 import ReportRequestButton from '../../components/ReportRequestButton';
+import { formatExactTime } from '@/lib/timeUtils';
 import { openRouteOnMap } from '@/app/lib/mapUtils';
 
 interface EnhancedRideRequestsProps {
@@ -128,10 +129,7 @@ console.log("Initial Requests:", initialRequests);
 
   const formatTime = useCallback((isoString: string) => {
     if (!isoString) return "";
-    return new Date(isoString).toLocaleTimeString(undefined, { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    return formatExactTime(isoString);
   }, []);
 
   const formatBudget = useCallback((budget: string) => {

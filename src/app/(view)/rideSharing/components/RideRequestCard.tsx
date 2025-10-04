@@ -14,6 +14,7 @@ import {
   Zap
 } from 'lucide-react';
 import { RideRequest } from '@/app/(model)/rideSharing/RideRequest/rideRequestModel';
+import { formatExactTime } from '@/lib/timeUtils';
 
 interface RideRequestCardProps {
   request: RideRequest;
@@ -47,10 +48,7 @@ const RideRequestCard: React.FC<RideRequestCardProps> = ({
 
   const formatTime = (isoString: string) => {
     if (!isoString) return "";
-    return new Date(isoString).toLocaleTimeString(undefined, { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    return formatExactTime(isoString);
   };
 
   const formatBudget = (budget: string) => {

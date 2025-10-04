@@ -588,7 +588,7 @@ export default function CreateRideRequestWizard() {
         travelerId: (session.user as any).id,
         startLocationText: formData.pickupLocation!.address,
         endLocationText: formData.dropoffLocation!.address,
-        departureTime: new Date(`${formData.departureDate}T${formData.departureTime}`).toISOString(),
+        departureTime: `${formData.departureDate}T${formData.departureTime}:00.000Z`,
         startLocationLat: formData.pickupLocation!.lat,
         startLocationLng: formData.pickupLocation!.lng,
         endLocationLat: formData.dropoffLocation!.lat,

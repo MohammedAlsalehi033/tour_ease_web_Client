@@ -14,6 +14,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { RideListing } from '@/app/(model)/rideSharing/RideListting/rideListtingModel';
+import { formatExactTime, formatLocalDate } from '@/app/lib/timeUtils';
 
 interface RideListingCardProps {
   listing: RideListing;
@@ -26,7 +27,7 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
   onClick, 
   isBooked = false 
 }) => {
-  const formatDate = (isoString: string) => {
+  const formatDateRelative = (isoString: string) => {
     if (!isoString) return "TBD";
     const date = new Date(isoString);
     const now = new Date();
@@ -47,10 +48,12 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
 
   const formatTime = (isoString: string) => {
     if (!isoString) return "";
-    return new Date(isoString).toLocaleTimeString(undefined, { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
+    return formatExactTime(isoString); // Use exact time without timezone conversion
+  };
+
+  const formatDate = (isoString: string) => {
+    if (!isoString) return "TBD";
+    return formatLocalDate(isoString);
   };
 
   const formatPrice = (price: string) => {
@@ -250,7 +253,7 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
           <div className="grid grid-cols-2 gap-4 text-xs mb-4">
             <div className="flex items-center space-x-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
               <Calendar size={12} />
-              <span>{formatDate(listing.departureTime)}</span>
+              <span>{formatDateRelative(listing.departureTime)}</span>
             </div>
             <div className="flex items-center space-x-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
               <Clock size={12} />
