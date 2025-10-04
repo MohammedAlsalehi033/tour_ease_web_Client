@@ -51,4 +51,10 @@ export class QuestionsRepo {
         const response = await this.apiService.delete<ResponseModel<Question>>(`/questions/${questionId}`);
         return response.data as Question;
     }
+
+    async searchQuestions(query: string, page: number = 1, limit: number = 10): Promise<Question[]> {
+        const response = await this.apiService.get<ResponseModel<Question>>(`/questions/search?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
+        return response.data as Question[];
+    }
+
 }

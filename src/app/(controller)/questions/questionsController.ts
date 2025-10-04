@@ -84,4 +84,11 @@ export class QuestionsController {
             throw new Error (`failed to delete ${error}`)
         }
     }
+    async searchQuestions(query: string): Promise<Question[]> {
+        try {
+            return await this.questionsRepo.searchQuestions(query);
+        } catch (error) {
+            throw new Error(`Failed to search questions with query ${query}: ${(error as Error).message}`);
+        }
+    }
     }

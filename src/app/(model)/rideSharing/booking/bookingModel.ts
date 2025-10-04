@@ -8,7 +8,7 @@ export interface Booking {
     travelerId: string;
     seatsBooked: number;
     luggage: string | null;
-    status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+    status: 'pending' | 'accepted' | 'rejected' | 'cancelled' | 'complete';
     totalPrice: string;
     createdAt: string;
     bookingSource: 'listing' | 'request';

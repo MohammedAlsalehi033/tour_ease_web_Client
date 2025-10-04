@@ -18,6 +18,9 @@ import { UserRepository } from '../(model)/user/userRepository';
 import { UserController } from '../(controller)/user/userController';
 import { ReportRepo } from '../(model)/report/reportRepo';
 import { ReportController } from '../(controller)/report/reportController';
+import { ReviewRepo } from '../(model)/review/reviewRepo';
+import { ReviewController } from '../(controller)/review/reviewController';
+import { ApiService } from '../services/apiService';
 
 
 container.registerSingleton(RideListingRepo)
@@ -36,5 +39,8 @@ container.registerSingleton(UserRepository)
 container.registerSingleton(UserController)
 container.registerSingleton(ReportRepo)
 container.registerSingleton(ReportController)
+container.registerSingleton(ReviewRepo)
+container.registerSingleton(ReviewController)
+container.registerSingleton(ApiService)
 
 export { container };

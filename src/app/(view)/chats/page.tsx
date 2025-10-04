@@ -236,17 +236,7 @@ const page = async () => {
               </div>
             </div>
           </div>
-          {/* Search bar */}
-          <div className="mt-6 flex items-center gap-2">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Search chats..."
-                className="input w-full pl-10 pr-4 py-3 rounded-xl shadow focus:ring-2 focus:ring-primary/30"
-              />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary/60" />
-            </div>
-          </div>
+          
         </div>
 
         {/* Chats List */}

@@ -8,6 +8,7 @@ import { BookingController } from '@/app/(controller)/rideSharing/bookingControl
 import { RideListingController } from '@/app/(controller)/rideSharing/rideListingController';
 import { User } from '@/app/(model)/user/userModel';
 import { Booking } from '@/app/(model)/rideSharing/booking/bookingModel';
+import ReviewPastRides from './ReviewPastRides';
 import Link from 'next/link';
 
 interface FunctionalDashboardProps {
@@ -248,15 +249,22 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
         <QuickActions isProvider={isProvider} isNewUser={isNewUser} />
 
         {/* Recent Activity & Upcoming Trips */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <RecentBookings bookings={bookings.slice(0, 5)} isProvider={isProvider} />
           <UpcomingBookings 
             bookings={bookings.filter(b => 
-              b.status === 'confirmed' || b.status === 'pending'
+              b.status === 'accepted' || b.status === 'pending'
             ).slice(0, 5)} 
             isProvider={isProvider} 
           />
         </div>
+
+        {/* Review Past Rides - Only for travelers */}
+        {!isProvider && (
+          <div className="mb-8">
+            <ReviewPastRides bookings={bookings} isProvider={!!isProvider} />
+          </div>
+        )}
 
         {/* New User Onboarding */}
         {isNewUser && <NewUserBanner isProvider={isProvider} />}

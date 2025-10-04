@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import OtherAvatarPic from '../components/otherAvatarPic';
 import AddQuestionComponent from './addQuestionComponent';
+import QuestionsPageClient from './QuestionsPageClient';
 import { container } from 'tsyringe';
 import { QuestionsController } from '@/app/(controller)/questions/questionsController';
 import { Question } from '@/app/(model)/questions/questionsModel';
@@ -8,8 +9,8 @@ import Link from 'next/link';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import ReportQuestionButton from '../components/ReportQuestionButton';
-// Added FaQuestionCircle and FaSearch for the new header and search bar
-import { FaCity, FaUtensils, FaHotel, FaLandmark, FaCalendarAlt, FaBus, FaShoppingBag, FaFilm, FaMapMarkerAlt, FaStoreAlt, FaQuestionCircle, FaSearch } from 'react-icons/fa';
+// Added FaQuestionCircle for the header
+import { FaCity, FaUtensils, FaHotel, FaLandmark, FaCalendarAlt, FaBus, FaShoppingBag, FaFilm, FaMapMarkerAlt, FaStoreAlt, FaQuestionCircle } from 'react-icons/fa';
 
 // This component remains unchanged
 function QuestionsList({ questions, currentUserId }: { questions: Question[], currentUserId?: string }) {
@@ -24,6 +25,8 @@ function QuestionsList({ questions, currentUserId }: { questions: Question[], cu
     if (diff < 2592000) return `${Math.floor(diff / 86400)}d ago`;
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   }
+
+  
 
   return (
     <div className="flex flex-col gap-6">
@@ -153,57 +156,51 @@ const page = async () => {
 
         {/* Column 1: Main Content */}
         <main className="lg:w-2/3 flex-shrink-0">
-          {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center">
-              <div className="bg-primary/10 p-3 rounded-full mr-4 flex-shrink-0">
-                <FaQuestionCircle className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="font-display text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface">
-                  Community Q&A
-                </h1>
-                <p className="font-sans text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                  Ask questions and share travel advice with others
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Search bar */}
-          <div className="mb-6 relative">
-             <input
-              type="text"
-              placeholder="Search questions..."
-              className="input w-full pl-10 pr-4 py-3 rounded-xl shadow-sm focus:ring-2 focus:ring-primary/30 bg-white dark:bg-dark-surface border border-primary/20 dark:border-dark-outline/40"
-            />
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary/60" />
-          </div>
-
-          <div className="my-6">
-            <AddQuestionComponent />
-          </div>
-          
-          {/* Mobile category selector */}
-          <div className="lg:hidden w-full mb-6">
-            <div className="card border border-primary/20 dark:border-dark-outline/40 rounded-2xl bg-white dark:bg-dark-surface p-3">
-              <h2 className="text-md font-bold mb-3 text-primary px-1">Categories</h2>
-              <div className="overflow-x-auto">
-                <div className="flex gap-3 px-1 pb-1 whitespace-nowrap scrollbar-thin scrollbar-thumb-primary/40 scrollbar-track-transparent">
-                  {categories.map((cat, idx) => (
-                    <div key={idx} className="card inline-flex items-center text-body-lg font-bold px-4 py-2 rounded-lg transition-transform duration-200 hover:scale-105 cursor-pointer select-none bg-white dark:bg-dark-surface border border-primary/10 dark:border-dark-outline/40">
-                      {cat.icon}
-                      {cat.name}
-                    </div>
-                  ))}
+          <QuestionsPageClient
+            questionsListComponent={
+              <Suspense fallback={<QuestionsSkeleton />}>
+                <QuestionsContent />
+              </Suspense>
+            }
+          >
+            {/* Header */}
+            <div className="mb-6">
+              <div className="flex items-center">
+                <div className="bg-primary/10 p-3 rounded-full mr-4 flex-shrink-0">
+                  <FaQuestionCircle className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h1 className="font-display text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface">
+                    Community Q&A
+                  </h1>
+                  <p className="font-sans text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                    Ask questions and share travel advice with others
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-          
-          <Suspense fallback={<QuestionsSkeleton />}>
-            <QuestionsContent />
-          </Suspense>
+
+            <div className="my-6">
+              <AddQuestionComponent />
+            </div>
+
+            {/* Mobile category selector */}
+            <div className="lg:hidden w-full mb-6">
+              <div className="card border border-primary/20 dark:border-dark-outline/40 rounded-2xl bg-white dark:bg-dark-surface p-3">
+                <h2 className="text-md font-bold mb-3 text-primary px-1">Categories</h2>
+                <div className="overflow-x-auto">
+                  <div className="flex gap-3 px-1 pb-1 whitespace-nowrap scrollbar-thin scrollbar-thumb-primary/40 scrollbar-track-transparent">
+                    {categories.map((cat, idx) => (
+                      <div key={idx} className="card inline-flex items-center text-body-lg font-bold px-4 py-2 rounded-lg transition-transform duration-200 hover:scale-105 cursor-pointer select-none bg-white dark:bg-dark-surface border border-primary/10 dark:border-dark-outline/40">
+                        {cat.icon}
+                        {cat.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </QuestionsPageClient>
         </main>
 
         {/* Column 2: Categories Sidebar (Desktop) */}
