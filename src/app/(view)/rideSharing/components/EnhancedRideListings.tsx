@@ -48,7 +48,6 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
   const [selectedSeats, setSelectedSeats] = useState(1);
   const [bookingMessage, setBookingMessage] = useState("");
 
-console.log(allListings);
   const { data: session } = useSession();
   const router = useRouter();
   const userId = (session?.user as any)?.id;

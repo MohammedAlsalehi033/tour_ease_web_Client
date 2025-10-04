@@ -43,7 +43,7 @@ export class RideListingRepo {
         const departureBefore = new Date(`${date}T${timeRange.end}`).toISOString();
         endpoint += `&departureBefore=${encodeURIComponent(departureBefore)}`;
       }
-
+      console.log('Fetching nearby listings with endpoint:', endpoint);
       const response = await this.apiService.get<ResponseModel<RideListing[]>>(endpoint);
       
       if (!response.success) {
