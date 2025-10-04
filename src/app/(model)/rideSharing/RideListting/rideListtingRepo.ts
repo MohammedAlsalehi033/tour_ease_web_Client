@@ -36,11 +36,13 @@ export class RideListingRepo {
       }
       // Combine date and time to create ISO 8601 formatted strings
       if (date && timeRange.start) {
-        const departureAfter = new Date(`${date}T${timeRange.start}`).toISOString();
+        // Force UTC interpretation to avoid timezone conversion issues
+        const departureAfter = new Date(`${date}T${timeRange.start}:00.000Z`).toISOString();
         endpoint += `&departureAfter=${encodeURIComponent(departureAfter)}`;
       }
       if (date && timeRange.end) {
-        const departureBefore = new Date(`${date}T${timeRange.end}`).toISOString();
+        // Force UTC interpretation to avoid timezone conversion issues
+        const departureBefore = new Date(`${date}T${timeRange.end}:00.000Z`).toISOString();
         endpoint += `&departureBefore=${encodeURIComponent(departureBefore)}`;
       }
       console.log('Fetching nearby listings with endpoint:', endpoint);
