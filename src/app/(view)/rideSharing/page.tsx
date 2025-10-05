@@ -217,12 +217,25 @@ export default async function Page(
     const searchLng = searchData.pickupLocation.coordinates.lng;
     const searchRadius = 18000000; // 18,000 km radius
 
+
+  // latitude: number,
+  //       longitude: number,
+  //       radius?: number,
+  //       dropLocationLatitude?: number,
+  //       dropLocationLongitude?: number,
+  //       date?: string,
+  //       startTime?: string,
+  //       endTime?: string
+
     const rideRequests: RideRequest[] = await rideRequestController.getNearByRideRequests(
       searchLat,
       searchLng,
       searchRadius,
       searchData.dropoffLocation.coordinates.lat,
-      searchData.dropoffLocation.coordinates.lng
+      searchData.dropoffLocation.coordinates.lng,
+      searchData.date,
+      searchData.timeRange.start,
+      searchData.timeRange.end
     );
 
     const rideListings: RideListing[] = await rideListingController.getNearByRideListing(

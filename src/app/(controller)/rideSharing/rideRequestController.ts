@@ -12,16 +12,22 @@ export class RideRequestController {
         latitude: number,
         longitude: number,
         radius?: number,
-        dropLoationLatitude?: number,
-        dropLoationLongitude?: number
+        dropLocationLatitude?: number,
+        dropLocationLongitude?: number,
+        date?: string,
+        startTime?: string,
+        endTime?: string
     ): Promise<RideRequest[]> {
         try {
             const rideRequests = await this.rideRequestRepository.getNearByRideRequests(
-                latitude,
-                longitude,
+                latitude, 
+                longitude, 
                 radius,
-                dropLoationLatitude,
-                dropLoationLongitude
+                date,
+                startTime,
+                endTime,
+                dropLocationLatitude,
+                dropLocationLongitude
             );
             return rideRequests;
         } catch (error) {
