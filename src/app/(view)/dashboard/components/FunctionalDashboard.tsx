@@ -171,7 +171,7 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
               />
               <StatCard
                 title="Total Earnings"
-                value={`$${stats.totalEarnings.toLocaleString()}`}
+                value={`PKR ${stats.totalEarnings.toLocaleString()}`}
                 icon="💰"
                 color="rgb(var(--success))"
               />
@@ -198,7 +198,7 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
               />
               <StatCard
                 title="Total Spent"
-                value={`$${stats.totalSpent.toLocaleString()}`}
+                value={`PKR ${stats.totalSpent.toLocaleString()}`}
                 icon="💳"
                 color="rgb(var(--error))"
               />
@@ -366,7 +366,7 @@ const RecentBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> =
                   {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
                 </h3>
                 <p className="text-sm opacity-70" style={{ color: `rgb(var(--text))` }}>
-                  ${parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
+                  PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
                 </p>
                 <p className="text-xs opacity-50 mt-1" style={{ color: `rgb(var(--text))` }}>
                   {new Date(booking.createdAt).toLocaleDateString()}
@@ -418,7 +418,7 @@ const UpcomingBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> =
                   {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
                 </h3>
                 <p className="text-sm opacity-70" style={{ color: `rgb(var(--text))` }}>
-                  ${parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
+                  PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
                 </p>
                 <p className="text-xs opacity-50 mt-1" style={{ color: `rgb(var(--text))` }}>
                   {new Date(booking.createdAt).toLocaleDateString()}

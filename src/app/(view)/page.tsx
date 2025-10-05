@@ -199,8 +199,8 @@ const LandingPage = () => {
               </button>
             )}
             
-            <Link href="/auth/signin" className="text-primary hover:text-primary-dark transition-colors font-medium">Sign In</Link>
-            <Link href="/auth/signup" className="bg-primary text-white px-6 py-2.5 rounded-2xl hover:bg-primary-dark transition-all hover:shadow-lg">Get Started</Link>
+            <Link href="/login" className="text-primary hover:text-primary-dark transition-colors font-medium">Sign In</Link>
+            <Link href="/register" className="bg-primary text-white px-6 py-2.5 rounded-2xl hover:bg-primary-dark transition-all hover:shadow-lg">Get Started</Link>
           </div>
 
           {/* Mobile menu button */}
@@ -241,8 +241,8 @@ const LandingPage = () => {
               <Link href="#services" className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">Services</Link>
               <Link href="#technology" className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">Technology</Link>
               <Link href="#about" className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">About</Link>
-              <Link href="/auth/signin" className="block px-3 py-2 text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors font-medium">Sign In</Link>
-              <Link href="/auth/signup" className="block px-3 py-2 bg-primary text-white rounded-2xl hover:bg-primary-dark transition-colors text-center font-medium">Get Started</Link>
+              <Link href="/login" className="block px-3 py-2 text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors font-medium">Sign In</Link>
+              <Link href="/register" className="block px-3 py-2 bg-primary text-white rounded-2xl hover:bg-primary-dark transition-colors text-center font-medium">Get Started</Link>
             </div>
           </motion.div>
         )}
@@ -313,7 +313,7 @@ const LandingPage = () => {
 
             {/* CTA Buttons - Full width on mobile */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center items-stretch sm:items-center pt-2 sm:pt-4 px-2 sm:px-4">
-              <Link href="/auth/signup" className="w-full sm:w-auto">
+              <Link href="/register" className="w-full sm:w-auto">
                 <motion.button
                   whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(33, 150, 243, 0.4)" }}
                   whileTap={{ scale: 0.95 }}
@@ -323,8 +323,8 @@ const LandingPage = () => {
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </motion.button>
               </Link>
-              
-              <Link href="/auth/signin" className="w-full sm:w-auto">
+
+              <Link href="/login" className="w-full sm:w-auto">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -572,7 +572,7 @@ const LandingPage = () => {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/auth/signup">
+                  <Link href="/register">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -623,7 +623,7 @@ const LandingPage = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
-              <Link href="/auth/signup">
+              <Link href="/register">
                 <motion.button
                   whileHover={{ 
                     scale: 1.05,
