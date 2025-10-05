@@ -43,6 +43,8 @@ const UserSidebar = ({ hasActiveRide: hasActiveRideProp }) => {
     const [textIndex, setTextIndex] = useState(0);
     const pathname = usePathname();
 
+    
+
     // Use real-time active ride context, fallback to prop
     const { hasActiveRide: hasActiveRideContext, activeRide } = useActiveRideContext();
     const hasActiveRide = hasActiveRideContext || hasActiveRideProp;
@@ -55,6 +57,7 @@ const UserSidebar = ({ hasActiveRide: hasActiveRideProp }) => {
 
     ];
     const cyclingText = ["TourEase", ...slogans];
+
 
 
     useEffect(() => {
@@ -80,7 +83,7 @@ const UserSidebar = ({ hasActiveRide: hasActiveRideProp }) => {
         }
         return pathname === path;
     };
-
+console.log(pathname)
     const navSections = [
         {
             title: 'Main',
@@ -125,7 +128,7 @@ const UserSidebar = ({ hasActiveRide: hasActiveRideProp }) => {
             </div>
 
             {/* Mobile Sidebar Toggle */}
-            <div className="xl:hidden fixed top-4 left-4 z-30">
+            <div className={`xl:hidden fixed top-4 left-4 z-30 ${pathname === '/' ? 'hidden' : ''}`}>
                 <button
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     className="p-2 rounded-md text-gray-700 dark:text-gray-200 bg-white/50 dark:bg-black/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary"
@@ -136,7 +139,7 @@ const UserSidebar = ({ hasActiveRide: hasActiveRideProp }) => {
 
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-20 w-64 bg-primary text-white transform transition-transform duration-500 ease-in-out ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'} xl:translate-x-0`}
+                className={`fixed inset-y-0 left-0 z-20 w-64 bg-primary text-white transform transition-transform duration-500 ease-in-out ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'} xl:translate-x-0 ${pathname === '/' ? 'hidden' : ''}`}
             >
                 <div className="flex items-center justify-center h-20 border-b border-white/20">
                     {/* Animated Text */}

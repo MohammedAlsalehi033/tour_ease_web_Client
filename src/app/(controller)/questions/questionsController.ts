@@ -91,4 +91,12 @@ export class QuestionsController {
             throw new Error(`Failed to search questions with query ${query}: ${(error as Error).message}`);
         }
     }
+
+    async searchQuestionsByTag(tag: string): Promise<Question[]> {
+        try {
+            return await this.questionsRepo.searchQuestionsByTag(tag);
+        } catch (error) {
+            throw new Error(`Failed to search questions by tag ${tag}: ${(error as Error).message}`);
+        }
+    }
     }

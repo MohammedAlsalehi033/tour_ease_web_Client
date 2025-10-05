@@ -36,62 +36,111 @@ function LoginPage() {
   };
 
 return (
-  <div>
-    <div className="max-w-md w-full p-6 bg-light-surface dark:bg-dark-surface rounded-lg shadow-md card">
-      <h1 className="font-display text-headline-md font-semibold mb-6 text-center">Login</h1>
-      
-      {error && (
-        <div className="bg-error bg-opacity-10 border border-error text-error px-4 py-3 rounded mb-4 font-sans text-body-md font-medium">
-          {error}
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="font-display text-title-md mb-2" htmlFor="email">
-            Email
-          </label>
-          <input
-            className="input w-full"
-            id="email"
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
+  <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="max-w-md w-full">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="font-display text-headline-lg font-bold text-primary mb-2">
+          Welcome Back
+        </h1>
+        <p className="font-sans text-body-lg" style={{ color: 'rgba(var(--text), 0.7)' }}>
+          Sign in to your TourEase account
+        </p>
+      </div>
+
+      {/* Login Form Card */}
+      <div className="card">
+        <h2 className="font-display text-headline-md font-semibold mb-6">
+          Login
+        </h2>
         
-        <div className="mb-6">
-          <label className="font-display text-title-md mb-2" htmlFor="password">
-            Password
-          </label>
-          <input
-            className="input w-full"
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+        {error && (
+          <div className="badge-error px-4 py-3 rounded mb-6 font-sans text-body-md font-medium">
+            {error}
+          </div>
+        )}
         
-        <div className="flex items-center justify-between">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Email Input */}
+          <div>
+            <label 
+              htmlFor="email" 
+              className="font-display text-title-md mb-2"
+            >
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input w-full"
+              required
+            />
+          </div>
+          
+          {/* Password Input */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label 
+                htmlFor="password" 
+                className="font-display text-title-md"
+              >
+                Password
+              </label>
+              <Link 
+                href="/forgot-password"
+                className="text-sm text-primary hover:underline font-medium"
+              >
+                Forgot?
+              </Link>
+            </div>
+            <input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input w-full"
+              required
+            />
+          </div>
+
+          {/* Remember Me Checkbox */}
+          <div className="flex items-center">
+            <input
+              id="remember"
+              type="checkbox"
+              className="checkbox"
+            />
+            <label htmlFor="remember" className="ml-2 block text-sm">
+              Remember me
+            </label>
+          </div>
+          
+          {/* Submit Button */}
           <button
-            className="btn-primary"
             type="submit"
+            className="btn-primary w-full"
           >
             Sign In
           </button>
-          <Link 
-            href="/register"
-            className="btn-text"
-          >
-            Create an account
-          </Link>
+        </form>
+
+        {/* Register Link */}
+        <div className="mt-6 text-center">
+          <p className="font-sans text-body-md" style={{ color: 'rgba(var(--text), 0.7)' }}>
+            Don't have an account?{" "}
+            <Link 
+              href="/register"
+              className="text-primary hover:underline font-semibold"
+            >
+              Create one now
+            </Link>
+          </p>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 );

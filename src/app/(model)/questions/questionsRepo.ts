@@ -57,4 +57,9 @@ export class QuestionsRepo {
         return response.data as Question[];
     }
 
+    async searchQuestionsByTag(tag: string, page: number = 1, limit: number = 10): Promise<Question[]> {
+        const response = await this.apiService.get<ResponseModel<Question>>(`/questions/tag/${encodeURIComponent(tag)}?page=${page}&limit=${limit}`);
+        return response.data as Question[];
+    }
+
 }

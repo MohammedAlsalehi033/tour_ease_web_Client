@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import OtherAvatarPic from '../components/otherAvatarPic';
 import AddQuestionComponent from './addQuestionComponent';
-import QuestionsPageClient from './QuestionsPageClient';
+import QuestionsPageWrapper from './QuestionsPageWrapper';
 import { container } from 'tsyringe';
 import { QuestionsController } from '@/app/(controller)/questions/questionsController';
 import { Question } from '@/app/(model)/questions/questionsModel';
@@ -150,78 +150,35 @@ const page = async () => {
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Main container using Flexbox for columns on large screens */}
-      <div className="lg:flex lg:gap-8">
-
-        {/* Column 1: Main Content */}
-        <main className="lg:w-2/3 flex-shrink-0">
-          <QuestionsPageClient
-            questionsListComponent={
-              <Suspense fallback={<QuestionsSkeleton />}>
-                <QuestionsContent />
-              </Suspense>
-            }
-          >
-            {/* Header */}
-            <div className="mb-6">
-              <div className="flex items-center">
-                <div className="bg-primary/10 p-3 rounded-full mr-4 flex-shrink-0">
-                  <FaQuestionCircle className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h1 className="font-display text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface">
-                    Community Q&A
-                  </h1>
-                  <p className="font-sans text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                    Ask questions and share travel advice with others
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="my-6">
-              <AddQuestionComponent />
-            </div>
-
-            {/* Mobile category selector */}
-            <div className="lg:hidden w-full mb-6">
-              <div className="card border border-primary/20 dark:border-dark-outline/40 rounded-2xl bg-white dark:bg-dark-surface p-3">
-                <h2 className="text-md font-bold mb-3 text-primary px-1">Categories</h2>
-                <div className="overflow-x-auto">
-                  <div className="flex gap-3 px-1 pb-1 whitespace-nowrap scrollbar-thin scrollbar-thumb-primary/40 scrollbar-track-transparent">
-                    {categories.map((cat, idx) => (
-                      <div key={idx} className="card inline-flex items-center text-body-lg font-bold px-4 py-2 rounded-lg transition-transform duration-200 hover:scale-105 cursor-pointer select-none bg-white dark:bg-dark-surface border border-primary/10 dark:border-dark-outline/40">
-                        {cat.icon}
-                        {cat.name}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </QuestionsPageClient>
-        </main>
-
-        {/* Column 2: Categories Sidebar (Desktop) */}
-        <aside className="hidden lg:block lg:w-1/3">
-          <div className="sticky top-24">
-            <div className="card border border-primary/20 dark:border-dark-outline/40 rounded-2xl bg-white dark:bg-dark-surface p-4">
-              <h2 className="text-lg font-bold mb-4 text-primary">Categories</h2>
-              <div className="flex flex-col gap-2">
-                {categories.map((cat, idx) => (
-                  <div key={idx} className="card flex items-center text-title-md font-bold px-5 py-2 rounded-lg transition-transform duration-200 hover:scale-105 hover:shadow-md cursor-pointer select-none bg-white dark:bg-dark-surface border border-primary/10 dark:border-dark-outline/40">
-                    {cat.icon}
-                    {cat.name}
-                  </div>
-                ))}
-              </div>
-            </div>
+    <QuestionsPageWrapper
+      categories={categories}
+      questionsListComponent={
+        <Suspense fallback={<QuestionsSkeleton />}>
+          <QuestionsContent />
+        </Suspense>
+      }
+    >
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center">
+          <div className="bg-primary/10 p-3 rounded-full mr-4 flex-shrink-0">
+            <FaQuestionCircle className="w-6 h-6 text-primary" />
           </div>
-        </aside>
-
+          <div>
+            <h1 className="font-display text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface">
+              Community Q&A
+            </h1>
+            <p className="font-sans text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
+              Ask questions and share travel advice with others
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <div className="my-6">
+        <AddQuestionComponent />
+      </div>
+    </QuestionsPageWrapper>
   );
 };
 
