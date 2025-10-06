@@ -14,7 +14,8 @@ import {
   MessageCircle,
   ArrowRight,
   User,
-  CheckCircle2
+  CheckCircle2,
+  Briefcase
 } from 'lucide-react';
 import { TransportationOffer } from '@/app/(model)/rideSharing/offer/offerModel';
 import AcceptButton from './acceptButton';
@@ -251,6 +252,16 @@ const EnhancedNotificationCard: React.FC<EnhancedNotificationCardProps> = ({
           </div>
           <p className="text-body-sm font-medium text-light-on-surface dark:text-dark-on-surface">
             {offer.seatsRequested} {isListingOffer ? 'requested' : 'offered'}
+          </p>
+        </div>
+
+        <div className="p-3 rounded-lg bg-light-surface-variant/30 dark:bg-dark-surface-variant/30">
+          <div className="flex items-center mb-1">
+            <Briefcase className="w-4 h-4 text-primary mr-1" />
+            <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">Luggage</p>
+          </div>
+          <p className="text-body-sm font-medium text-light-on-surface dark:text-dark-on-surface">
+            {routeInfo?.luggage || 0} bags
           </p>
         </div>
       </div>

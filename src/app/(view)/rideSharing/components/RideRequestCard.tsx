@@ -11,7 +11,8 @@ import {
   User,
   CheckCircle,
   AlertCircle,
-  Zap
+  Zap,
+  Briefcase
 } from 'lucide-react';
 import { RideRequest } from '@/app/(model)/rideSharing/RideRequest/rideRequestModel';
 import { formatExactTime } from '@/lib/timeUtils';
@@ -178,8 +179,8 @@ const RideRequestCard: React.FC<RideRequestCardProps> = ({
               <span>{request.distance_km} km</span>
             </div>
             <div className="flex items-center space-x-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
-              <DollarSign size={12} />
-              <span>Flexible</span>
+              <Briefcase size={12} />
+              <span>{request.luggage || 0} bags</span>
             </div>
           </div>
         </div>

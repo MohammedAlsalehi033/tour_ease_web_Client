@@ -16,7 +16,8 @@ import {
   Car,
   Route,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  Briefcase
 } from 'lucide-react';
 import { RideListing } from '@/app/(model)/rideSharing/RideListting/rideListtingModel';
 import { RideRequest } from '@/app/(model)/rideSharing/RideRequest/rideRequestModel';
@@ -188,6 +189,20 @@ const RideDetailModal: React.FC<RideDetailModalProps> = ({
                       </p>
                       <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
                         {listing ? listing.seatsAvailable : request?.seatsNeeded} seats
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-light-surface-variant dark:bg-dark-surface-variant rounded-xl">
+                  <div className="flex items-center space-x-3">
+                    <Briefcase className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="font-medium text-light-on-surface dark:text-dark-on-surface">
+                        Luggage
+                      </p>
+                      <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        {listing ? listing.luggage || 0 : request?.luggage || 0} bags
                       </p>
                     </div>
                   </div>

@@ -21,7 +21,8 @@ import {
   User,
   Zap,
   RefreshCw,
-  Flag
+  Flag,
+  Briefcase
 } from 'lucide-react';
 import { RideRequest } from '../../../(model)/rideSharing/RideRequest/rideRequestModel';
 import { useSession } from 'next-auth/react';
@@ -613,6 +614,15 @@ console.log("Initial Requests:", initialRequests);
                     </div>
                     <p className="text-2xl font-bold text-light-on-surface dark:text-dark-on-surface">
                       {selectedRequest?.seatsNeeded}
+                    </p>
+                  </div>
+                  <div className="bg-light-surface-variant/50 dark:bg-dark-surface-variant/50 p-4 rounded-xl">
+                    <div className="flex items-center mb-2">
+                      <Briefcase className="w-5 h-5 text-primary mr-2" />
+                      <p className="text-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">Luggage</p>
+                    </div>
+                    <p className="text-2xl font-bold text-light-on-surface dark:text-dark-on-surface">
+                      {selectedRequest?.luggage || 0} bags
                     </p>
                   </div>
                 </div>

@@ -29,6 +29,7 @@ export interface RideListing {
   mediaUrls: string[];
   createdAt: string;
   distance_km: number;
+  luggage?: number;
   provider: Provider;
 }
 

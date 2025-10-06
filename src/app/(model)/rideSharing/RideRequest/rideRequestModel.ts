@@ -13,6 +13,7 @@ export interface RideRequest {
   budget: string;
   createdAt: string;
   distance_km: number;
+  luggage?: number;
   sender: {
     id: string;
     username: string;

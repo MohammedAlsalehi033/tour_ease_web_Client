@@ -11,7 +11,8 @@ import {
   Star,
   Shield,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Briefcase
 } from 'lucide-react';
 import { RideListing } from '@/app/(model)/rideSharing/RideListting/rideListtingModel';
 import { formatExactTime, formatLocalDate } from '@/app/lib/timeUtils';
@@ -264,10 +265,8 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
               <span>{listing.distance_km} km</span>
             </div>
             <div className="flex items-center space-x-2 text-light-on-surface-variant dark:text-dark-on-surface-variant">
-              <Shield size={12} />
-              <span className={isVerified ? 'text-success' : 'text-warning'}>
-                {isVerified ? 'Verified' : 'Pending'}
-              </span>
+              <Briefcase size={12} />
+              <span>{listing.luggage || 0} bags</span>
             </div>
           </div>
 

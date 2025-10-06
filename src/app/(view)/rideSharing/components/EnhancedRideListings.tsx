@@ -19,7 +19,8 @@ import {
   Navigation,
   Heart,
   Share2,
-  Filter
+  Filter,
+  Briefcase
 } from 'lucide-react';
 import { RideListing } from '../../../(model)/rideSharing/RideListting/rideListtingModel';
 import { useSession } from 'next-auth/react';
@@ -470,6 +471,15 @@ const EnhancedRideListings: React.FC<EnhancedRideListingsProps> = ({ rideListing
                     </div>
                     <p className="text-lg font-bold text-light-on-surface dark:text-dark-on-surface">
                       {selectedListing.seatsAvailable}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(var(--surface), 0.8)' }}>
+                    <div className="flex items-center mb-1">
+                      <Briefcase className="w-4 h-4 text-primary mr-1.5" />
+                      <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">Luggage</p>
+                    </div>
+                    <p className="text-sm font-semibold text-light-on-surface dark:text-dark-on-surface">
+                      {selectedListing.luggage || 0} bags
                     </p>
                   </div>
                 </div>
