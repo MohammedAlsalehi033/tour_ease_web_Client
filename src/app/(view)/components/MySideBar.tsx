@@ -123,7 +123,7 @@ console.log(pathname)
 
     return (
         <div>
-            <div className="fixed top-4 right-4 z-30">
+            <div className={`fixed top-4 right-4 z-30 ${pathname === '/' ? 'hidden' : ''}`}>
                 <ThemeToggler />
             </div>
 

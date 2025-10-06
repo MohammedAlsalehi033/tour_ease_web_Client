@@ -181,14 +181,14 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
                 icon="✅"
                 color="rgb(var(--info))"
               />
-              <StatCard
+              {/* <StatCard
                 title="Driver Rating"
                 value={`${stats.averageRating.toFixed(1)}/5`}
                 icon="⭐"
                 color="rgb(var(--warning))"
-              />
+              /> */}
             </>
-          ) : stats.totalBookings > 0 ? (
+          ) : stats.totalBookings < 0 ? (
             <>
               <StatCard
                 title="Total Bookings"
@@ -208,12 +208,12 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
                 icon="✅"
                 color="rgb(var(--success))"
               />
-              <StatCard
+              {/* <StatCard
                 title="Your Rating"
                 value={`${stats.averageRating.toFixed(1)}/5`}
                 icon="⭐"
                 color="rgb(var(--warning))"
-              />
+              /> */}
             </>
           ) : (
             <>
