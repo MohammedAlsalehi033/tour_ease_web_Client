@@ -34,12 +34,10 @@ interface RequestFormData {
   dropoffLocation: LocationData | null;
   departureDate: string;
   departureTime: string;
-  flexibleTime: boolean;
   seatsNeeded: number;
   maxBudget: number;
   luggageRequirement: number;
   notes: string;
-  urgency: 'flexible' | 'today' | 'urgent';
 }
 
 const steps = [
@@ -74,12 +72,10 @@ export default function CreateRideRequestWizard() {
     dropoffLocation: null,
     departureDate: '',
     departureTime: '09:00',
-    flexibleTime: false,
     seatsNeeded: 1,
     maxBudget: 1000,
     luggageRequirement: 1,
-    notes: '',
-    urgency: 'flexible'
+    notes: ''
   });
 
   // Get today as minimum date
@@ -559,12 +555,21 @@ export default function CreateRideRequestWizard() {
     }
   };
 
+  const isDateTimeInPast = (): boolean => {
+    if (!formData.departureDate || !formData.departureTime) return false;
+    
+    const selectedDateTime = new Date(`${formData.departureDate}T${formData.departureTime}`);
+    const now = new Date();
+    
+    return selectedDateTime < now;
+  };
+
   const isStepValid = (step: number): boolean => {
     switch (step) {
       case 1:
         return !!(formData.pickupLocation && formData.dropoffLocation);
       case 2:
-        return !!(formData.departureDate && (formData.departureTime || formData.flexibleTime));
+        return !!(formData.departureDate && formData.departureTime) && !isDateTimeInPast();
       case 3:
         return formData.seatsNeeded > 0 && formData.maxBudget > 0;
       case 4:
@@ -604,14 +609,6 @@ export default function CreateRideRequestWizard() {
       console.error('Error creating ride request:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const getUrgencyColor = (urgency: string) => {
-    switch (urgency) {
-      case 'urgent': return 'bg-red-100 text-red-800 border-red-200';
-      case 'today': return 'bg-orange-100 text-orange-800 border-orange-200';
-      default: return 'bg-green-100 text-green-800 border-green-200';
     }
   };
 
@@ -789,33 +786,6 @@ export default function CreateRideRequestWizard() {
               </h2>
 
               <div className="space-y-6">
-                {/* Urgency Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-[rgb(var(--text))] mb-3">
-                    How urgent is your trip?
-                  </label>
-                  <div className="grid grid-cols-3 gap-3">
-                    {[
-                      { value: 'flexible', label: 'Flexible', desc: 'I can wait for the best match' },
-                      { value: 'today', label: 'Today', desc: 'I need to travel today' },
-                      { value: 'urgent', label: 'Urgent', desc: 'ASAP - very important' }
-                    ].map((option) => (
-                      <button
-                        key={option.value}
-                        onClick={() => handleInputChange('urgency', option.value)}
-                        className={`p-3 border-2 rounded-lg text-left transition-all ${
-                          formData.urgency === option.value 
-                            ? 'bg-[rgba(var(--primary),0.1)] border-[rgb(var(--primary))] text-[rgb(var(--primary))]'
-                            : 'border-gray-200 hover:border-gray-300 text-[rgb(var(--text))]'
-                        }`}
-                      >
-                        <div className="font-medium">{option.label}</div>
-                        <div className="text-xs text-[rgb(var(--text-secondary))]">{option.desc}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-[rgb(var(--text))] mb-2">
@@ -838,37 +808,33 @@ export default function CreateRideRequestWizard() {
                       type="time"
                       value={formData.departureTime}
                       onChange={(e) => handleInputChange('departureTime', e.target.value)}
-                      disabled={formData.flexibleTime}
-                      className="input w-full disabled:bg-gray-100"
+                      className="input w-full"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="flexible-time"
-                    checked={formData.flexibleTime}
-                    onChange={(e) => handleInputChange('flexibleTime', e.target.checked)}
-                    className="w-4 h-4 text-[rgb(var(--primary))] border-gray-300 rounded focus:ring-[rgb(var(--primary))]"
-                  />
-                  <label htmlFor="flexible-time" className="ml-2 text-sm text-[rgb(var(--text))]">
-                    I'm flexible with the departure time
-                  </label>
-                </div>
-
-                {formData.departureDate && (
-                  <div className="p-4 bg-[rgba(var(--primary),0.1)] rounded-lg">
-                    <div className="flex items-center">
-                      <Clock className="text-[rgb(var(--primary))] mr-2" size={20} />
-                      <span className="font-medium text-[rgb(var(--primary))]">
-                        {formData.flexibleTime 
-                          ? `Travel Date: ${new Date(formData.departureDate).toLocaleDateString()} (Flexible time)`
-                          : `Travel: ${new Date(`${formData.departureDate}T${formData.departureTime}`).toLocaleString()}`
-                        }
-                      </span>
-                    </div>
-                  </div>
+                {formData.departureDate && formData.departureTime && (
+                  <>
+                    {isDateTimeInPast() ? (
+                      <div className="p-4 bg-[rgba(var(--error),0.1)] border border-[rgba(var(--error),0.3)] rounded-lg">
+                        <div className="flex items-center">
+                          <AlertCircle className="text-[rgb(var(--error))] mr-2" size={20} />
+                          <span className="font-medium text-[rgb(var(--error))]">
+                            The selected date and time is in the past. Please choose a future time.
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-[rgba(var(--primary),0.1)] rounded-lg">
+                        <div className="flex items-center">
+                          <Clock className="text-[rgb(var(--primary))] mr-2" size={20} />
+                          <span className="font-medium text-[rgb(var(--primary))]">
+                            Travel: {new Date(`${formData.departureDate}T${formData.departureTime}`).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -988,13 +954,8 @@ export default function CreateRideRequestWizard() {
                     <Calendar className="mr-2 text-[rgb(var(--primary))]" size={18} />
                     Schedule
                   </h3>
-                  <div className="flex items-center mb-2">
-                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-[rgba(var(--primary),0.1)] text-[rgb(var(--primary))]">
-                      {formData.urgency.toUpperCase()}
-                    </span>
-                  </div>
                   <p className="text-[rgb(var(--text))]"><strong>Date:</strong> {new Date(formData.departureDate).toLocaleDateString()}</p>
-                  <p className="text-[rgb(var(--text))]"><strong>Time:</strong> {formData.flexibleTime ? 'Flexible' : formData.departureTime}</p>
+                  <p className="text-[rgb(var(--text))]"><strong>Time:</strong> {formData.departureTime}</p>
                 </div>
 
                 <div className="p-4 bg-[rgba(var(--surface),0.8)] border border-gray-200 dark:border-gray-600 rounded-lg">

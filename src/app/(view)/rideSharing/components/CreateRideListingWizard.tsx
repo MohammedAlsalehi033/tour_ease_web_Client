@@ -13,7 +13,8 @@ import {
   Search,
   Navigation,
   Car,
-  Info
+  Info,
+  AlertCircle
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { container } from 'tsyringe';
@@ -557,12 +558,21 @@ export default function CreateRideListingWizard() {
     }
   };
 
+  const isDateTimeInPast = (): boolean => {
+    if (!formData.departureDate || !formData.departureTime) return false;
+    
+    const selectedDateTime = new Date(`${formData.departureDate}T${formData.departureTime}`);
+    const now = new Date();
+    
+    return selectedDateTime < now;
+  };
+
   const isStepValid = (step: number): boolean => {
     switch (step) {
       case 1:
         return !!(formData.pickupLocation && formData.dropoffLocation);
       case 2:
-        return !!(formData.departureDate && formData.departureTime);
+        return !!(formData.departureDate && formData.departureTime) && !isDateTimeInPast();
       case 3:
         return formData.seatsAvailable > 0 && formData.pricePerSeat > 0;
       case 4:
@@ -815,15 +825,28 @@ export default function CreateRideListingWizard() {
                 </div>
               </div>
 
-              {formData.departureDate && (
-                <div className="mt-6 p-4 bg-[rgba(var(--primary),0.1)] border border-[rgba(var(--primary),0.3)] rounded-lg">
-                  <div className="flex items-center">
-                    <Clock className="text-[rgb(var(--primary))] mr-2" size={20} />
-                    <span className="font-medium text-[rgb(var(--primary))]">
-                      Departure: {new Date(`${formData.departureDate}T${formData.departureTime}`).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
+              {formData.departureDate && formData.departureTime && (
+                <>
+                  {isDateTimeInPast() ? (
+                    <div className="mt-6 p-4 bg-[rgba(var(--error),0.1)] border border-[rgba(var(--error),0.3)] rounded-lg">
+                      <div className="flex items-center">
+                        <AlertCircle className="text-[rgb(var(--error))] mr-2" size={20} />
+                        <span className="font-medium text-[rgb(var(--error))]">
+                          The selected date and time is in the past. Please choose a future time.
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-6 p-4 bg-[rgba(var(--primary),0.1)] border border-[rgba(var(--primary),0.3)] rounded-lg">
+                      <div className="flex items-center">
+                        <Clock className="text-[rgb(var(--primary))] mr-2" size={20} />
+                        <span className="font-medium text-[rgb(var(--primary))]">
+                          Departure: {new Date(`${formData.departureDate}T${formData.departureTime}`).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
