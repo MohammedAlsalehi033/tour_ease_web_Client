@@ -96,6 +96,7 @@ const ActiveRidePage = () => {
                         role = 'traveler';
                         
                         pendingBookings.forEach((booking: any) => {
+                            console.log("Processing traveler booking:", booking);
                             const normalized = normalizeBookingData(booking, 'traveler');
                             if (normalized) {
                                 allRidesData.push(normalized);
@@ -153,6 +154,9 @@ const ActiveRidePage = () => {
                     createdAt: booking.createdAt,
                     pickupNotes: booking.request.pickupNotes,
                     dropoffNotes: booking.request.dropoffNotes,
+                    // Include vehicle info from the offer sender (provider)
+                    vehicleType: booking.offer?.sender?.transportationProvider?.vehicleType,
+                    vehicleMediaUrls: booking.offer?.sender?.transportationProvider?.vehicleMediaUrls,
                 };
                 
                 if (userRole === 'driver') {
@@ -165,6 +169,20 @@ const ActiveRidePage = () => {
                             mediaUrls: booking.traveler.mediaUrls,
                             phoneNumber: booking.traveler.phoneNumber,
                             email: booking.traveler.email,
+                        };
+                    }
+                } else if (userRole === 'traveler') {
+                    // For travelers viewing a request booking, extract driver/provider data from the offer
+                    // The offer.sender is the provider who made the offer
+                    if (booking.offer?.sender) {
+                        const sender = booking.offer.sender;
+                        otherUserId = sender.id;
+                        otherUser = {
+                            id: sender.id,
+                            username: sender.username || 'Driver',
+                            mediaUrls: sender.mediaUrls,
+                            phoneNumber: sender.phoneNumber,
+                            email: sender.email,
                         };
                     }
                 }
