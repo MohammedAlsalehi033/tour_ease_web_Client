@@ -16,7 +16,12 @@ export class RideRequestController {
         dropLocationLongitude?: number,
         date?: string,
         startTime?: string,
-        endTime?: string
+        endTime?: string,
+        minBudget?: number,
+        maxBudget?: number,
+        maxSeatsNeeded?: number,
+        luggage?: number,
+        sortBy?: 'distance' | 'budget_asc' | 'budget_desc' | 'time_asc' | 'time_desc'
     ): Promise<RideRequest[]> {
         try {
             const rideRequests = await this.rideRequestRepository.getNearByRideRequests(
@@ -27,7 +32,12 @@ export class RideRequestController {
                 startTime,
                 endTime,
                 dropLocationLatitude,
-                dropLocationLongitude
+                dropLocationLongitude,
+                minBudget,
+                maxBudget,
+                maxSeatsNeeded,
+                luggage,
+                sortBy
             );
             return rideRequests;
         } catch (error) {

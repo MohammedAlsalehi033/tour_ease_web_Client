@@ -28,13 +28,45 @@ export class RideRequestRepo {
         startTime?: string,
         endTime?: string,
         dropLocationLatitude?: number,
-        dropLocationLongitude?: number
+        dropLocationLongitude?: number,
+        minBudget?: number,
+        maxBudget?: number,
+        maxSeatsNeeded?: number,
+        luggage?: number,
+        sortBy?: 'distance' | 'budget_asc' | 'budget_desc' | 'time_asc' | 'time_desc'
     ): Promise<RideRequest[]> {
         try {
             let endpoint = `/searchForNearByRequests?lat=${latitude}&lng=${longitude}&date=${date || ''}&startTime=${startTime || ''}&endTime=${endTime || ''}&latEnd=${dropLocationLatitude || ''}&lngEnd=${dropLocationLongitude || ''}`;
 
             if (radius) {
                 endpoint += `&radiusKm=${radius}`;
+            }
+
+            // Add minBudget (default to 0 if not provided)
+            if (minBudget !== undefined) {
+                endpoint += `&minBudget=${minBudget}`;
+            } else {
+                endpoint += `&minBudget=0`;
+            }
+
+            // Add maxBudget if provided
+            if (maxBudget !== undefined) {
+                endpoint += `&maxBudget=${maxBudget}`;
+            }
+
+            // Add maxSeatsNeeded if provided (optional)
+            if (maxSeatsNeeded !== undefined) {
+                endpoint += `&maxSeatsNeeded=${maxSeatsNeeded}`;
+            }
+
+            // Add luggage if provided (optional)
+            if (luggage !== undefined) {
+                endpoint += `&luggage=${luggage}`;
+            }
+
+            // Add sortBy if provided
+            if (sortBy) {
+                endpoint += `&sortBy=${sortBy}`;
             }
 
             const response = await this.apiService.get<ResponseModel<RideRequest>>(endpoint);
