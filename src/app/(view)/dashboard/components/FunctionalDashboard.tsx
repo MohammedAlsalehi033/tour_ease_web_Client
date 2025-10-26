@@ -74,19 +74,19 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
             // Continue with empty bookings array
             userBookings = [];
           }
-          
+
           setBookings(userBookings);
 
           // Calculate stats from actual data
-          const completedBookings = userBookings.filter(booking => 
+          const completedBookings = userBookings.filter(booking =>
             booking.status === 'accepted'
           );
-          
-          const totalSpent = isProvider ? 0 : userBookings.reduce((sum, booking) => 
+
+          const totalSpent = isProvider ? 0 : userBookings.reduce((sum, booking) =>
             sum + (parseFloat(booking.totalPrice) || 0), 0
           );
-          
-          const totalEarnings = isProvider ? userBookings.reduce((sum, booking) => 
+
+          const totalEarnings = isProvider ? userBookings.reduce((sum, booking) =>
             sum + (parseFloat(booking.totalPrice) || 0), 0
           ) : 0;
 
@@ -126,7 +126,7 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: `rgb(var(--background))` }}>
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="btn-primary"
           >
@@ -146,11 +146,11 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
         {/* Dashboard Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2" style={{ color: `rgb(var(--text))` }}>
-            {greeting}, {session.user?.name || 'User'}! 
+            {greeting}, {session.user?.name || 'User'}!
             {isNewUser ? ' 🚀' : isProvider ? ' 🚗' : ' 👋'}
           </h1>
           <p className="opacity-70" style={{ color: `rgb(var(--text))` }}>
-            {isNewUser 
+            {isNewUser
               ? "Welcome to TourEase! Let's get you started with your first ride."
               : isProvider
                 ? "Manage your rides and track your earnings."
@@ -251,11 +251,11 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
         {/* Recent Activity & Upcoming Trips */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <RecentBookings bookings={bookings.slice(0, 5)} isProvider={isProvider} />
-          <UpcomingBookings 
-            bookings={bookings.filter(b => 
+          <UpcomingBookings
+            bookings={bookings.filter(b =>
               b.status === 'accepted' || b.status === 'pending'
-            ).slice(0, 5)} 
-            isProvider={isProvider} 
+            ).slice(0, 5)}
+            isProvider={isProvider}
           />
         </div>
 
@@ -274,179 +274,177 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
 };
 
 // Stat Card Component
-const StatCard: React.FC<{ title: string; value: string | number; icon: string; color: string }> = 
-({ title, value, icon, color }) => (
-  <div
-    className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
-    style={{ backgroundColor: `rgb(var(--surface))` }}
-  >
-    <div className="flex items-center justify-between mb-4">
-      <div className="text-2xl">{icon}</div>
-      <div className="text-2xl font-bold" style={{ color }}>
-        {value}
+const StatCard: React.FC<{ title: string; value: string | number; icon: string; color: string }> =
+  ({ title, value, icon, color }) => (
+    <div
+      className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
+      style={{ backgroundColor: `rgb(var(--surface))` }}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-2xl">{icon}</div>
+        <div className="text-2xl font-bold" style={{ color }}>
+          {value}
+        </div>
       </div>
+      <h3 className="text-lg font-semibold" style={{ color: `rgb(var(--text))` }}>
+        {title}
+      </h3>
     </div>
-    <h3 className="text-lg font-semibold" style={{ color: `rgb(var(--text))` }}>
-      {title}
-    </h3>
-  </div>
-);
+  );
 
 // Quick Actions Component
-const QuickActions: React.FC<{ isProvider: boolean; isNewUser: boolean }> = 
-({ isProvider, isNewUser }) => {
-  const actions = isNewUser ? [
-    { title: 'Complete Profile', href: '/profile', icon: '👤', color: 'rgb(var(--primary))' },
-    { title: 'Find Rides', href: '/rideSharing/map', icon: '🔍', color: 'rgb(var(--success))' },
-    { title: 'Ask Questions', href: '/questions', icon: '🛡️', color: 'rgb(var(--info))' },
-    { title: 'Chat Support', href: '/chats', icon: '❓', color: 'rgb(var(--warning))' }
-  ] : isProvider ? [
-    { title: 'Offer Ride', href: '/rideSharing/listing', icon: '➕', color: 'rgb(var(--primary))' },
-    { title: 'Active Rides', href: '/rideSharing/activeRide', icon: '📋', color: 'rgb(var(--success))' },
-    { title: 'My Reviews', href: '/my-reviews', icon: '⭐', color: 'rgb(var(--info))' },
-    { title: 'Trip Planner', href: '/tripPlanner', icon: '🗺️', color: 'rgb(var(--warning))' }
-  ] : [
-    { title: 'Find Rides', href: '/rideSharing/maps', icon: '🔍', color: 'rgb(var(--primary))' },
-    { title: 'Trip Planner', href: '/tripPlanner', icon: '�️', color: 'rgb(var(--success))' },
-    { title: 'My Reviews', href: '/my-reviews', icon: '⭐', color: 'rgb(var(--info))' },
-    { title: 'Ask Questions', href: '/questions', icon: '❓', color: 'rgb(var(--warning))' }
-  ];
+const QuickActions: React.FC<{ isProvider: boolean; isNewUser: boolean }> =
+  ({ isProvider, isNewUser }) => {
+    const actions = isNewUser ? [
+      { title: 'Complete Profile', href: '/profile', icon: '👤', color: 'rgb(var(--primary))' },
+      { title: 'Find Rides', href: '/rideSharing/map', icon: '🔍', color: 'rgb(var(--success))' },
+      { title: 'Ask Questions', href: '/questions', icon: '🛡️', color: 'rgb(var(--info))' },
+      { title: 'Chat Support', href: '/chats', icon: '❓', color: 'rgb(var(--warning))' }
+    ] : isProvider ? [
+      { title: 'Offer Ride', href: '/rideSharing/listing', icon: '➕', color: 'rgb(var(--primary))' },
+      { title: 'Active Rides', href: '/rideSharing/activeRide', icon: '📋', color: 'rgb(var(--success))' },
+      { title: 'My Reviews', href: '/my-reviews', icon: '⭐', color: 'rgb(var(--info))' },
+      { title: 'Trip Planner', href: '/tripPlanner', icon: '🗺️', color: 'rgb(var(--warning))' }
+    ] : [
+      { title: 'Find Rides', href: '/rideSharing/maps', icon: '🔍', color: 'rgb(var(--primary))' },
+      { title: 'Trip Planner', href: '/tripPlanner', icon: '�️', color: 'rgb(var(--success))' },
+      { title: 'My Reviews', href: '/my-reviews', icon: '⭐', color: 'rgb(var(--info))' },
+      { title: 'Ask Questions', href: '/questions', icon: '❓', color: 'rgb(var(--warning))' }
+    ];
 
-  return (
-    <div 
-      className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700 mb-8"
+    return (
+      <div
+        className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700 mb-8"
+        style={{ backgroundColor: `rgb(var(--surface))` }}
+      >
+        <h2 className="text-xl font-semibold mb-4" style={{ color: `rgb(var(--text))` }}>
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {actions.map((action, index) => (
+            <Link
+              key={index}
+              href={action.href}
+              className="p-4 rounded-lg text-white block hover:shadow-lg transition-all duration-200 hover:scale-105"
+              style={{ backgroundColor: action.color }}
+            >
+              <div className="flex items-center mb-2">
+                <span className="text-2xl mr-3">{action.icon}</span>
+                <h3 className="font-semibold">{action.title}</h3>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+// Recent Bookings Component
+const RecentBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> =
+  ({ bookings, isProvider }) => (
+    <div
+      className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700"
       style={{ backgroundColor: `rgb(var(--surface))` }}
     >
       <h2 className="text-xl font-semibold mb-4" style={{ color: `rgb(var(--text))` }}>
-        Quick Actions
+        {isProvider ? 'Recent Driver Bookings' : 'Recent Bookings'}
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {actions.map((action, index) => (
-          <Link
-            key={index}
-            href={action.href}
-            className="p-4 rounded-lg text-white block hover:shadow-lg transition-all duration-200 hover:scale-105"
-            style={{ backgroundColor: action.color }}
-          >
-            <div className="flex items-center mb-2">
-              <span className="text-2xl mr-3">{action.icon}</span>
-              <h3 className="font-semibold">{action.title}</h3>
+      {bookings.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="text-6xl mb-4">📱</div>
+          <p className="opacity-70" style={{ color: `rgb(var(--text))` }}>
+            No bookings yet
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {bookings.map((booking) => (
+            <div key={booking.id} className="p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-medium" style={{ color: `rgb(var(--text))` }}>
+                    {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
+                  </h3>
+                  <p className="text-sm opacity-70" style={{ color: `rgb(var(--text))` }}>
+                    PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
+                  </p>
+                  <p className="text-xs opacity-50 mt-1" style={{ color: `rgb(var(--text))` }}>
+                    {new Date(booking.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <span
+                  className={`px-2 py-1 rounded text-xs font-medium ${booking.status === 'accepted' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                      booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                        booking.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                          booking.status === 'cancelled' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' :
+                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                    }`}
+                >
+                  {booking.status}
+                </span>
+              </div>
             </div>
-          </Link>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
-};
-
-// Recent Bookings Component
-const RecentBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> = 
-({ bookings, isProvider }) => (
-  <div 
-    className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700"
-    style={{ backgroundColor: `rgb(var(--surface))` }}
-  >
-    <h2 className="text-xl font-semibold mb-4" style={{ color: `rgb(var(--text))` }}>
-      {isProvider ? 'Recent Driver Bookings' : 'Recent Bookings'}
-    </h2>
-    {bookings.length === 0 ? (
-      <div className="text-center py-8">
-        <div className="text-6xl mb-4">📱</div>
-        <p className="opacity-70" style={{ color: `rgb(var(--text))` }}>
-          No bookings yet
-        </p>
-      </div>
-    ) : (
-      <div className="space-y-4">
-        {bookings.map((booking) => (
-          <div key={booking.id} className="p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium" style={{ color: `rgb(var(--text))` }}>
-                  {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
-                </h3>
-                <p className="text-sm opacity-70" style={{ color: `rgb(var(--text))` }}>
-                  PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
-                </p>
-                <p className="text-xs opacity-50 mt-1" style={{ color: `rgb(var(--text))` }}>
-                  {new Date(booking.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-              <span 
-                className={`px-2 py-1 rounded text-xs font-medium ${
-                  booking.status === 'accepted' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                  booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                  booking.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                  booking.status === 'cancelled' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' :
-                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                }`}
-              >
-                {booking.status}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
 
 // Upcoming Bookings Component  
-const UpcomingBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> = 
-({ bookings, isProvider }) => (
-  <div 
-    className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700"
-    style={{ backgroundColor: `rgb(var(--surface))` }}
-  >
-    <h2 className="text-xl font-semibold mb-4" style={{ color: `rgb(var(--text))` }}>
-      {isProvider ? 'Upcoming Driver Bookings' : 'Upcoming Trips'}
-    </h2>
-    {bookings.length === 0 ? (
-      <div className="text-center py-8">
-        <div className="text-6xl mb-4">✈️</div>
-        <p className="opacity-70" style={{ color: `rgb(var(--text))` }}>
-          No upcoming trips
-        </p>
-      </div>
-    ) : (
-      <div className="space-y-4">
-        {bookings.map((booking) => (
-          <div key={booking.id} className="p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-medium" style={{ color: `rgb(var(--text))` }}>
-                  {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
-                </h3>
-                <p className="text-sm opacity-70" style={{ color: `rgb(var(--text))` }}>
-                  PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
-                </p>
-                <p className="text-xs opacity-50 mt-1" style={{ color: `rgb(var(--text))` }}>
-                  {new Date(booking.createdAt).toLocaleDateString()}
-                </p>
+const UpcomingBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> =
+  ({ bookings, isProvider }) => (
+    <div
+      className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700"
+      style={{ backgroundColor: `rgb(var(--surface))` }}
+    >
+      <h2 className="text-xl font-semibold mb-4" style={{ color: `rgb(var(--text))` }}>
+        {isProvider ? 'Upcoming Driver Bookings' : 'Upcoming Trips'}
+      </h2>
+      {bookings.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="text-6xl mb-4">✈️</div>
+          <p className="opacity-70" style={{ color: `rgb(var(--text))` }}>
+            No upcoming trips
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {bookings.map((booking) => (
+            <div key={booking.id} className="p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-medium" style={{ color: `rgb(var(--text))` }}>
+                    {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
+                  </h3>
+                  <p className="text-sm opacity-70" style={{ color: `rgb(var(--text))` }}>
+                    PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
+                  </p>
+                  <p className="text-xs opacity-50 mt-1" style={{ color: `rgb(var(--text))` }}>
+                    {new Date(booking.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <span
+                  className={`px-2 py-1 rounded text-xs font-medium ${booking.status === 'accepted' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                      booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                        booking.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                          booking.status === 'cancelled' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' :
+                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                    }`}
+                >
+                  {booking.status}
+                </span>
               </div>
-              <span 
-                className={`px-2 py-1 rounded text-xs font-medium ${
-                  booking.status === 'accepted' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                  booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                  booking.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                  booking.status === 'cancelled' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' :
-                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                }`}
-              >
-                {booking.status}
-              </span>
             </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
 // New User Banner
 const NewUserBanner: React.FC<{ isProvider: boolean }> = ({ isProvider }) => (
-  <div className="mt-8 rounded-lg p-6 text-white" 
-       style={{ background: 'linear-gradient(135deg, rgb(var(--primary)), rgb(var(--secondary)))' }}>
+  <div className="mt-8 rounded-lg p-6 text-white"
+    style={{ background: 'linear-gradient(135deg, rgb(var(--primary)), rgb(var(--secondary)))' }}>
     <div className="flex items-center justify-between">
       <div className="flex items-center">
         <span className="text-3xl mr-4">🎯</span>
@@ -455,7 +453,7 @@ const NewUserBanner: React.FC<{ isProvider: boolean }> = ({ isProvider }) => (
             Complete your TourEase journey!
           </h3>
           <p className="opacity-90">
-            {isProvider 
+            {isProvider
               ? "Start offering rides and earn money today."
               : "Find your first ride and explore the city."
             }
