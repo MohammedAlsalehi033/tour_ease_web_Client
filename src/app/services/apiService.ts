@@ -15,7 +15,7 @@ interface FetchOptions {
 @injectable()
 export class ApiService {
   readonly baseUrl: string = 'https://api.tourease.me/api';
-  readonly baseUrl2: string = 'https://api.tourease.me/api';
+  readonly baseUrl2: string = 'http://localhost:3000/api';
 
   constructor() {
 
