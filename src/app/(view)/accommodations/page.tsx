@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Search,
-  MapPin,
-  Calendar,
-  Users,
-  Star,
+import { 
+  Search, 
+  MapPin, 
+  Calendar, 
+  Users, 
+  Star, 
   Heart,
   Wifi,
   Car,
@@ -34,7 +34,7 @@ const AccommodationsPage = () => {
     {
       id: 2,
       name: "Mountain View Hotel",
-      location: "Islamabad, Pakistan",
+      location: "Islamabad, Pakistan", 
       price: 8500,
       rating: 4.6,
       reviews: 189,
@@ -98,18 +98,19 @@ const AccommodationsPage = () => {
   return (
     <div className="min-h-screen bg-light-background dark:bg-dark-background">
       {/* Hero Section */}
-      <div className="relative h-24 sm:h-32 lg:h-40 bg-light-surface dark:bg-dark-surface border-b border-light-outline dark:border-dark-outline">
+      <div className="relative h-48 lg:h-64 bg-gradient-to-r from-primary to-primary-variant">
+        <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative container mx-auto px-4 h-full flex items-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-light-on-surface dark:text-dark-on-surface"
+            className="text-white"
           >
-            <h1 className="font-display text-headline-md sm:text-headline-lg lg:text-headline-xl font-bold mb-1 sm:mb-2">
+            <h1 className="text-3xl lg:text-4xl font-bold mb-2">
               Find Your Perfect Stay
             </h1>
-            <p className="text-body-sm sm:text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
+            <p className="text-lg opacity-90">
               Discover amazing accommodations across Pakistan
             </p>
           </motion.div>
@@ -117,57 +118,57 @@ const AccommodationsPage = () => {
       </div>
 
       {/* Search Section */}
-      <div className="bg-light-surface dark:bg-dark-surface shadow-sm">
-        <div className="container mx-auto px-4 py-3 sm:py-4">
-          <div className="card shadow-lg rounded-lg border border-light-outline dark:border-dark-outline p-3 sm:p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="bg-white dark:bg-dark-surface shadow-sm">
+        <div className="container mx-auto px-4 py-6">
+          <div className="bg-light-surface dark:bg-dark-surface-variant rounded-lg p-4 shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="relative">
-                <label className="block font-display text-body-xs sm:text-body-sm font-medium mb-1 text-light-on-surface dark:text-dark-on-surface">
+                <label className="block text-sm font-medium mb-1 text-light-on-surface dark:text-dark-on-surface">
                   Location
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-3 h-3 sm:w-4 sm:h-4" />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
                   <input
                     type="text"
                     placeholder="Where to?"
-                    className="input w-full pl-8 sm:pl-9 pr-3 py-2 text-sm sm:text-base"
+                    className="w-full pl-9 pr-3 py-2 rounded border border-light-outline dark:border-dark-outline bg-white dark:bg-dark-surface focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   />
                 </div>
               </div>
 
               <div className="relative">
-                <label className="block font-display text-body-xs sm:text-body-sm font-medium mb-1 text-light-on-surface dark:text-dark-on-surface">
+                <label className="block text-sm font-medium mb-1 text-light-on-surface dark:text-dark-on-surface">
                   Check-in
                 </label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-3 h-3 sm:w-4 sm:h-4" />
+                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
                   <input
                     type="date"
-                    className="input w-full pl-8 sm:pl-9 pr-3 py-2 text-sm sm:text-base"
+                    className="w-full pl-9 pr-3 py-2 rounded border border-light-outline dark:border-dark-outline bg-white dark:bg-dark-surface focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   />
                 </div>
               </div>
 
               <div className="relative">
-                <label className="block font-display text-body-xs sm:text-body-sm font-medium mb-1 text-light-on-surface dark:text-dark-on-surface">
+                <label className="block text-sm font-medium mb-1 text-light-on-surface dark:text-dark-on-surface">
                   Check-out
                 </label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-3 h-3 sm:w-4 sm:h-4" />
+                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
                   <input
                     type="date"
-                    className="input w-full pl-8 sm:pl-9 pr-3 py-2 text-sm sm:text-base"
+                    className="w-full pl-9 pr-3 py-2 rounded border border-light-outline dark:border-dark-outline bg-white dark:bg-dark-surface focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   />
                 </div>
               </div>
 
               <div className="relative">
-                <label className="block font-display text-body-xs sm:text-body-sm font-medium mb-1 text-light-on-surface dark:text-dark-on-surface">
+                <label className="block text-sm font-medium mb-1 text-light-on-surface dark:text-dark-on-surface">
                   Guests
                 </label>
                 <div className="relative">
-                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-3 h-3 sm:w-4 sm:h-4" />
-                  <select className="input w-full pl-8 sm:pl-9 pr-3 py-2 text-sm sm:text-base appearance-none">
+                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
+                  <select className="w-full pl-9 pr-3 py-2 rounded border border-light-outline dark:border-dark-outline bg-white dark:bg-dark-surface focus:ring-2 focus:ring-primary focus:border-transparent text-sm appearance-none">
                     <option>2 Guests</option>
                     <option>1 Guest</option>
                     <option>3 Guests</option>
@@ -177,11 +178,11 @@ const AccommodationsPage = () => {
               </div>
             </div>
 
-            <div className="mt-3 flex justify-center sm:justify-start">
+            <div className="mt-4">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="btn-primary px-4 sm:px-6 py-2 rounded-lg font-medium flex items-center space-x-2 text-sm sm:text-base"
+                className="bg-primary text-white px-6 py-2 rounded font-semibold hover:bg-primary-variant transition-colors duration-200 flex items-center space-x-2"
               >
                 <Search className="w-4 h-4" />
                 <span>Search</span>
@@ -192,100 +193,91 @@ const AccommodationsPage = () => {
       </div>
 
       {/* Results */}
-      <div className="container mx-auto px-4 py-4 sm:py-6">
-        <div className="mb-3 sm:mb-4">
-          <h2 className="font-display text-headline-md sm:text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface mb-1">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-light-on-surface dark:text-dark-on-surface mb-1">
             Featured Accommodations
           </h2>
-          <p className="text-body-sm sm:text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
+          <p className="text-light-on-surface-variant dark:text-dark-on-surface-variant">
             {dummyAccommodations.length} properties available
           </p>
         </div>
 
         {/* Accommodations Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {dummyAccommodations.map((accommodation, index) => (
             <motion.div
               key={accommodation.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="card shadow-lg rounded-lg border border-light-outline dark:border-dark-outline overflow-hidden group"
+              className="bg-white dark:bg-dark-surface rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden group"
             >
-              <div className="relative h-32 sm:h-40">
+              <div className="relative h-48">
                 <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary-variant/20 flex items-center justify-center">
                   <div className="text-center text-primary">
-                    <Shield className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-1" />
-                    <p className="text-xs sm:text-sm">Image Placeholder</p>
+                    <Shield className="w-12 h-12 mx-auto mb-2" />
+                    <p className="text-sm">Image Placeholder</p>
                   </div>
                 </div>
-
-                <button className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-dark-surface/80 rounded-full hover:bg-white dark:hover:bg-dark-surface transition-colors">
-                  <Heart className="w-3 h-3 text-light-on-surface-variant dark:text-dark-on-surface-variant hover:text-error" />
+                
+                <button className="absolute top-3 right-3 p-2 bg-white/80 dark:bg-dark-surface/80 rounded-full hover:bg-white dark:hover:bg-dark-surface transition-colors">
+                  <Heart className="w-4 h-4 text-light-on-surface-variant dark:text-dark-on-surface-variant hover:text-error" />
                 </button>
 
-                <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-0.5 rounded text-xs font-medium">
+                <div className="absolute bottom-3 left-3 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
                   {accommodation.type}
                 </div>
               </div>
 
-              <div className="p-3 sm:p-4">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
-                  <h3 className="font-display text-headline-sm sm:text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface group-hover:text-primary transition-colors mb-1 sm:mb-0">
+              <div className="p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-lg font-semibold text-light-on-surface dark:text-dark-on-surface group-hover:text-primary transition-colors">
                     {accommodation.name}
                   </h3>
                   <div className="flex items-center space-x-1">
-                    <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-warning text-warning" />
-                    <span className="text-body-xs sm:text-body-sm font-medium text-light-on-surface dark:text-dark-on-surface">
+                    <Star className="w-4 h-4 fill-warning text-warning" />
+                    <span className="text-sm font-medium text-light-on-surface dark:text-dark-on-surface">
                       {accommodation.rating}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center text-light-on-surface-variant dark:text-dark-on-surface-variant mb-2">
-                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-                  <span className="text-body-xs sm:text-body-sm truncate">{accommodation.location}</span>
+                  <MapPin className="w-4 h-4 mr-1" />
+                  <span className="text-sm">{accommodation.location}</span>
                 </div>
 
-                <p className="text-body-xs sm:text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-3 line-clamp-2">
+                <p className="text-light-on-surface-variant dark:text-dark-on-surface-variant text-sm mb-3">
                   {accommodation.description}
                 </p>
 
-                {/* Amenities Grid */}
-                <div className="grid grid-cols-2 gap-1.5 mb-3">
-                  {accommodation.amenities.slice(0, 4).map((amenity) => {
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {accommodation.amenities.map((amenity) => {
                     const IconComponent = amenityIcons[amenity as keyof typeof amenityIcons] || Shield;
                     return (
                       <div
                         key={amenity}
-                        className="flex items-center space-x-1.5 bg-light-surface-variant/30 dark:bg-dark-surface-variant/30 px-2 py-1.5 rounded-md"
+                        className="flex items-center space-x-1 bg-light-surface dark:bg-dark-surface-variant px-2 py-1 rounded text-xs"
                       >
-                        <IconComponent className="w-3 h-3 text-primary flex-shrink-0" />
-                        <span className="text-body-xs text-light-on-surface dark:text-dark-on-surface capitalize truncate">
+                        <IconComponent className="w-3 h-3 text-primary" />
+                        <span className="capitalize text-light-on-surface dark:text-dark-on-surface">
                           {amenity}
                         </span>
                       </div>
                     );
                   })}
-                  {accommodation.amenities.length > 4 && (
-                    <div className="flex items-center space-x-1.5 bg-light-surface-variant/30 dark:bg-dark-surface-variant/30 px-2 py-1.5 rounded-md col-span-2">
-                      <Shield className="w-3 h-3 text-primary flex-shrink-0" />
-                      <span className="text-body-xs text-light-on-surface dark:text-dark-on-surface">
-                        +{accommodation.amenities.length - 4} more
-                      </span>
-                    </div>
-                  )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2">
+                <div className="flex justify-between items-center">
                   <div>
-                    <div className="flex items-center mb-0.5">
-                      <Banknote className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-primary flex-shrink-0" />
-                      <span className="font-display text-headline-sm font-bold text-primary">
+                    <div className="flex items-center">
+                      <Banknote className="w-4 h-4 mr-1 text-primary" />
+                      <span className="text-xl font-bold text-primary">
                         PKR {accommodation.price.toLocaleString()}
                       </span>
                     </div>
-                    <p className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                    <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
                       per night • {accommodation.reviews} reviews
                     </p>
                   </div>
@@ -293,9 +285,9 @@ const AccommodationsPage = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="btn-primary px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium text-body-xs sm:text-body-sm w-full sm:w-auto"
+                    className="bg-primary text-white px-4 py-2 rounded font-medium hover:bg-primary-variant transition-colors text-sm"
                   >
-                    View Details
+                    View
                   </motion.button>
                 </div>
               </div>
@@ -304,22 +296,20 @@ const AccommodationsPage = () => {
         </div>
 
         {/* Coming Soon Notice */}
-        <div className="mt-6 sm:mt-8">
+        <div className="mt-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="card shadow-lg rounded-lg border border-primary/20 bg-light-surface-variant/30 dark:bg-dark-surface-variant/30 p-3 sm:p-4"
+            className="text-center bg-gradient-to-r from-primary/10 to-primary-variant/10 rounded-lg p-6"
           >
-            <div className="text-center">
-              <Shield className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 text-primary" />
-              <h3 className="font-display text-headline-sm sm:text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface mb-1 sm:mb-2">
-                Coming Soon
-              </h3>
-              <p className="text-body-xs sm:text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant max-w-xl mx-auto">
-                Full accommodation booking functionality is under development. Stay tuned for our complete booking system!
-              </p>
-            </div>
+            <Shield className="w-12 h-12 mx-auto mb-3 text-primary" />
+            <h3 className="text-xl font-bold text-light-on-surface dark:text-dark-on-surface mb-2">
+              Coming Soon
+            </h3>
+            <p className="text-light-on-surface-variant dark:text-dark-on-surface-variant max-w-xl mx-auto">
+              Full accommodation booking functionality is under development. Stay tuned for our complete booking system!
+            </p>
           </motion.div>
         </div>
       </div>

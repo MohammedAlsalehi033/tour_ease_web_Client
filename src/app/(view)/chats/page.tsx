@@ -40,62 +40,60 @@ const formatTimestamp = (timestamp: string | number | Date) => {
 
 const ChatItem = ({ chat }: { chat: Chat }) => {
   return (
-    <div>
-      <Link href={`/chats/${chat.partnerId}`} className="block group">
-        <div className="card p-0 rounded-xl border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface hover:shadow-xl hover:border-primary/50 transition-all duration-200 cursor-pointer flex overflow-hidden relative">
-          {/* Colored accent bar */}
-          <div className="w-2 bg-gradient-to-b from-primary/80 to-primary/40 dark:from-primary/60 dark:to-primary/20" />
-          <div className="flex items-center space-x-4 flex-1 p-4">
-            {/* Avatar */}
-            <div className="relative flex-shrink-0">
+    <Link href={`/chats/${chat.partnerId}`} className="block group">
+      <div className="card p-0 rounded-xl border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface hover:shadow-xl hover:border-primary/50 transition-all duration-200 cursor-pointer flex overflow-hidden relative">
+        {/* Colored accent bar */}
+        <div className="w-2 bg-gradient-to-b from-primary/80 to-primary/40 dark:from-primary/60 dark:to-primary/20" />
+        <div className="flex items-center space-x-4 flex-1 p-4">
+          {/* Avatar */}
+          <div className="relative flex-shrink-0">
+           
+              <OtherAvatarPic imageUrl={chat.avatarUrl} otherUserId={chat.userId} userName={chat.userName} />
              
-                <OtherAvatarPic imageUrl={chat.avatarUrl} otherUserId={chat.userId} userName={chat.userName} />
-               
-              {/* Online status indicator with pulse */}
-              {chat.isOnline && (
-                <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white dark:border-gray-800"></span>
-                </span>
-              )}
-            </div>
+            {/* Online status indicator with pulse */}
+            {chat.isOnline && (
+              <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white dark:border-gray-800"></span>
+              </span>
+            )}
+          </div>
 
-            {/* Chat content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-1">
-                <h3 className="font-display text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">
-                  {chat.userName || 'Unknown User'}
-                </h3>
-                <div className="flex items-center space-x-2 flex-shrink-0">
-                  {/* Unread badge */}
-                  {chat.isUnread && (
-                    <span className="badge badge-info animate-pulse-glow">New</span>
-                  )}
-                  <span className="badge bg-light-surface-variant/60 dark:bg-dark-surface-variant/60 text-xs font-semibold px-2 py-0.5">
-                    {formatTimestamp(chat.timestamp)}
-                  </span>
-                </div>
+          {/* Chat content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-display text-title-md font-medium text-light-on-surface dark:text-dark-on-surface truncate">
+                {chat.userName || 'Unknown User'}
+              </h3>
+              <div className="flex items-center space-x-2 flex-shrink-0">
+                {/* Unread badge */}
+                {chat.isUnread && (
+                  <span className="badge badge-info animate-pulse-glow">New</span>
+                )}
+                <span className="badge bg-light-surface-variant/60 dark:bg-dark-surface-variant/60 text-xs font-semibold px-2 py-0.5">
+                  {formatTimestamp(chat.timestamp)}
+                </span>
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <p className={`font-sans text-body-md truncate flex-1 ${
-                  chat.isUnread
-                    ? 'font-semibold text-light-on-surface dark:text-dark-on-surface'
-                    : 'text-light-on-surface-variant dark:text-dark-on-surface-variant'
-                }`}>
-                  {chat.lastMessage || 'No messages yet'}
-                </p>
-                {/* Message status icons */}
-                <div className="flex items-center ml-2">
-                  {!chat.isUnread && (
-                    <CheckCheck className="w-4 h-4 text-primary/60" />
-                  )}
-                </div>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <p className={`font-sans text-body-md truncate flex-1 ${
+                chat.isUnread
+                  ? 'font-semibold text-light-on-surface dark:text-dark-on-surface'
+                  : 'text-light-on-surface-variant dark:text-dark-on-surface-variant'
+              }`}>
+                {chat.lastMessage || 'No messages yet'}
+              </p>
+              {/* Message status icons */}
+              <div className="flex items-center ml-2">
+                {!chat.isUnread && (
+                  <CheckCheck className="w-4 h-4 text-primary/60" />
+                )}
               </div>
             </div>
           </div>
         </div>
-      </Link>
-    </div>
+      </div>
+    </Link>
   );
 };
 
