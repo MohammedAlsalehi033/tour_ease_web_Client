@@ -20,6 +20,8 @@ import { ReportRepo } from '../(model)/report/reportRepo';
 import { ReportController } from '../(controller)/report/reportController';
 import { ReviewRepo } from '../(model)/review/reviewRepo';
 import { ReviewController } from '../(controller)/review/reviewController';
+import { TripPlannerRepo } from '../(model)/tripPlanner/tripPlannerRepo';
+import { TripPlannerController } from '../(controller)/tripPlanner/tripPlannerController';
 import { ApiService } from '../services/apiService';
 
 
@@ -41,6 +43,8 @@ container.registerSingleton(ReportRepo)
 container.registerSingleton(ReportController)
 container.registerSingleton(ReviewRepo)
 container.registerSingleton(ReviewController)
+container.registerSingleton(TripPlannerRepo)
+container.registerSingleton(TripPlannerController)
 container.registerSingleton(ApiService)
 
 export { container };

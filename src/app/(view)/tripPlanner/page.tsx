@@ -1,151 +1,102 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { MapPin, Calendar, Users, Star, ArrowRight, Trash2, Plus } from 'lucide-react';
-import TripPlannerWizard from './components/TripPlannerWizard';
-import CurrentPlans from './components/CurrentPlans';
+import Image from 'next/image';
+import { container } from '@/app/lib/diContainer';
+import { TripPlannerController } from '@/app/(controller)/tripPlanner/tripPlannerController';
+import ResultsDisplay from './components/ResultsDisplay';
+import { RefinePlanChat } from './components/RefinePlanChat';
+import SavedPlansListComponent from './components/SavedPlansList';
+import { SearchForm } from './components/SearchForm';
+import type {
+  TripPlannerSearchParams,
+  RecommendedPlan,
+  TransportOption,
+  AccommodationOption,
+  SavedPlan
+} from '@/app/(model)/tripPlanner/tripPlannerModel';
 
-interface Plan {
-  id: string;
-  from: string;
-  to: string;
-  startDate: string;
-  endDate: string;
-  budget: number;
-  activities: string[];
-  travelers: number;
-  createdAt: string;
-  status: 'planned' | 'active' | 'completed';
-}
+type ViewMode = 'search' | 'results' | 'savedPlans';
 
-const mockPlans: Plan[] = [
-  {
-    id: '1',
-    from: 'New York, NY',
-    to: 'Paris, France',
-    startDate: '2024-06-15',
-    endDate: '2024-06-25',
-    budget: 3500,
-    activities: ['Sightseeing', 'Dining', 'Museums'],
-    travelers: 2,
-    createdAt: '2024-01-15',
-    status: 'planned'
-  },
-  {
-    id: '2',
-    from: 'Los Angeles, CA',
-    to: 'Tokyo, Japan',
-    startDate: '2024-08-10',
-    endDate: '2024-08-20',
-    budget: 4200,
-    activities: ['Cultural Tours', 'Dining', 'Shopping'],
-    travelers: 1,
-    createdAt: '2024-02-20',
-    status: 'planned'
-  }
-];
+import {
+  RoomSelectionMap,
+  RoomCatalogEntry,
+  SelectedRoomAllocation,
+  toNumber,
+  extractRoomId,
+  getRoomCatalog,
+  buildInitialRoomSelections,
+  buildSelectedRoomAllocations
+} from './tripPlannerHelpers';
 
+// Main Component
 export default function TripPlanner() {
-  const searchParams = useSearchParams();
-  const [showWizard, setShowWizard] = useState(false);
-  const [plans, setPlans] = useState<Plan[]>(mockPlans);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>('search');
+  const [searchResults, setSearchResults] = useState<any>(null);
+  const [searchParams, setSearchParams] = useState<TripPlannerSearchParams | null>(null);
+  const [loading, setLoading] = useState(false);
+  const tripPlannerController = container.resolve(TripPlannerController);
 
-  // Check for success parameter
-  useEffect(() => {
-    const success = searchParams.get('success');
-    if (success === 'plan-created') {
-      setSuccessMessage('Your trip plan has been created successfully!');
-      setShowWizard(false);
-      setTimeout(() => setSuccessMessage(''), 5000);
+  const handleSearch = async (params: TripPlannerSearchParams) => {
+    setLoading(true);
+    try {
+      const results = await tripPlannerController.generateTripPlans(params);
+      setSearchResults(results);
+      setSearchParams(params);
+      setViewMode('results');
+    } catch (error) {
+      console.error('Search error:', error);
+      alert('Failed to search for trips: ' + (error as Error).message);
+    } finally {
+      setLoading(false);
     }
-  }, [searchParams]);
-
-  const handleDeletePlan = (planId: string) => {
-    setPlans(prev => prev.filter(plan => plan.id !== planId));
   };
 
-  const handleUpdatePlan = (planId: string, updates: Partial<Plan>) => {
-    setPlans(prev => prev.map(plan => 
-      plan.id === planId ? { ...plan, ...updates } : plan
-    ));
+  const handleBackToSearch = () => {
+    setViewMode('search');
+    setSearchResults(null);
+    setSearchParams(null);
   };
-
-  if (showWizard) {
-    return <TripPlannerWizard />;
-  }
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--background))] py-8 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 transition-colors duration-200">
       <div className="max-w-6xl mx-auto">
-        {/* Success Message */}
-        {successMessage && (
-          <div className="mb-6 p-4 bg-[rgba(var(--success),0.1)] border border-[rgb(var(--success))] rounded-lg">
-            <p className="text-[rgb(var(--success))] font-medium">{successMessage}</p>
-          </div>
-        )}
-
-        {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[rgb(var(--text))] mb-2">
-            Trip Planner
-          </h1>
-          <p className="text-[rgb(var(--text-secondary))] mb-6">
-            Plan your perfect getaway with personalized recommendations
-          </p>
-          
-          {/* Create New Plan Button */}
-          <button
-            onClick={() => setShowWizard(true)}
-            className="btn btn-primary text-lg px-8 py-3 inline-flex items-center gap-2"
-          >
-            <Plus size={20} />
-            Plan New Trip
+          <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Smart Trip Planner</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Plan your perfect trip with AI-powered recommendations</p>
+        </div>
+
+        <div className="flex gap-4 mb-6 justify-center">
+          <button onClick={() => setViewMode('search')}
+            className={`px-4 py-2 rounded-lg transition-all duration-200 ${viewMode === 'search'
+                ? 'bg-primary text-white shadow-lg'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}>
+            New Search
+          </button>
+          <button onClick={() => setViewMode('savedPlans')}
+            className={`px-4 py-2 rounded-lg transition-all duration-200 ${viewMode === 'savedPlans'
+                ? 'bg-primary text-white shadow-lg'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}>
+            My Saved Plans
           </button>
         </div>
 
-        {/* Current Plans Section */}
-        <div className="mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-[rgb(var(--text))]">
-              Your Trip Plans
-            </h2>
-            {plans.length > 0 && (
-              <span className="bg-[rgba(var(--primary),0.1)] text-[rgb(var(--primary))] px-3 py-1 rounded-full text-sm font-medium">
-                {plans.length} {plans.length === 1 ? 'plan' : 'plans'}
-              </span>
-            )}
-          </div>
-          
-          <CurrentPlans 
-            plans={plans}
-            onDeletePlan={handleDeletePlan}
-            onUpdatePlan={handleUpdatePlan}
-          />
-        </div>
-
-        {/* Empty State */}
-        {plans.length === 0 && (
+        {loading && (
           <div className="text-center py-12">
-            <div className="bg-[rgb(var(--surface))] rounded-lg p-8 max-w-md mx-auto">
-              <div className="w-16 h-16 bg-[rgba(var(--primary),0.1)] rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="text-[rgb(var(--primary))]" size={24} />
-              </div>
-              <h3 className="text-lg font-medium text-[rgb(var(--text))] mb-2">
-                No trips planned yet
-              </h3>
-              <p className="text-[rgb(var(--text-secondary))] mb-6">
-                Start planning your next adventure by creating your first trip plan.
-              </p>
-              <button
-                onClick={() => setShowWizard(true)}
-                className="btn btn-primary"
-              >
-                Plan Your First Trip
-              </button>
-            </div>
+            <div className="text-lg">Searching for the best options...</div>
           </div>
         )}
+
+        {!loading && viewMode === 'search' && <SearchForm onSearch={handleSearch} />}
+        {!loading && viewMode === 'results' && searchResults && searchParams && (
+          <ResultsDisplay
+            results={searchResults}
+            onBack={handleBackToSearch}
+            originalRequest={searchParams}
+          />
+        )}
+  {!loading && viewMode === 'savedPlans' && <SavedPlansListComponent />}
       </div>
     </div>
   );
