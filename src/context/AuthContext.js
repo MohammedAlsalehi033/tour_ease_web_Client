@@ -5,7 +5,10 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { 
   createUserWithEmailAndPassword, 
   signOut as firebaseSignOut,
-  updateProfile
+  updateProfile,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  signInWithPopup
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { ApiService } from "@/app/services/apiService";
@@ -55,6 +58,78 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Sign in with Google
+  const signInWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const apiserver = new ApiService();
+
+      // Create user in database if they don't exist
+      try {
+        await apiserver.post("/createUser", {
+          id: userCredential.user.uid,
+          username: userCredential.user.displayName || "Google User",
+          email: userCredential.user.email,
+          password: "", // No password for OAuth users
+        });
+      } catch (dbError) {
+        // User might already exist, that's okay
+        console.log("User might already exist in database");
+      }
+
+      // Get the Firebase ID token
+      const idToken = await userCredential.user.getIdToken();
+      
+      // Sign in with NextAuth using the Firebase token
+      const result = await signIn("credentials", {
+        email: userCredential.user.email,
+        firebaseToken: idToken,
+        redirect: false,
+      });
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Sign in with Facebook
+  const signInWithFacebook = async () => {
+    try {
+      const provider = new FacebookAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const apiserver = new ApiService();
+
+      // Create user in database if they don't exist
+      try {
+        await apiserver.post("/createUser", {
+          id: userCredential.user.uid,
+          username: userCredential.user.displayName || "Facebook User",
+          email: userCredential.user.email,
+          password: "", // No password for OAuth users
+        });
+      } catch (dbError) {
+        // User might already exist, that's okay
+        console.log("User might already exist in database");
+      }
+
+      // Get the Firebase ID token
+      const idToken = await userCredential.user.getIdToken();
+      
+      // Sign in with NextAuth using the Firebase token
+      const result = await signIn("credentials", {
+        email: userCredential.user.email,
+        firebaseToken: idToken,
+        redirect: false,
+      });
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   // Logout of both Firebase and NextAuth
   const logout = async () => {
     try {
@@ -76,6 +151,8 @@ export const AuthProvider = ({ children }) => {
       currentUser: session?.user,  // Changed from user to currentUser
       signup,
       login,
+      signInWithGoogle,
+      signInWithFacebook,
       logout,
       loading
     }}>
