@@ -7,6 +7,7 @@ export interface Provider {
   vehicleMediaUrls: string[];
   vehicleType: string;
   seatsAvailable: number;
+  departureTime?: string; // Optional: provider's preferred/default departure time
   createdAt: string;
   accountStatus: 'active' | 'blocked' | 'pending';
   user: User;

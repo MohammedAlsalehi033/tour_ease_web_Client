@@ -1,3 +1,5 @@
+import type { AccommodationOption } from '@/app/(model)/tripPlanner/tripPlannerModel';
+
 // Shared helpers and small types for the Trip Planner page
 export type RoomSelectionMap = Record<number, boolean>;
 
@@ -99,41 +101,41 @@ export function getRoomCatalog(acc: any): RoomCatalogEntry[] {
   return Array.from(catalogMap.values());
 }
 
-export function buildInitialRoomSelections(accommodation: any, existingAllocations?: any[]): RoomSelectionMap {
-  const selections: RoomSelectionMap = {};
+export function buildInitialRoomSelections(
+  accommodation: AccommodationOption | null,
+  preSelectedAllocations?: any[]
+): RoomSelectionMap {
+  if (!accommodation) return {};
 
-  const registerAllocation = (allocation: any) => {
-    if (!allocation) return;
-    const roomId =
-      allocation.roomId ??
-      allocation.Room?.id ??
-      allocation.room?.id ??
-      allocation.id ??
-      allocation.room?.roomId ??
-      allocation.Room?.roomId;
-    if (roomId == null) return;
-    const quantity =
-      allocation.numberOfRooms ??
-      allocation.quantity ??
-      allocation.count ??
-      allocation.rooms ??
-      allocation.roomsBooked ??
-      (allocation.selected ? 1 : 0);
-    if (quantity && Number(quantity) > 0) {
-      selections[Number(roomId)] = true;
-    }
-  };
+  const catalog = getRoomCatalog(accommodation);
+  if (catalog.length === 0) return {};
 
-  if (Array.isArray(existingAllocations) && existingAllocations.length > 0) {
-    existingAllocations.forEach(registerAllocation);
+  // If pre-selected allocations are provided (e.g., from an optimal plan), use them.
+  if (preSelectedAllocations && preSelectedAllocations.length > 0) {
+    const selections: RoomSelectionMap = {};
+    const preSelectedRoomIds = new Set(
+      preSelectedAllocations.map(alloc => alloc.roomId || alloc.room?.id).filter(Boolean)
+    );
+    preSelectedRoomIds.forEach(id => {
+      selections[id] = true;
+    });
     return selections;
   }
 
-  if (Array.isArray(accommodation?.roomAllocations)) {
-    accommodation.roomAllocations.forEach(registerAllocation);
+  // Default behavior: select only the cheapest room.
+  let cheapestRoom: RoomCatalogEntry | null = null;
+  for (const room of catalog) {
+    const roomPrice = toNumber(room.pricePerNight) || Infinity;
+    if (!cheapestRoom || roomPrice < (toNumber(cheapestRoom.pricePerNight) || Infinity)) {
+      cheapestRoom = room;
+    }
   }
 
-  return selections;
+  if (cheapestRoom) {
+    return { [cheapestRoom.id]: true };
+  }
+
+  return {};
 }
 
 export function buildSelectedRoomAllocations(

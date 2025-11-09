@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { container } from '@/app/lib/diContainer';
 import { TripPlannerController } from '@/app/(controller)/tripPlanner/tripPlannerController';
 import { RefinePlanChat } from './RefinePlanChat';
+import { BookingSummary } from './BookingSummary';
 import type { TripPlannerSearchParams, TransportOption, AccommodationOption } from '@/app/(model)/tripPlanner/tripPlannerModel';
 import {
   RoomSelectionMap,
@@ -27,6 +28,7 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
   const [roomSelections, setRoomSelections] = useState<RoomSelectionMap>({});
   const [currentResults, setCurrentResults] = useState(results);
   const [showBudgetWidget, setShowBudgetWidget] = useState(true);
+  const [bookingDetails, setBookingDetails] = useState<any>(null);
   const tripPlannerController = container.resolve(TripPlannerController);
 
   const { optimalPlan, recommendedPlans, availableOptions, itinerary, tripSummary } = currentResults?.data || {};
@@ -66,6 +68,9 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
   const updatedTotalCost = tripSummary
     ? transportCost + accommodationCost + activitiesCost + mealsCost + otherCost
     : transportCost + accommodationCost;
+  const budget = toNumber(originalRequest.budget);
+  const clientSideBudgetStatus = budget > 0 && updatedTotalCost > budget ? 'over_budget' : 'within_budget';
+
   const selectedAccommodationImages = Array.isArray(selectedAccommodation?.images) && selectedAccommodation.images.length > 0
     ? selectedAccommodation.images
     : Array.isArray(selectedAccommodation?.mediaUrls)
@@ -113,7 +118,8 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
 
   const handleSelectAccommodation = (accommodation: AccommodationOption) => {
     setSelectedAccommodation(accommodation);
-    setRoomSelections(buildInitialRoomSelections(accommodation));
+    // Pass undefined (no preselections) to select only the cheapest room
+    setRoomSelections(buildInitialRoomSelections(accommodation, undefined));
   };
 
   const handleRoomToggle = (roomId: number, isSelected: boolean) => {
@@ -203,6 +209,79 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
     }
   };
 
+  const handleInitiateBooking = () => {
+    console.log('handleInitiateBooking called');
+    const outboundOption = activeOutboundTransport;
+    const returnOption = activeReturnTransport;
+
+    console.log('Outbound:', outboundOption);
+    console.log('Return:', returnOption);
+    console.log('Accommodation:', selectedAccommodation);
+    console.log('Selected Plan:', selectedPlan);
+
+    if (!selectedPlan && !outboundOption && !selectedAccommodation) {
+      alert('Please select a plan or choose transportation and accommodation');
+      return;
+    }
+
+    if (requiresReturnTransport && !returnOption) {
+      alert('Please select a return transportation option.');
+      return;
+    }
+
+    if (selectedAccommodation && roomCatalog.length > 0 && selectedRoomAllocations.length === 0) {
+      alert('Please choose at least one room type for the selected accommodation.');
+      return;
+    }
+
+    console.log('Validation passed, creating booking details...');
+
+    const roomPayload = selectedAccommodation
+      ? (selectedRoomAllocations.length > 0
+          ? selectedRoomAllocations.map(allocation => ({
+              roomId: allocation.roomId,
+              numberOfRooms: 1
+            }))
+          : (selectedAccommodation.roomAllocations || []).map((r: any) => ({
+              roomId: r.roomId || r.room?.id,
+              numberOfRooms: (r.numberOfRooms || r.quantity || 0) > 0 ? 1 : 0
+            })).filter((entry: any) => entry.roomId && entry.numberOfRooms > 0))
+      : [];
+
+    setBookingDetails({
+      outboundTransport: outboundOption,
+      returnTransport: returnOption,
+      accommodation: selectedAccommodation,
+      selectedRooms: selectedRoomAllocations,
+      totalCost: calculateTotalCost(),
+      nightsCount: nightsCount,
+      bookingRequest: {
+        outboundTransportId: outboundOption?.id || 0,
+        returnTransportId: returnOption?.id ?? null,
+        accommodationId: selectedAccommodation?.id || 0,
+        selectedRoomAllocations: roomPayload,
+        seatsNeeded: currentResults.data.requestSummary.numberOfTravelers,
+        checkInDate: currentResults.data.requestSummary.startTime,
+        checkOutDate: currentResults.data.requestSummary.endTime
+      }
+    });
+    
+    console.log('Booking details set!');
+  };
+
+  const confirmAndBook = async () => {
+    if (!bookingDetails?.bookingRequest) return;
+
+    try {
+      const confirmation = await tripPlannerController.confirmBooking(bookingDetails.bookingRequest);
+      alert('Booking offers sent successfully! Total estimated cost: PKR ' + confirmation.totalCost.toLocaleString());
+      setBookingDetails(null);
+    } catch (error) {
+      console.error('Booking error:', error);
+      alert('Booking failed: ' + (error as Error).message);
+    }
+  };
+
   const handleBookPlan = async () => {
     const outboundOption = activeOutboundTransport;
     const returnOption = activeReturnTransport;
@@ -254,11 +333,20 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
   };
 
   return (
-    <div className="relative">
-      {/* Back Button */}
-      <button onClick={onBack} className="btn-outlined mb-6">
-        ← Back to Search
-      </button>
+    <>
+      {/* Booking Summary Full Page */}
+      {bookingDetails ? (
+        <BookingSummary
+          {...bookingDetails}
+          onConfirm={confirmAndBook}
+          onCancel={() => setBookingDetails(null)}
+        />
+      ) : (
+        <div className="relative">
+          {/* Back Button */}
+          <button onClick={onBack} className="btn-outlined mb-6">
+            ← Back to Search
+          </button>
 
       {/* Optimal Plan Card */}
       {(optimalPlan || hasItinerary) && (
@@ -349,6 +437,14 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                     </span>
                   </div>
                   <div className="space-y-2 text-sm">
+                    {transport.departureTime && (
+                      <p>🕐 {new Date(transport.departureTime).toLocaleString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}</p>
+                    )}
                     <p>🪑 {transport.seatsAvailable} seats available</p>
                     <p className="text-lg font-bold text-primary">PKR {(transport.totalCost || 0).toLocaleString()}</p>
                   </div>
@@ -410,6 +506,14 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                     </span>
                   </div>
                   <div className="space-y-2 text-sm">
+                    {transport.departureTime && (
+                      <p>🕐 {new Date(transport.departureTime).toLocaleString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}</p>
+                    )}
                     <p>🪑 {transport.seatsAvailable} seats available</p>
                     <p className="text-lg font-bold text-primary">PKR {(transport.totalCost || 0).toLocaleString()}</p>
                   </div>
@@ -744,9 +848,9 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                       PKR {calculateTotalCost().toLocaleString()}
                     </span>
                   </div>
-                  {tripSummary?.budgetStatus && (
-                    <p className={`text-xs mt-2 ${tripSummary.budgetStatus === 'over_budget' ? 'text-error' : 'text-success'}`}>
-                      {tripSummary.budgetStatus === 'over_budget' ? '⚠️ Over Budget' : '✅ Within Budget'}
+                  {budget > 0 && (
+                    <p className={`text-xs mt-2 ${clientSideBudgetStatus === 'over_budget' ? 'text-error' : 'text-success'}`}>
+                      {clientSideBudgetStatus === 'over_budget' ? '⚠️ Over Budget' : '✅ Within Budget'}
                     </p>
                   )}
                 </div>
@@ -756,7 +860,7 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                   <button onClick={handleSavePlan} className="btn-outlined w-full">
                     💾 Save Plan
                   </button>
-                  <button onClick={handleBookPlan} className="btn-primary w-full">
+                  <button onClick={handleInitiateBooking} className="btn-primary w-full">
                     Book Now
                   </button>
                 </div>
@@ -766,6 +870,8 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
         </>
       )}
     </div>
+      )}
+    </>
   );
 };
 
