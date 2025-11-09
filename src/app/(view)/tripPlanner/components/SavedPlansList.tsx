@@ -354,28 +354,25 @@ const SavedPlansList = () => {
 
   const selectedPlan = plans.find(p => p.id === selectedPlanId);
 
-  const activePlanData = selectedPlan
-    ? planSearchData ||
-      selectedPlan.planData ||
-      (selectedPlan.searchResultsData?.data ?? selectedPlan.searchResultsData) ||
-      null
-    : null;
+  // =================================================================
+  // START OF FIX: Read from state, don't re-derive
+  // =================================================================
+  console.log('Available options state:', availableOptions);
+  // Read directly from the state variables set by loadAvailableOptions
+  const outboundTransportOptions = availableOptions?.outboundTransportation || [];
+  const returnTransportOptions = availableOptions?.returnTransportation || [];
+  const accommodationOptions = availableOptions?.accommodations || [];
 
-  const outboundTransportOptions = activePlanData?.availableOptions?.outboundTransportation
-    || activePlanData?.transportationOptions?.outbound
-    || [];
+  // planSearchData is set by loadAvailableOptions/fetchAvailableOptionsFromBackend
+  const itineraryData = Array.isArray(planSearchData?.searchResultsData?.itinerary) ? planSearchData.searchResultsData.itinerary : [];
+  const tripSummaryData = planSearchData?.searchResultsData?.tripSummary || null;
+  const optimalPlanData = planSearchData?.searchResultsData?.optimalPlan || null;
+  console.log('Plan search data:', planSearchData);
+  
+  // =================================================================
+  // END OF FIX
+  // =================================================================
 
-  const returnTransportOptions = activePlanData?.availableOptions?.returnTransportation
-    || activePlanData?.transportationOptions?.return
-    || [];
-
-  const accommodationOptions = activePlanData?.availableOptions?.accommodations
-    || activePlanData?.accommodationOptions
-    || [];
-
-  const itineraryData = Array.isArray(activePlanData?.itinerary) ? activePlanData.itinerary : [];
-  const tripSummaryData = activePlanData?.tripSummary || null;
-  const optimalPlanData = activePlanData?.optimalPlan || null;
   const hasItinerary = itineraryData.length > 0;
   const transportSliderId = selectedPlan ? `saved-transport-slider-${selectedPlan.id}` : 'saved-transport-slider';
   const returnTransportSliderId = selectedPlan ? `saved-return-slider-${selectedPlan.id}` : 'saved-return-slider';
