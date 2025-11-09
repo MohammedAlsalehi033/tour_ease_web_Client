@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Session } from 'next-auth';
-import { motion } from 'framer-motion';
 import { container } from '@/app/lib/diContainer';
 import { UserController } from '@/app/(controller)/user/userController';
 import { BookingController } from '@/app/(controller)/rideSharing/bookingController';
+import { RideListingController } from '@/app/(controller)/rideSharing/rideListingController';
 import { User } from '@/app/(model)/user/userModel';
 import { Booking } from '@/app/(model)/rideSharing/booking/bookingModel';
 import ReviewPastRides from './ReviewPastRides';
@@ -38,44 +38,6 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 }
-    }
-  };
-
-  const cardHoverVariants = {
-    scale: 1.05,
-    y: -2,
-    transition: { duration: 0.2 }
-  };
-
-  const staggerContainerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-
   // Get greeting based on time
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
@@ -95,36 +57,36 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
           setUser(userData);
 
           // Check if user is transportation provider
-          const isProvider = !!userData.roles?.includes('transportation_provider');
+          const isProvider = userData.roles.includes('transportation_provider');
 
           // Fetch bookings based on user role
           let userBookings: Booking[] = [];
           try {
             if (isProvider) {
               const response = await bookingController.getBookingsForDriver(session.user.id);
-              userBookings = response.success ? (response.data as Booking[]) : [];
+              userBookings = response.success ? response.data : [];
             } else {
               const response = await bookingController.getBookingsForTraveler(session.user.id);
-              userBookings = response.success ? (response.data as Booking[]) : [];
+              userBookings = response.success ? response.data : [];
             }
           } catch (bookingError) {
             console.error('Error fetching bookings:', bookingError);
             // Continue with empty bookings array
             userBookings = [];
           }
-
+          
           setBookings(userBookings);
 
           // Calculate stats from actual data
-          const completedBookings = userBookings.filter(booking =>
+          const completedBookings = userBookings.filter(booking => 
             booking.status === 'accepted'
           );
-
-          const totalSpent = isProvider ? 0 : userBookings.reduce((sum, booking) =>
+          
+          const totalSpent = isProvider ? 0 : userBookings.reduce((sum, booking) => 
             sum + (parseFloat(booking.totalPrice) || 0), 0
           );
-
-          const totalEarnings = isProvider ? userBookings.reduce((sum, booking) =>
+          
+          const totalEarnings = isProvider ? userBookings.reduce((sum, booking) => 
             sum + (parseFloat(booking.totalPrice) || 0), 0
           ) : 0;
 
@@ -150,10 +112,10 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-light-background dark:bg-dark-background">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: `rgb(var(--background))` }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4 mx-auto"></div>
-          <p className="text-body-lg text-light-on-surface dark:text-dark-on-surface">Loading your dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mb-4 mx-auto" style={{ borderColor: `rgb(var(--primary))` }}></div>
+          <p style={{ color: `rgb(var(--text))` }}>Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -161,12 +123,12 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-light-background dark:bg-dark-background">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: `rgb(var(--background))` }}>
         <div className="text-center">
-          <p className="text-error mb-4">{error}</p>
-          <button
+          <p className="text-red-500 mb-4">{error}</p>
+          <button 
             onClick={() => window.location.reload()}
-            className="btn-primary py-2 px-6"
+            className="btn-primary"
           >
             Retry
           </button>
@@ -175,498 +137,341 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
     );
   }
 
-  const isProvider = !!user?.roles?.includes('transportation_provider');
+  const isProvider = user?.roles.includes('transportation_provider');
   const isNewUser = stats.totalBookings === 0;
 
   return (
-    <motion.div
-      className="min-h-screen bg-light-background dark:bg-dark-background"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
-      <div className=" p-6 ">
+    <div className="min-h-screen" style={{ backgroundColor: `rgb(var(--background))` }}>
+      <div className=" mx-auto p-6">
         {/* Dashboard Header */}
-        <motion.div
-          className="mb-8"
-          variants={itemVariants}
-        >
-          <h1 className="font-display text-headline-lg font-bold mb-2 text-light-on-surface dark:text-dark-on-surface">
-            {greeting}, {session.user?.name || 'User'}!
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: `rgb(var(--text))` }}>
+            {greeting}, {session.user?.name || 'User'}! 
+            {isNewUser ? ' 🚀' : isProvider ? ' 🚗' : ' 👋'}
           </h1>
-          <p className="text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
-            {isNewUser
+          <p className="opacity-70" style={{ color: `rgb(var(--text))` }}>
+            {isNewUser 
               ? "Welcome to TourEase! Let's get you started with your first ride."
               : isProvider
                 ? "Manage your rides and track your earnings."
                 : "Find rides and manage your bookings."
             }
           </p>
-        </motion.div>
+        </div>
 
         {/* Stats Section */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
-          variants={staggerContainerVariants}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {isProvider ? (
             <>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
-                <StatCard
-                  title="Rides Offered"
-                  value={stats.ridesOffered}
-                />
-              </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
-                <StatCard
-                  title="Total Earnings"
-                  value={`PKR ${stats.totalEarnings.toLocaleString()}`}
-                />
-              </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
-                <StatCard
-                  title="Completed Trips"
-                  value={stats.completedRides}
-                />
-              </motion.div>
+              <StatCard
+                title="Rides Offered"
+                value={stats.ridesOffered}
+                icon="🚗"
+                color="rgb(var(--primary))"
+              />
+              <StatCard
+                title="Total Earnings"
+                value={`PKR ${stats.totalEarnings.toLocaleString()}`}
+                icon="💰"
+                color="rgb(var(--success))"
+              />
+              <StatCard
+                title="Completed Trips"
+                value={stats.completedRides}
+                icon="✅"
+                color="rgb(var(--info))"
+              />
+              {/* <StatCard
+                title="Driver Rating"
+                value={`${stats.averageRating.toFixed(1)}/5`}
+                icon="⭐"
+                color="rgb(var(--warning))"
+              /> */}
             </>
-          ) : stats.totalBookings > 0 ? (
+          ) : stats.totalBookings < 0 ? (
             <>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
-                <StatCard
-                  title="Total Bookings"
-                  value={stats.totalBookings}
-                />
-              </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
-                <StatCard
-                  title="Total Spent"
-                  value={`PKR ${stats.totalSpent.toLocaleString()}`}
-                />
-              </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
-                <StatCard
-                  title="Completed Trips"
-                  value={stats.completedRides}
-                />
-              </motion.div>
+              <StatCard
+                title="Total Bookings"
+                value={stats.totalBookings}
+                icon="🚌"
+                color="rgb(var(--primary))"
+              />
+              <StatCard
+                title="Total Spent"
+                value={`PKR ${stats.totalSpent.toLocaleString()}`}
+                icon="💳"
+                color="rgb(var(--error))"
+              />
+              <StatCard
+                title="Completed Trips"
+                value={stats.completedRides}
+                icon="✅"
+                color="rgb(var(--success))"
+              />
+              {/* <StatCard
+                title="Your Rating"
+                value={`${stats.averageRating.toFixed(1)}/5`}
+                icon="⭐"
+                color="rgb(var(--warning))"
+              /> */}
             </>
           ) : (
             <>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
-                <StatCard
-                  title="Get Started"
-                  value="0"
-                />
-              </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
-                <StatCard
-                  title="Find Rides"
-                  value="Explore"
-                />
-              </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
-                <StatCard
-                  title="Need Help?"
-                  value="Support"
-                />
-              </motion.div>
+              <StatCard
+                title="Welcome!"
+                value="Get Started"
+                icon="👋"
+                color="rgb(var(--primary))"
+              />
+              <StatCard
+                title="Find Rides"
+                value="Explore"
+                icon="🔍"
+                color="rgb(var(--success))"
+              />
+              <StatCard
+                title="Safety First"
+                value="Learn More"
+                icon="🛡️"
+                color="rgb(var(--info))"
+              />
+              <StatCard
+                title="Need Help?"
+                value="Support"
+                icon="❓"
+                color="rgb(var(--warning))"
+              />
             </>
           )}
-        </motion.div>
+        </div>
 
         {/* Quick Actions */}
-        <motion.div
-          variants={itemVariants}
-          whileHover={{ scale: 1.01 }}
-          transition={{ duration: 0.2 }}
-        >
-          <QuickActions isProvider={isProvider} isNewUser={isNewUser} />
-        </motion.div>
+        <QuickActions isProvider={isProvider} isNewUser={isNewUser} />
 
         {/* Recent Activity & Upcoming Trips */}
-        <motion.div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8"
-          variants={staggerContainerVariants}
-        >
-          <motion.div variants={itemVariants}>
-            <RecentBookings bookings={bookings.slice(0, 5)} isProvider={isProvider} />
-          </motion.div>
-          <motion.div variants={itemVariants}>
-            <UpcomingBookings
-              bookings={bookings.filter(b =>
-                b.status === 'accepted' || b.status === 'pending'
-              ).slice(0, 5)}
-              isProvider={isProvider}
-            />
-          </motion.div>
-        </motion.div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <RecentBookings bookings={bookings.slice(0, 5)} isProvider={isProvider} />
+          <UpcomingBookings 
+            bookings={bookings.filter(b => 
+              b.status === 'accepted' || b.status === 'pending'
+            ).slice(0, 5)} 
+            isProvider={isProvider} 
+          />
+        </div>
 
         {/* Review Past Rides - Only for travelers */}
         {!isProvider && (
-          <motion.div
-            className="mb-8"
-            variants={itemVariants}
-          >
+          <div className="mb-8">
             <ReviewPastRides bookings={bookings} isProvider={!!isProvider} />
-          </motion.div>
+          </div>
         )}
 
         {/* New User Onboarding */}
-        {isNewUser && (
-          <motion.div
-            variants={itemVariants}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-          >
-            <NewUserBanner isProvider={isProvider} />
-          </motion.div>
-        )}
+        {isNewUser && <NewUserBanner isProvider={isProvider} />}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 // Stat Card Component
-const StatCard: React.FC<{ title: string; value: string | number }> =
-  ({ title, value }) => (
-    <motion.div
-      className="card shadow-lg rounded-lg p-6 border border-light-outline dark:border-dark-outline cursor-pointer"
-      whileHover={{
-        scale: 1.05,
-        boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-        transition: { duration: 0.2 }
-      }}
-      whileTap={{ scale: 0.98 }}
-    >
-      <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">
-        {title}
-      </p>
-      <motion.p
-        className="font-display text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.3 }}
-      >
+const StatCard: React.FC<{ title: string; value: string | number; icon: string; color: string }> = 
+({ title, value, icon, color }) => (
+  <div
+    className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
+    style={{ backgroundColor: `rgb(var(--surface))` }}
+  >
+    <div className="flex items-center justify-between mb-4">
+      <div className="text-2xl">{icon}</div>
+      <div className="text-2xl font-bold" style={{ color }}>
         {value}
-      </motion.p>
-    </motion.div>
-  );
+      </div>
+    </div>
+    <h3 className="text-lg font-semibold" style={{ color: `rgb(var(--text))` }}>
+      {title}
+    </h3>
+  </div>
+);
 
 // Quick Actions Component
-const QuickActions: React.FC<{ isProvider: boolean; isNewUser: boolean }> =
-  ({ isProvider, isNewUser }) => {
-    const actions = isNewUser ? [
-      { title: 'Complete Profile', href: '/profile' },
-      { title: 'Find Rides', href: '/rideSharing/maps' },
-      { title: 'Ask Questions', href: '/questions' },
-      { title: 'Chat Support', href: '/chats' }
-    ] : isProvider ? [
-      { title: 'Offer Ride', href: '/rideSharing/listing' },
-      { title: 'Active Rides', href: '/rideSharing/activeRide' },
-      { title: 'My Reviews', href: '/my-reviews' },
-      { title: 'Trip Planner', href: '/tripPlanner' }
-    ] : [
-      { title: 'Find Rides', href: '/rideSharing/maps' },
-      { title: 'Trip Planner', href: '/tripPlanner' },
-      { title: 'My Reviews', href: '/my-reviews' },
-      { title: 'Ask Questions', href: '/questions' }
-    ];
+const QuickActions: React.FC<{ isProvider: boolean; isNewUser: boolean }> = 
+({ isProvider, isNewUser }) => {
+  const actions = isNewUser ? [
+    { title: 'Complete Profile', href: '/profile', icon: '👤', color: 'rgb(var(--primary))' },
+    { title: 'Find Rides', href: '/rideSharing/map', icon: '🔍', color: 'rgb(var(--success))' },
+    { title: 'Ask Questions', href: '/questions', icon: '🛡️', color: 'rgb(var(--info))' },
+    { title: 'Chat Support', href: '/chats', icon: '❓', color: 'rgb(var(--warning))' }
+  ] : isProvider ? [
+    { title: 'Offer Ride', href: '/rideSharing/listing', icon: '➕', color: 'rgb(var(--primary))' },
+    { title: 'Active Rides', href: '/rideSharing/activeRide', icon: '📋', color: 'rgb(var(--success))' },
+    { title: 'My Reviews', href: '/my-reviews', icon: '⭐', color: 'rgb(var(--info))' },
+    { title: 'Trip Planner', href: '/tripPlanner', icon: '🗺️', color: 'rgb(var(--warning))' }
+  ] : [
+    { title: 'Find Rides', href: '/rideSharing/maps', icon: '🔍', color: 'rgb(var(--primary))' },
+    { title: 'Trip Planner', href: '/tripPlanner', icon: '�️', color: 'rgb(var(--success))' },
+    { title: 'My Reviews', href: '/my-reviews', icon: '⭐', color: 'rgb(var(--info))' },
+    { title: 'Ask Questions', href: '/questions', icon: '❓', color: 'rgb(var(--warning))' }
+  ];
 
-    return (
-      <div className="card shadow-lg rounded-lg p-6 border border-light-outline dark:border-dark-outline mb-8">
-        <h2 className="font-display text-headline-md font-bold mb-4 text-light-on-surface dark:text-dark-on-surface">
-          Quick Actions
-        </h2>
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.3
-              }
-            }
-          }}
-        >
-          {actions.map((action, index) => (
-            <motion.div
-              key={index}
-              variants={{
-                hidden: { opacity: 0, y: 20, scale: 0.8 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  transition: { duration: 0.4 }
-                }
-              }}
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
-                transition: { duration: 0.2 }
-              }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link
-                href={action.href}
-                className="btn-primary text-center py-3 px-4 rounded-lg font-medium transition-all block"
-              >
-                {action.title}
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
+  return (
+    <div 
+      className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700 mb-8"
+      style={{ backgroundColor: `rgb(var(--surface))` }}
+    >
+      <h2 className="text-xl font-semibold mb-4" style={{ color: `rgb(var(--text))` }}>
+        Quick Actions
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {actions.map((action, index) => (
+          <Link
+            key={index}
+            href={action.href}
+            className="p-4 rounded-lg text-white block hover:shadow-lg transition-all duration-200 hover:scale-105"
+            style={{ backgroundColor: action.color }}
+          >
+            <div className="flex items-center mb-2">
+              <span className="text-2xl mr-3">{action.icon}</span>
+              <h3 className="font-semibold">{action.title}</h3>
+            </div>
+          </Link>
+        ))}
       </div>
-    );
-  };
+    </div>
+  );
+};
 
 // Recent Bookings Component
-const RecentBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> =
-  ({ bookings, isProvider }) => (
-    <motion.div
-      className="card shadow-lg rounded-lg p-6 border border-light-outline dark:border-dark-outline"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-    >
-      <h2 className="font-display text-headline-md font-bold mb-4 text-light-on-surface dark:text-dark-on-surface">
-        {isProvider ? 'Recent Driver Bookings' : 'Recent Bookings'}
-      </h2>
-      {bookings.length === 0 ? (
-        <motion.div
-          className="text-center py-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <p className="text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
-            No bookings yet
-          </p>
-        </motion.div>
-      ) : (
-        <motion.div
-          className="space-y-3"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.2
-              }
-            }
-          }}
-        >
-          {bookings.map((booking) => (
-            <motion.div
-              key={booking.id}
-              className="p-4 rounded-lg border border-light-outline dark:border-dark-outline bg-light-surface-variant/30 dark:bg-dark-surface-variant/30"
-              variants={{
-                hidden: { opacity: 0, x: -20 },
-                visible: {
-                  opacity: 1,
-                  x: 0,
-                  transition: { duration: 0.4 }
-                }
-              }}
-              whileHover={{
-                scale: 1.02,
-                backgroundColor: "rgba(var(--primary-rgb), 0.05)",
-                transition: { duration: 0.2 }
-              }}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium text-body-lg text-light-on-surface dark:text-dark-on-surface">
-                    {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
-                  </h3>
-                  <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                    PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
-                  </p>
-                  <p className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1">
-                    {new Date(booking.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <motion.span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    booking.status === 'accepted' ? 'badge-success' :
-                    booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200' :
-                    booking.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' :
-                    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                  }`}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                >
-                  {booking.status}
-                </motion.span>
+const RecentBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> = 
+({ bookings, isProvider }) => (
+  <div 
+    className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700"
+    style={{ backgroundColor: `rgb(var(--surface))` }}
+  >
+    <h2 className="text-xl font-semibold mb-4" style={{ color: `rgb(var(--text))` }}>
+      {isProvider ? 'Recent Driver Bookings' : 'Recent Bookings'}
+    </h2>
+    {bookings.length === 0 ? (
+      <div className="text-center py-8">
+        <div className="text-6xl mb-4">📱</div>
+        <p className="opacity-70" style={{ color: `rgb(var(--text))` }}>
+          No bookings yet
+        </p>
+      </div>
+    ) : (
+      <div className="space-y-4">
+        {bookings.map((booking) => (
+          <div key={booking.id} className="p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-medium" style={{ color: `rgb(var(--text))` }}>
+                  {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
+                </h3>
+                <p className="text-sm opacity-70" style={{ color: `rgb(var(--text))` }}>
+                  PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
+                </p>
+                <p className="text-xs opacity-50 mt-1" style={{ color: `rgb(var(--text))` }}>
+                  {new Date(booking.createdAt).toLocaleDateString()}
+                </p>
               </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
-    </motion.div>
-  );
+              <span 
+                className={`px-2 py-1 rounded text-xs font-medium ${
+                  booking.status === 'accepted' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                  booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                  booking.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                  booking.status === 'cancelled' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' :
+                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                }`}
+              >
+                {booking.status}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
 
 // Upcoming Bookings Component  
-const UpcomingBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> =
-  ({ bookings, isProvider }) => (
-    <motion.div
-      className="card shadow-lg rounded-lg p-6 border border-light-outline dark:border-dark-outline"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
-      whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-    >
-      <h2 className="font-display text-headline-md font-bold mb-4 text-light-on-surface dark:text-dark-on-surface">
-        {isProvider ? 'Upcoming Driver Bookings' : 'Upcoming Trips'}
-      </h2>
-      {bookings.length === 0 ? (
-        <motion.div
-          className="text-center py-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <p className="text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
-            No upcoming trips
-          </p>
-        </motion.div>
-      ) : (
-        <motion.div
-          className="space-y-3"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.3
-              }
-            }
-          }}
-        >
-          {bookings.map((booking) => (
-            <motion.div
-              key={booking.id}
-              className="p-4 rounded-lg border border-light-outline dark:border-dark-outline bg-light-surface-variant/30 dark:bg-dark-surface-variant/30"
-              variants={{
-                hidden: { opacity: 0, x: 20 },
-                visible: {
-                  opacity: 1,
-                  x: 0,
-                  transition: { duration: 0.4 }
-                }
-              }}
-              whileHover={{
-                scale: 1.02,
-                backgroundColor: "rgba(var(--primary-rgb), 0.05)",
-                transition: { duration: 0.2 }
-              }}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium text-body-lg text-light-on-surface dark:text-dark-on-surface">
-                    {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
-                  </h3>
-                  <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
-                    PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
-                  </p>
-                  <p className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1">
-                    {new Date(booking.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <motion.span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    booking.status === 'accepted' ? 'badge-success' :
-                    booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200' :
-                    booking.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' :
-                    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                  }`}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-                >
-                  {booking.status}
-                </motion.span>
+const UpcomingBookings: React.FC<{ bookings: Booking[]; isProvider: boolean }> = 
+({ bookings, isProvider }) => (
+  <div 
+    className="rounded-[var(--radius-standard)] p-6 border border-gray-200 dark:border-gray-700"
+    style={{ backgroundColor: `rgb(var(--surface))` }}
+  >
+    <h2 className="text-xl font-semibold mb-4" style={{ color: `rgb(var(--text))` }}>
+      {isProvider ? 'Upcoming Driver Bookings' : 'Upcoming Trips'}
+    </h2>
+    {bookings.length === 0 ? (
+      <div className="text-center py-8">
+        <div className="text-6xl mb-4">✈️</div>
+        <p className="opacity-70" style={{ color: `rgb(var(--text))` }}>
+          No upcoming trips
+        </p>
+      </div>
+    ) : (
+      <div className="space-y-4">
+        {bookings.map((booking) => (
+          <div key={booking.id} className="p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-medium" style={{ color: `rgb(var(--text))` }}>
+                  {booking.bookingSource === 'listing' ? 'Ride Listing' : 'Ride Request'} #{booking.id.toString().slice(-4)}
+                </h3>
+                <p className="text-sm opacity-70" style={{ color: `rgb(var(--text))` }}>
+                  PKR {parseFloat(booking.totalPrice).toFixed(2)} • {booking.seatsBooked} seat{booking.seatsBooked !== 1 ? 's' : ''}
+                </p>
+                <p className="text-xs opacity-50 mt-1" style={{ color: `rgb(var(--text))` }}>
+                  {new Date(booking.createdAt).toLocaleDateString()}
+                </p>
               </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
-    </motion.div>
-  );
+              <span 
+                className={`px-2 py-1 rounded text-xs font-medium ${
+                  booking.status === 'accepted' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                  booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                  booking.status === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                  booking.status === 'cancelled' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' :
+                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                }`}
+              >
+                {booking.status}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
 
 // New User Banner
 const NewUserBanner: React.FC<{ isProvider: boolean }> = ({ isProvider }) => (
-  <motion.div
-    className="card shadow-lg rounded-lg p-6 border border-primary/20 bg-gradient-to-r from-primary/10 to-secondary/10"
-    initial={{ opacity: 0, scale: 0.9, y: 30 }}
-    animate={{ opacity: 1, scale: 1, y: 0 }}
-    transition={{
-      duration: 0.6,
-      delay: 0.8,
-      type: "spring",
-      stiffness: 100
-    }}
-    whileHover={{
-      scale: 1.02,
-      boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
-      transition: { duration: 0.3 }
-    }}
-  >
-    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 1.2, duration: 0.5 }}
-      >
-        <h3 className="font-display text-headline-md font-bold mb-2 text-light-on-surface dark:text-dark-on-surface">
-          Complete your TourEase journey!
-        </h3>
-        <p className="text-body-lg text-light-on-surface-variant dark:text-dark-on-surface-variant">
-          {isProvider
-            ? "Start offering rides and earn money today."
-            : "Find your first ride and explore the city."
-          }
-        </p>
-      </motion.div>
-      <motion.div
-        className="flex gap-3 flex-shrink-0"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 1.4, duration: 0.5 }}
-      >
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Link href="/profile" className="btn-secondary py-2 px-4 rounded-lg font-medium whitespace-nowrap">
-            Complete Profile
-          </Link>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Link href="/rideSharing" className="btn-primary py-2 px-4 rounded-lg font-medium whitespace-nowrap">
-            {isProvider ? 'Offer First Ride' : 'Find First Ride'}
-          </Link>
-        </motion.div>
-      </motion.div>
+  <div className="mt-8 rounded-lg p-6 text-white" 
+       style={{ background: 'linear-gradient(135deg, rgb(var(--primary)), rgb(var(--secondary)))' }}>
+    <div className="flex items-center justify-between">
+      <div className="flex items-center">
+        <span className="text-3xl mr-4">🎯</span>
+        <div>
+          <h3 className="text-xl font-semibold mb-1">
+            Complete your TourEase journey!
+          </h3>
+          <p className="opacity-90">
+            {isProvider 
+              ? "Start offering rides and earn money today."
+              : "Find your first ride and explore the city."
+            }
+          </p>
+        </div>
+      </div>
+      <div className="flex space-x-3">
+        <Link href="/profile" className="bg-white bg-opacity-20 px-4 py-2 rounded-lg font-medium hover:bg-opacity-30 transition-colors">
+          Complete Profile
+        </Link>
+        <Link href="/rideSharing" className="bg-white bg-opacity-20 px-4 py-2 rounded-lg font-medium hover:bg-opacity-30 transition-colors">
+          {isProvider ? 'Offer First Ride' : 'Find First Ride'}
+        </Link>
+      </div>
     </div>
-  </motion.div>
+  </div>
 );
 
 export default FunctionalDashboard;
