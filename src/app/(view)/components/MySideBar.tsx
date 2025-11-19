@@ -6,7 +6,7 @@ import {
     HomeIcon, ChatBubbleLeftRightIcon, UserIcon,
     TruckIcon, BuildingOfficeIcon,
     QuestionMarkCircleIcon, BellIcon, Bars3Icon,
-    CalendarDaysIcon, ChartBarIcon
+    CalendarDaysIcon, ChartBarIcon, TicketIcon
 } from '@heroicons/react/24/outline';
 import ThemeToggler from './themeToggler';
 import { useActiveRideContext } from '@/app/components/ActiveRideProvider';
@@ -103,6 +103,7 @@ console.log(pathname)
                     showActiveRideBadge: hasActiveRide
                 },
                 { href: '/tripPlanner', text: 'Trip Planner', icon: CalendarDaysIcon },
+                { href: '/bookings', text: 'Bookings', icon: TicketIcon },
             ]
         },
         {

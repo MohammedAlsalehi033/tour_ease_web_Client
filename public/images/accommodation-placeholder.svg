@@ -1,0 +1,6 @@
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" rx="24" fill="#F8FAFC" />
+  <rect x="48" y="48" width="504" height="304" rx="20" fill="#E2E8F0" />
+  <text x="300" y="220" textAnchor="middle" fontSize="32" fontFamily="'Inter', sans-serif" font-weight="600" fill="#0F172A">No Image</text>
+  <text x="300" y="255" textAnchor="middle" fontSize="14" fontFamily="'Inter', sans-serif" fill="#475569">Upload a photo to showcase the space</text>
+</svg>

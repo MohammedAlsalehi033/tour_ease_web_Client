@@ -1,0 +1,573 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap');
+
+@font-face {
+  font-family: 'Lina Round';
+  src: url('/fonts/Lina round/Linaround-Regular.otf') format('opentype');
+  font-display: swap;
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Rounded Mplus 1c';
+  src: url('/fonts/Rounded Mplus 1c/MPLUSRounded1c-ExtraBold.ttf') format('truetype');
+  font-display: swap;
+  font-weight: 800;
+  font-style: normal;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+================================================================================
+ BASE LAYER & THEME VARIABLES (:root)
+================================================================================
+ This layer defines the core design tokens for the application, directly
+ translating the theme from the Flutter `AppThemes.dart` file.
+ - Colors are mapped from the Flutter `ColorScheme`.
+ - Sizing variables for border radius are defined here.
+ - Light and Dark mode variables are set up for theme switching.
+================================================================================
+*/
+@layer base {
+  :root {
+    /* Font family variables */
+    --font-display: 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-lina: 'Lina Round', sans-serif;
+    --font-rounded: 'Rounded Mplus 1c', sans-serif;
+
+    /* Sizing variables from Flutter Theme */
+    --radius-standard: 12px; /* Flutter: _borderRadius = 12.0 */
+    --radius-button: 8px;   /* Flutter: _buttonBorderRadius = 8.0 */
+
+    /* Light mode variables (blue theme) - Mapped from Flutter's light ColorScheme */
+    --primary: 33, 150, 243;      /* #2196F3 - Material Blue (_primaryColor) */
+    --secondary: 66, 165, 245;    /* #42A5F5 - Blue 400 (_secondaryColor) */
+    --primary-dark: 13, 71, 161;  /* #0D47A1 - Darker for hover (not in Flutter theme, but good for web) */
+    
+    --error: 229, 57, 53;         /* #E53935 - Red 600 (_errorColor) */
+    --success: 67, 160, 71;       /* #43A047 - Green 600 (_successColor) */
+    --warning: 255, 160, 0;       /* #FFA000 - Amber 700 (_warningColor) */
+    --info: 2, 136, 209;          /* #0288D1 - Light Blue 700 (_infoColor) */
+    
+    --background: 245, 245, 245;  /* #F5F5F5 - Flutter: background */
+    --surface: 255, 255, 255;     /* #FFFFFF - Flutter: surface */
+    --text: 0, 0, 0, 0.87;        /* Black87 - Flutter: onSurface / onBackground */
+    
+    /* Gradient for button animations */
+    --gradient-primary: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
+  }
+
+  .dark {
+    /* Dark mode variables - Mapped from Flutter's dark ColorScheme */
+    --primary: 33, 150, 243;      /* Same blue for consistency */
+    --secondary: 66, 165, 245;    /* Same blue light */
+    --primary-dark: 13, 71, 161;  /* Same blue dark */
+    
+    --background: 18, 18, 18;     /* #121212 - Flutter: background */
+    --surface: 32, 32, 32;        /* #202020 - Flutter: surface */
+    --text: 255, 255, 255;        /* White - Flutter: onSurface / onBackground */
+  }
+
+  body {
+    background-color: rgb(var(--background));
+    color: rgb(var(--text));
+    @apply transition-colors duration-200;
+    font-family: var(--font-body);
+  }
+
+  /* Typography mapping from Flutter's TextTheme */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+
+  h1 {
+    /* Matches displaySmall: fontSize: 24, fontWeight: bold */
+    @apply text-2xl font-bold;
+    color: rgb(var(--primary));
+  }
+
+  h2 {
+    /* Matches headlineMedium: fontSize: 20, fontWeight: w600 */
+    @apply text-xl font-semibold;
+    color: rgb(var(--text));
+  }
+
+  h3 {
+    /* Matches headlineSmall: fontSize: 18, fontWeight: w600 */
+    @apply text-lg font-semibold;
+     color: rgb(var(--text));
+  }
+}
+
+
+/*
+================================================================================
+ COMPONENTS LAYER
+================================================================================
+ This layer defines reusable component classes. These classes are designed
+ to match the styled widgets in the Flutter theme (Buttons, Cards, Inputs, etc.).
+ They use the variables defined in the :root for consistency.
+================================================================================
+*/
+@layer components {
+
+  /* Tabs Component */
+  .tabs {
+    @apply flex overflow-x-auto;
+    background-color: rgb(var(--surface));
+  }
+  .tabs > *:not(:last-child) {
+    @apply border-r;
+    border-color: rgba(var(--text), 0.1);
+  }
+   .tabs > *:not(:last-child):hover {
+    border-color: rgba(var(--text), 0.2);
+  }
+
+  .tab {
+    /* Matches bodyLarge: fontSize: 16, and titleLarge: fontWeight: w600 */
+    @apply px-4 py-2 text-base font-semibold transition-colors duration-200;
+    color: rgb(var(--text));
+    background-color: rgb(var(--surface));
+  }
+  .tab:hover {
+     background-color: rgba(var(--surface), 0.8);
+  }
+
+  /* Enhanced Base Button Style with Smooth Animations */
+  .btn {
+    /* Matches _baseButtonStyle: padding & button border radius */
+    @apply px-6 py-3 font-medium relative overflow-hidden;
+    border-radius: var(--radius-button);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  
+  /* Shimmer effect for all buttons */
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s ease;
+  }
+  
+  .btn:hover::before {
+    left: 100%;
+  }
+  
+  .btn:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Enhanced Primary Button (ElevatedButton) with Gradient Option */
+  .btn-primary {
+    @apply btn text-white;
+    background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 50%, rgb(var(--primary)) 100%);
+    background-size: 200% auto;
+    box-shadow: 0 4px 12px rgba(var(--primary), 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .btn-primary:hover {
+    background-position: right center;
+    box-shadow: 0 6px 20px rgba(var(--primary), 0.4);
+    transform: translateY(-2px);
+  }
+  
+  .btn-primary:disabled {
+    @apply opacity-40 cursor-not-allowed;
+    transform: none;
+  }
+  
+  /* Enhanced Outlined Button with Hover Fill Effect */
+  .btn-outlined {
+    @apply btn bg-transparent border-2;
+    border-color: rgb(var(--primary));
+    color: rgb(var(--primary));
+    position: relative;
+    z-index: 1;
+  }
+  
+  .btn-outlined::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: rgba(var(--primary), 0.1);
+    transition: width 0.3s ease;
+    z-index: -1;
+    border-radius: inherit;
+  }
+  
+  .btn-outlined:hover::after {
+    width: 100%;
+  }
+  
+  .btn-outlined:hover {
+    box-shadow: 0 4px 12px rgba(var(--primary), 0.2);
+    transform: translateY(-1px);
+  }
+  
+  .btn-outlined:disabled {
+    @apply opacity-40 cursor-not-allowed;
+  }
+  
+  /* Enhanced Text Button with Underline Animation */
+  .btn-text {
+    @apply btn bg-transparent;
+    color: rgb(var(--primary));
+    position: relative;
+  }
+  
+  .btn-text::after {
+    content: '';
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+  }
+  
+  .btn-text:hover::after {
+    width: calc(100% - 48px); /* Accounting for padding */
+  }
+  
+  .btn-text:hover {
+    background-color: rgba(var(--primary), 0.05);
+  }
+  
+  .btn-text:disabled {
+    @apply opacity-40 cursor-not-allowed;
+  }
+  
+  /* Card Component with Animation */
+  .card {
+    /* Matches CardTheme: elevation, margin, shape, color */
+    @apply p-4 m-2 shadow-md dark:shadow-lg transition-all duration-300;
+    background-color: rgb(var(--surface));
+    border-radius: var(--radius-standard);
+  }
+  .card:hover {
+    /* Added lift animation on hover */
+    @apply shadow-xl transform -translate-y-1;
+  }
+
+  /* Chat Message (Styled like a card) */
+  .chat-message {
+    @apply p-4 m-2 w-1/2 shadow-md dark:shadow-lg transition-shadow duration-200;
+    border-radius: var(--radius-standard);
+  }
+  
+  /* Input Field with Animation */
+  .input {
+    /* Matches InputDecorationTheme: fill, border, padding */
+    @apply border focus:border-2 focus:outline-none px-4 py-4 text-base transition-all duration-300;
+    background-color: rgba(var(--surface), 0.8);
+    border-color: rgba(var(--primary), 0.2);
+    color: rgb(var(--text));
+    border-radius: var(--radius-standard);
+  }
+  .dark .input {
+    background-color: rgba(var(--surface), 0.5);
+  }
+  .input:focus {
+    border-color: rgb(var(--primary));
+    /* Added glow effect on focus */
+    box-shadow: 0 0 0 3px rgba(var(--primary), 0.2);
+  }
+  
+  /* Divider */
+  .divider {
+    /* Matches DividerTheme */
+    @apply h-px my-4;
+    background-color: rgba(var(--text), 0.1);
+  }
+
+  /* Scrollbar Hide Utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+
+  /* Slide Up Animation */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  .animate-slide-up {
+    animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  /* Checkbox */
+  .checkbox {
+    /* Matches CheckboxTheme */
+    @apply h-5 w-5;
+    accent-color: rgb(var(--primary));
+    border-radius: 4px;
+  }
+  
+  /* Switch */
+  .switch {
+    /* Matches SwitchTheme */
+    @apply relative inline-block h-6 w-11;
+  }
+  .switch input { @apply opacity-0 w-0 h-0; }
+  .switch .slider {
+    @apply absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 dark:bg-gray-600 transition-all rounded-full;
+  }
+  .switch .slider:before {
+    @apply absolute content-[''] h-5 w-5 left-0.5 bottom-0.5 bg-white transition-all rounded-full;
+  }
+  .switch input:checked + .slider {
+    background-color: rgba(var(--primary), 0.5);
+  }
+  .switch input:checked + .slider:before {
+    background-color: rgb(var(--primary));
+    transform: translateX(20px);
+  }
+
+  /* App Bar */
+  .app-bar {
+    /* Matches AppBarTheme */
+    @apply border-b py-4 px-6 flex items-center;
+    background-color: rgb(var(--surface));
+    border-color: rgba(var(--text), 0.1);
+  }
+  
+  /* Bottom Sheet */
+  .bottom-sheet {
+    /* Matches BottomSheetTheme */
+    @apply p-6 shadow-lg;
+    background-color: rgb(var(--surface));
+    border-top-left-radius: var(--radius-standard);
+    border-top-right-radius: var(--radius-standard);
+  }
+
+  /* Badge Components */
+  .badge {
+    @apply inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-success {
+    background-color: rgba(var(--success), 0.1);
+    color: rgb(var(--success));
+  }
+  .dark .badge-success {
+    background-color: rgba(var(--success), 0.2);
+  }
+  .badge-error {
+    background-color: rgba(var(--error), 0.1);
+    color: rgb(var(--error));
+  }
+  .dark .badge-error {
+    background-color: rgba(var(--error), 0.2);
+  }
+  .badge-info {
+    background-color: rgba(var(--info), 0.1);
+    color: rgb(var(--info));
+  }
+  .dark .badge-info {
+    background-color: rgba(var(--info), 0.2);
+  }
+  .badge-warning {
+    background-color: rgba(var(--warning), 0.2);
+    color: #c28b00; /* Equivalent to text-yellow-800 */
+  }
+  .dark .badge-warning {
+    color: rgb(var(--warning));
+  }
+
+  /* Accordion content for smooth open/close */
+  .accordion-content {
+    @apply overflow-hidden transition-all duration-500 ease-in-out;
+  }
+  
+  /* Additional Modern Button Variants */
+  
+  /* Pulse Button - Great for CTAs */
+  .btn-pulse {
+    @apply btn-primary;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  /* Glow Button */
+  .btn-glow {
+    @apply btn-primary;
+  }
+  
+  .btn-glow:hover {
+    box-shadow: 0 0 20px rgba(var(--primary), 0.6),
+                0 0 40px rgba(var(--primary), 0.4);
+  }
+  
+  /* Ripple Button */
+  .btn-ripple {
+    @apply btn-primary;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .btn-ripple:active::after {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+
+/*
+================================================================================
+ UTILITIES LAYER & ANIMATIONS
+================================================================================
+ This layer contains custom animations and utility classes.
+================================================================================
+*/
+@layer utilities {
+  .animate-pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+  
+  .animate-active-ride-pulse {
+    animation: active-ride-pulse 2s infinite;
+  }
+  
+  .animate-notification-bounce {
+    animation: notification-bounce 1s ease-out;
+  }
+  
+  /* Utility for a fade-in-up entrance animation */
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+    opacity: 0; /* Start hidden */
+  }
+  
+  /* Smooth slide in from left */
+  .animate-slide-in-left {
+    animation: slide-in-left 0.5s ease-out forwards;
+    opacity: 0;
+  }
+  
+  /* Smooth slide in from right */
+  .animate-slide-in-right {
+    animation: slide-in-right 0.5s ease-out forwards;
+    opacity: 0;
+  }
+}
+
+/* Enhanced Keyframes for button animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(var(--primary), 0.4);
+  }
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 10px 4px rgba(var(--primary), 0.2);
+  }
+} 
+
+@keyframes active-ride-pulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.6);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 15px 6px rgba(255, 193, 7, 0.3);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes notification-bounce {
+  0% {
+    transform: translateY(-10px) scale(0.9);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(5px) scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+} 
+
+/* Keyframe for the fade-in-up animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide animations */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

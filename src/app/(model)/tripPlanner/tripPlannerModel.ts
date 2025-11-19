@@ -20,6 +20,7 @@ export interface TripPlannerSearchParams {
   needsReturnTransport?: boolean;
   useAIOptimization?: boolean;
   maxIterations?: number;
+  detailedStartLocation?: { lat: number; lng: number };
 }
 
 export interface TransportOption {

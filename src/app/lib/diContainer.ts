@@ -22,6 +22,10 @@ import { ReviewRepo } from '../(model)/review/reviewRepo';
 import { ReviewController } from '../(controller)/review/reviewController';
 import { TripPlannerRepo } from '../(model)/tripPlanner/tripPlannerRepo';
 import { TripPlannerController } from '../(controller)/tripPlanner/tripPlannerController';
+import { AccommodationRepo } from '../(model)/accommodation/accommodationRepo';
+import { AccommodationController } from '../(controller)/accommodation/accommodationController';
+import { PaymentRepo } from '../(model)/payment/paymentRepo';
+import { PaymentController } from '../(controller)/payment/paymentController';
 import { ApiService } from '../services/apiService';
 
 
@@ -45,6 +49,10 @@ container.registerSingleton(ReviewRepo)
 container.registerSingleton(ReviewController)
 container.registerSingleton(TripPlannerRepo)
 container.registerSingleton(TripPlannerController)
+container.registerSingleton(AccommodationRepo)
+container.registerSingleton(AccommodationController)
+container.registerSingleton(PaymentRepo)
+container.registerSingleton(PaymentController)
 container.registerSingleton(ApiService)
 
 export { container };

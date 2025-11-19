@@ -58,25 +58,25 @@ export default function TripPlanner() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 transition-colors duration-200">
+    <div className="min-h-screen  py-8 px-4 transition-colors duration-200">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Smart Trip Planner</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Plan your perfect trip with AI-powered recommendations</p>
+          <h1 className="text-3xl font-bold mb-2  ">Smart Trip Planner</h1>
+          <p className="text-sm  ">Plan your perfect trip with AI-powered recommendations</p>
         </div>
 
         <div className="flex gap-4 mb-6 justify-center">
           <button onClick={() => setViewMode('search')}
             className={`px-4 py-2 rounded-lg transition-all duration-200 ${viewMode === 'search'
                 ? 'bg-primary text-white shadow-lg'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+                : 'bg-gray-200  text-gray-800  hover:bg-gray-300 '
               }`}>
             New Search
           </button>
           <button onClick={() => setViewMode('savedPlans')}
             className={`px-4 py-2 rounded-lg transition-all duration-200 ${viewMode === 'savedPlans'
                 ? 'bg-primary text-white shadow-lg'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+                : 'bg-gray-200  text-gray-800  hover:bg-gray-300 '
               }`}>
             My Saved Plans
           </button>

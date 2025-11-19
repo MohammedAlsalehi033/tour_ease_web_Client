@@ -9,8 +9,8 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'tour-ease.s3.ap-south-1.amazonaws.com',
-        pathname: '/uploads/**'
+        hostname: 'tour-ease.s3.ap-south-1.amazonaws.com'
+        // Removed pathname restriction to allow all paths
       },
       {
         protocol: 'https',
@@ -19,6 +19,18 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'places.googleapis.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.tourease.me'
+      },
+      {
+        protocol: 'https',
+        hostname: 'example.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.mapbox.com'
       }
     ]
   },

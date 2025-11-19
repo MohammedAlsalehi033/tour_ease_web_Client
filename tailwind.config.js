@@ -161,6 +161,8 @@ module.exports = {
         'display': ['Space Grotesk', 'Poppins', 'sans-serif'],
         'body': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         'mono': ['JetBrains Mono', 'Fira Code', 'monospace'],
+        'lina': ['Lina Round', 'sans-serif'],
+        'rounded': ['Rounded Mplus 1c', 'sans-serif'],
       },
       fontWeight: {
         light: '300',

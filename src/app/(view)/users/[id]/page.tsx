@@ -1,9 +1,41 @@
 'use client'
 import 'reflect-metadata';
 import { useParams } from 'next/navigation'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { container } from "@/app/lib/diContainer";
 import { UserController } from '@/app/(controller)/user/userController';
+
+const ACTIVE_BOOKING_STATUSES = new Set(['pending', 'confirmed', 'active', 'ongoing', 'in_progress']);
+
+type BookingType = 'transportation' | 'accommodation';
+
+interface CombinedBooking {
+    id: number;
+    type: BookingType;
+    status: string | null;
+    isActive: boolean;
+    price?: number;
+    createdAt?: string;
+    title: string;
+    subtitle: string;
+    details: Record<string, any>;
+}
+
+const isActiveBookingStatus = (status?: string | null): boolean => {
+    if (!status) return false;
+    return ACTIVE_BOOKING_STATUSES.has(status.toLowerCase());
+};
+
+const formatStatusLabel = (status?: string | null): string => {
+    if (!status) return 'Unknown';
+    return status.charAt(0).toUpperCase() + status.slice(1);
+};
+
+const toPriceValue = (value?: number | string | null): number | undefined => {
+    if (value === undefined || value === null) return undefined;
+    const parsed = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+};
 
 
 
@@ -14,6 +46,63 @@ const UserProfilePage = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isBlocking, setIsBlocking] = useState<boolean>(false);
+    const [activeTab, setActiveTab] = useState<'overview' | 'bookings'>('overview');
+    const tabs: Array<'overview' | 'bookings'> = ['overview', 'bookings'];
+
+    const combinedBookings = useMemo<CombinedBooking[]>(() => {
+        if (!user) return [];
+        const records: CombinedBooking[] = [];
+
+        (user.transportationBookings || []).forEach((booking: any) => {
+            const startLocation = booking.listing?.startLocationText ?? booking.request?.startLocationText;
+            const endLocation = booking.listing?.endLocationText ?? booking.request?.endLocationText;
+            const route = startLocation && endLocation ? `${startLocation} → ${endLocation}` : startLocation ?? endLocation ?? 'Ride details pending';
+
+            records.push({
+                id: booking.id,
+                type: 'transportation',
+                status: booking.status ?? null,
+                isActive: isActiveBookingStatus(booking.status),
+                price: toPriceValue(booking.totalPrice),
+                createdAt: booking.createdAt,
+                title: `Ride ${booking.id}`,
+                subtitle: route,
+                details: {
+                    Seats: booking.seatsBooked ?? 'N/A',
+                    Source: booking.bookingSource ?? 'N/A',
+                    Listing: booking.listing?.id ? `Listing #${booking.listing.id}` : 'N/A',
+                    Request: booking.request?.id ? `Request #${booking.request.id}` : 'N/A',
+                },
+            });
+        });
+
+        (user.accommodationBookings || []).forEach((booking: any) => {
+            const propertyName = booking.room?.accommodation?.name ?? 'Accommodation';
+            const roomType = booking.room?.roomType ?? 'Room';
+
+            records.push({
+                id: booking.id,
+                type: 'accommodation',
+                status: booking.status ?? null,
+                isActive: isActiveBookingStatus(booking.status),
+                price: toPriceValue(booking.totalPrice),
+                createdAt: booking.createdAt,
+                title: `${propertyName}`,
+                subtitle: `${roomType} · ${booking.numberOfRooms ?? 1} room(s)`,
+                details: {
+                    CheckIn: booking.checkInDate,
+                    CheckOut: booking.checkOutDate,
+                    'Room ID': booking.roomId,
+                    'Provider': booking.room?.accommodation?.providerId ?? 'N/A',
+                },
+            });
+        });
+
+        return records;
+    }, [user]);
+
+    const activeBookings = combinedBookings.filter(booking => booking.isActive);
+    const pastBookings = combinedBookings.filter(booking => !booking.isActive);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -25,17 +114,16 @@ const UserProfilePage = () => {
             setLoading(true);
             setError(null);
             try {
-                const userController = container.resolve(UserController);
+                const userController = container.resolve(UserController) as any;
                 const response = await userController.getUserById(id);
+                const normalized = response?.data ?? response;
 
-                if (response && response.data) {
-                     setUser(response.data);
-                 } else if (response && response.id) { 
-                     setUser(response);
-                 } else {
-                     setError("User data not found in expected format.");
-                     setUser(null);
-                 }
+                if (normalized && normalized.id) {
+                    setUser(normalized);
+                } else {
+                    setError("User data not found in expected format.");
+                    setUser(null);
+                }
             } catch (err: any) {
                 setError(err.message || "An error occurred while fetching user data.");
                 setUser(null);
@@ -52,19 +140,19 @@ const UserProfilePage = () => {
         if (!confirmBlock) return;
         setIsBlocking(true);
         try {
-            const userController = container.resolve(UserController);
+            const userController = container.resolve(UserController) as any;
             const blockResponse = await userController.blockUser(id);
             alert(blockResponse?.message || "User status updated.");
 
-            if (blockResponse?.success && blockResponse?.data) {
-                 setUser(blockResponse.data); 
+            const normalizedBlock = blockResponse?.data ?? blockResponse;
+            if (blockResponse?.success && normalizedBlock && normalizedBlock.id) {
+                setUser(normalizedBlock);
             } else {
-                 const updatedUser = await userController.getUserById(id);
-                  if (updatedUser && updatedUser.data) {
-                     setUser(updatedUser.data);
-                 } else if (updatedUser && updatedUser.id) {
-                     setUser(updatedUser);
-                 }
+                const updatedUser = await userController.getUserById(id);
+                const normalizedUpdate = updatedUser?.data ?? updatedUser;
+                if (normalizedUpdate && normalizedUpdate.id) {
+                    setUser(normalizedUpdate);
+                }
             }
         } catch (err: any) {
             alert(`Failed to block user: ${err.message}`);
@@ -109,6 +197,100 @@ const UserProfilePage = () => {
              </div>
          </div>
      );
+
+    const renderTransportationBookingsSection = () => {
+        if (!user.transportationBookings || user.transportationBookings.length === 0) {
+            return null;
+        }
+        return (
+            <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
+                <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Transportation Bookings ({user.transportationBookings.length})</h2>
+                <div>
+                    {user.transportationBookings.map((booking: any, index: number) => renderDetailItemCard(booking, index, 'Booking', {
+                        Status: booking.status,
+                        Price: `PKR ${booking.totalPrice}`,
+                        Seats: booking.seatsBooked,
+                        Source: booking.bookingSource,
+                        Listing: booking.listing ? `(${booking.listing.id}) ${booking.listing.startLocationText} -> ${booking.listing.endLocationText}` : 'N/A',
+                        Request: booking.request ? `(${booking.request.id}) ${booking.request.startLocationText} -> ${booking.request.endLocationText}` : 'N/A',
+                        Date: formatDate(booking.createdAt),
+                    }))}
+                </div>
+            </div>
+        );
+    };
+
+    const renderAccommodationBookingsSection = () => {
+        if (!user.accommodationBookings || user.accommodationBookings.length === 0) {
+            return null;
+        }
+        return (
+            <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
+                <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Accommodation Bookings ({user.accommodationBookings.length})</h2>
+                <div>
+                    {user.accommodationBookings.map((booking: any, index: number) => renderDetailItemCard(booking, index, 'Booking', {
+                        Status: booking.status,
+                        Price: `PKR ${booking.totalPrice}`,
+                        CheckIn: formatDate(booking.checkInDate),
+                        CheckOut: formatDate(booking.checkOutDate),
+                        RoomType: booking.room?.roomType,
+                        Accommodation: booking.room?.accommodation?.name,
+                        Date: formatDate(booking.createdAt),
+                    }))}
+                </div>
+            </div>
+        );
+    };
+
+    const formatBookingDateLabel = (booking: CombinedBooking) => {
+        const checkIn = booking.details.CheckIn;
+        const checkOut = booking.details.CheckOut;
+        if (checkIn || checkOut) {
+            return `${formatDate(checkIn)} → ${formatDate(checkOut)}`;
+        }
+        if (booking.createdAt) {
+            return formatDate(booking.createdAt);
+        }
+        return 'Date TBD';
+    };
+
+    const renderBookingCard = (booking: CombinedBooking) => {
+        return (
+            <div key={`${booking.type}-${booking.id}`} className="card bg-light-surface dark:bg-dark-surface p-4 rounded-lg shadow-lg border border-light-outline dark:border-dark-outline">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                    <div>
+                        <p className="text-body-sm font-semibold text-light-on-surface dark:text-dark-on-surface">{booking.title}</p>
+                        <p className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant truncate">
+                            {booking.subtitle}
+                        </p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-body-xs font-medium border ${booking.isActive ? 'bg-success/10 text-success border-success/20' : 'bg-light-surface-variant dark:bg-dark-surface-variant border-light-outline dark:border-dark-outline'}`}>
+                        {formatStatusLabel(booking.status)}
+                    </span>
+                </div>
+                <p className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-2">
+                    {formatBookingDateLabel(booking)}
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-3 text-body-sm">
+                    <span className="text-primary font-semibold">
+                        {booking.price ? `PKR ${booking.price.toLocaleString()}` : 'Price TBD'}
+                    </span>
+                    <span className="text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                        {booking.type === 'transportation' ? 'Ride' : 'Stay'} booking
+                    </span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2 text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                    {Object.entries(booking.details).map(([key, value]) => (
+                        <div key={key} className="truncate">
+                            <span className="font-medium text-light-on-surface dark:text-dark-on-surface">{key}:</span> {value ?? 'N/A'}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+    const hasAnyBookings = combinedBookings.length > 0;
 
     return (
         <div className="text-light-onSurface dark:text-dark-onSurface">
@@ -178,135 +360,158 @@ const UserProfilePage = () => {
                  )}
 
                 {/* --- Detailed Lists --- */}
-
-                {/* Transportation Bookings */}
-                {user.transportationBookings && user.transportationBookings.length > 0 && (
-                    <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
-                        <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Transportation Bookings ({user.transportationBookings.length})</h2>
-                        <div>
-                            {user.transportationBookings.map((booking: any, index: number) => renderDetailItemCard(booking, index, 'Booking', {
-                                Status: booking.status,
-                                Price: `PKR ${booking.totalPrice}`,
-                                Seats: booking.seatsBooked,
-                                Source: booking.bookingSource,
-                                Listing: booking.listing ? `(${booking.listing.id}) ${booking.listing.startLocationText} -> ${booking.listing.endLocationText}` : 'N/A',
-                                Request: booking.request ? `(${booking.request.id}) ${booking.request.startLocationText} -> ${booking.request.endLocationText}` : 'N/A',
-                                Date: formatDate(booking.createdAt),
-                            }))}
-                        </div>
+                <div className="mt-8 flex justify-center">
+                    <div className="inline-flex items-center rounded-full border border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface">
+                        {tabs.map((tab, index) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`px-4 py-2 text-sm font-semibold transition ${
+                                    activeTab === tab
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'text-light-on-surface-variant dark:text-dark-on-surface-variant'
+                                } ${index < tabs.length - 1 ? 'border-r border-light-outline dark:border-dark-outline' : ''}`}
+                            >
+                                {tab === 'overview' ? 'Overview' : 'Bookings'}
+                            </button>
+                        ))}
                     </div>
-                )}
+                </div>
 
-                 {/* Accommodation Bookings */}
-                {user.accommodationBookings && user.accommodationBookings.length > 0 && (
-                    <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
-                        <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Accommodation Bookings ({user.accommodationBookings.length})</h2>
-                        <div>
-                            {user.accommodationBookings.map((booking: any, index: number) => renderDetailItemCard(booking, index, 'Booking', {
-                                Status: booking.status,
-                                Price: `PKR ${booking.totalPrice}`,
-                                CheckIn: formatDate(booking.checkInDate),
-                                CheckOut: formatDate(booking.checkOutDate),
-                                RoomType: booking.room?.roomType,
-                                Accommodation: booking.room?.accommodation?.name,
-                                Date: formatDate(booking.createdAt),
-                            }))}
-                        </div>
-                    </div>
-                )}
+                <div className="space-y-6 mt-6">
+                    {activeTab === 'overview' && (
+                        <>
+                            {renderTransportationBookingsSection()}
+                            {renderAccommodationBookingsSection()}
 
-                {/* Questions */}
-                {user.questions && user.questions.length > 0 && (
-                    <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
-                        <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Questions Asked ({user.questions.length})</h2>
-                        <div>
-                            {user.questions.map((q: any, index: number) => renderDetailItemCard(q, index, 'Question', {
-                                Title: q.title,
-                                Upvotes: q.upvotes,
-                                Downvotes: q.downvotes,
-                                Comments: q.comments?.length || 0,
-                                Tags: q.tags?.join(', '),
-                                Date: formatDate(q.createdAt),
-                            }))}
-                        </div>
-                    </div>
-                )}
+                            {/* Questions */}
+                            {user.questions && user.questions.length > 0 && (
+                                <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
+                                    <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Questions Asked ({user.questions.length})</h2>
+                                    <div>
+                                        {user.questions.map((q: any, index: number) => renderDetailItemCard(q, index, 'Question', {
+                                            Title: q.title,
+                                            Upvotes: q.upvotes,
+                                            Downvotes: q.downvotes,
+                                            Comments: q.comments?.length || 0,
+                                            Tags: q.tags?.join(', '),
+                                            Date: formatDate(q.createdAt),
+                                        }))}
+                                    </div>
+                                </div>
+                            )}
 
-                 {/* Offers Received */}
-                 {user.receivedOffers && user.receivedOffers.length > 0 && (
-                    <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
-                        <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Offers Received ({user.receivedOffers.length})</h2>
-                        <div>
-                            {user.receivedOffers.map((offer: any, index: number) => renderDetailItemCard(offer, index, 'Offer', {
-                                Status: offer.status,
-                                Price: `PKR ${offer.pricePerSeat}/seat`,
-                                Seats: offer.seatsRequested,
-                                // Sender: offer.sender?.username, // Included in getUserById? Check your include logic
-                                Listing: offer.listing?.id ? `Listing #${offer.listing.id}` : 'N/A',
-                                Request: offer.request?.id ? `Request #${offer.request.id}` : 'N/A',
-                                Date: formatDate(offer.createdAt),
-                            }))}
-                        </div>
-                    </div>
-                )}
+                            {/* Offers Received */}
+                            {user.receivedOffers && user.receivedOffers.length > 0 && (
+                                <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
+                                    <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Offers Received ({user.receivedOffers.length})</h2>
+                                    <div>
+                                        {user.receivedOffers.map((offer: any, index: number) => renderDetailItemCard(offer, index, 'Offer', {
+                                            Status: offer.status,
+                                            Price: `PKR ${offer.pricePerSeat}/seat`,
+                                            Seats: offer.seatsRequested,
+                                            Listing: offer.listing?.id ? `Listing #${offer.listing.id}` : 'N/A',
+                                            Request: offer.request?.id ? `Request #${offer.request.id}` : 'N/A',
+                                            Date: formatDate(offer.createdAt),
+                                        }))}
+                                    </div>
+                                </div>
+                            )}
 
-                  {/* Offers Sent */}
-                 {user.sentOffers && user.sentOffers.length > 0 && (
-                    <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
-                        <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Offers Sent ({user.sentOffers.length})</h2>
-                        <div>
-                            {user.sentOffers.map((offer: any, index: number) => renderDetailItemCard(offer, index, 'Offer', {
-                                Status: offer.status,
-                                Price: `PKR ${offer.pricePerSeat}/seat`,
-                                Seats: offer.seatsRequested,
-                                // Recipient: offer.recipient?.username, // Included in getUserById? Check your include logic
-                                Listing: offer.listing?.id ? `Listing #${offer.listing.id}` : 'N/A',
-                                Request: offer.request?.id ? `Request #${offer.request.id}` : 'N/A',
-                                Date: formatDate(offer.createdAt),
-                            }))}
-                        </div>
-                    </div>
-                )}
+                            {/* Offers Sent */}
+                            {user.sentOffers && user.sentOffers.length > 0 && (
+                                <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
+                                    <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Offers Sent ({user.sentOffers.length})</h2>
+                                    <div>
+                                        {user.sentOffers.map((offer: any, index: number) => renderDetailItemCard(offer, index, 'Offer', {
+                                            Status: offer.status,
+                                            Price: `PKR ${offer.pricePerSeat}/seat`,
+                                            Seats: offer.seatsRequested,
+                                            Listing: offer.listing?.id ? `Listing #${offer.listing.id}` : 'N/A',
+                                            Request: offer.request?.id ? `Request #${offer.request.id}` : 'N/A',
+                                            Date: formatDate(offer.createdAt),
+                                        }))}
+                                    </div>
+                                </div>
+                            )}
 
-                {/* Transportation Requests */}
-                {user.TransportationRequest && user.TransportationRequest.length > 0 && (
-                    <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
-                        <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Transportation Requests ({user.TransportationRequest.length})</h2>
-                        <div>
-                             {user.TransportationRequest.map((req: any, index: number) => renderDetailItemCard(req, index, 'Request', {
-                                From: req.startLocationText,
-                                To: req.endLocationText,
-                                Time: formatDate(req.departureTime),
-                                Seats: req.seatsNeeded,
-                                Budget: `$${req.budget}`,
-                                Offers: req.offers?.length || 0,
-                                Bookings: req.bookings?.length || 0,
-                                Date: formatDate(req.createdAt),
-                            }))}
-                        </div>
-                    </div>
-                )}
+                            {/* Transportation Requests */}
+                            {user.TransportationRequest && user.TransportationRequest.length > 0 && (
+                                <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
+                                    <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Transportation Requests ({user.TransportationRequest.length})</h2>
+                                    <div>
+                                        {user.TransportationRequest.map((req: any, index: number) => renderDetailItemCard(req, index, 'Request', {
+                                            From: req.startLocationText,
+                                            To: req.endLocationText,
+                                            Time: formatDate(req.departureTime),
+                                            Seats: req.seatsNeeded,
+                                            Budget: `$${req.budget}`,
+                                            Offers: req.offers?.length || 0,
+                                            Bookings: req.bookings?.length || 0,
+                                            Date: formatDate(req.createdAt),
+                                        }))}
+                                    </div>
+                                </div>
+                            )}
 
+                            {/* Reviews */}
+                            {user.reviews && user.reviews.length > 0 && (
+                                <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
+                                    <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Reviews Written ({user.reviews.length})</h2>
+                                    <div>
+                                        {user.reviews.map((review: any, index: number) => renderDetailItemCard(review, index, 'Review', {
+                                            Rating: `${review.rating} / 5`,
+                                            Type: review.reviewableType,
+                                            Comment: review.comment,
+                                            TargetID: review.transportationListingId || review.accommodationId || review.roomId || review.transportationBookingId || review.accommodationBookingId || 'N/A',
+                                            Date: formatDate(review.createdAt),
+                                        }))}
+                                    </div>
+                                </div>
+                            )}
 
-                {/* Reviews */}
-                {user.reviews && user.reviews.length > 0 && (
-                     <div className="card bg-light-surface dark:bg-dark-surface p-4 md:p-6 rounded-lg shadow-md">
-                         <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Reviews Written ({user.reviews.length})</h2>
-                         <div>
-                             {user.reviews.map((review: any, index: number) => renderDetailItemCard(review, index, 'Review', {
-                                 Rating: `${review.rating} / 5`,
-                                 Type: review.reviewableType,
-                                 Comment: review.comment,
-                                 TargetID: review.transportationListingId || review.accommodationId || review.roomId || review.transportationBookingId || review.accommodationBookingId || 'N/A',
-                                 Date: formatDate(review.createdAt),
-                             }))}
-                         </div>
-                     </div>
-                 )}
+                            {/* Add similar sections for Trips, Votes, Comments, Messages, Notifications as needed */}
+                        </>
+                    )}
 
+                    {activeTab === 'bookings' && (
+                        <>
+                            {!hasAnyBookings && (
+                                <div className="card bg-light-surface dark:bg-dark-surface p-6 rounded-lg shadow-md text-center">
+                                    <p className="text-body-md text-light-on-surface dark:text-dark-on-surface-variant">
+                                        This user does not have any bookings yet.
+                                    </p>
+                                </div>
+                            )}
 
-                 {/* Add similar sections for Trips, Votes, Comments, Messages, Notifications as needed */}
+                            {hasAnyBookings && (
+                                <div className="space-y-6">
+                                    <div>
+                                        <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Current & Upcoming Bookings ({activeBookings.length})</h2>
+                                        {activeBookings.length === 0 ? (
+                                            <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">No active bookings right now.</p>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {activeBookings.map(renderBookingCard)}
+                                            </div>
+                                        )}
+                                    </div>
 
+                                    <div>
+                                        <h2 className="text-title-lg font-medium mb-4 border-b pb-2 border-light-outline dark:border-dark-outline">Past Bookings ({pastBookings.length})</h2>
+                                        {pastBookings.length === 0 ? (
+                                            <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">No past bookings yet.</p>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                {pastBookings.map(renderBookingCard)}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
