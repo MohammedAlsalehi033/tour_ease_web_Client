@@ -360,16 +360,18 @@ console.log('Normalized options:', resolvedData);
     }
   };
 
-  const handleRoomToggle = (roomId: number, isSelected: boolean) => {
-    setRoomSelections(prev => {
-      const updated = { ...prev };
-      if (isSelected) {
-        updated[roomId] = { quantity: 1 };
-      } else {
-        delete updated[roomId];
-      }
-      return updated;
-    });
+  const sharePlanOnWhatsApp = (plan: SavedPlan) => {
+    const message = `*Trip Plan: ${plan.planName}*\n\n` +
+      `📅 Dates: ${new Date(plan.startTime).toLocaleDateString()} - ${new Date(plan.endTime).toLocaleDateString()}\n` +
+      `📍 Route: ${plan.startLocation} → ${plan.endLocation}\n` +
+      `👥 Travelers: ${plan.numberOfTravelers}\n` +
+      `💰 Total Cost: PKR ${(plan.totalCost || 0).toLocaleString()}\n` +
+      `💵 Budget: PKR ${(typeof plan.budget === 'string' ? parseInt(plan.budget) : plan.budget || 0).toLocaleString()}\n\n` +
+      `✨ Plan booked and ready to go!\n\n` +
+      `#TourEase #TripPlanning`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
 
@@ -1172,11 +1174,20 @@ console.log('Normalized options:', resolvedData);
           )}
 
           {/* Action Buttons */}
-          {(outboundTransportOptions.length > 0 || accommodationOptions.length > 0) && (
+          {selectedPlan.status === 'booked' ? (
+            <div className="flex flex-wrap gap-4 mb-8">
+              <button
+                onClick={() => sharePlanOnWhatsApp(selectedPlan)}
+                className="btn bg-green-600 text-white hover:bg-green-700 flex-1"
+              >
+                📱 Share Plan on WhatsApp
+              </button>
+            </div>
+          ) : (
             <div className="flex flex-wrap gap-4 mb-8">
               <button
                 onClick={() => updatePlan(selectedPlan.id)}
-                disabled={!selectedTransport || !selectedAccommodation}
+                disabled={!selectedTransport || !selectedAccommodation || outboundTransportOptions.length === 0}
                 className="btn btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 💾 Update Plan

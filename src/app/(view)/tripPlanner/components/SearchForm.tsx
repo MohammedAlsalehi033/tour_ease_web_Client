@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { TripPlannerSearchParams } from '@/app/(model)/tripPlanner/tripPlannerModel';
-import { MapPin, Calendar, Users, DollarSign, Sparkles } from 'lucide-react';
+import { MapPin, Calendar, Users, DollarSign } from 'lucide-react';
 import StartLocationWizard from './StartLocationWizard';
 
 interface LocationData {
@@ -15,16 +15,24 @@ export const SearchForm = ({ onSearch }: { onSearch: (params: TripPlannerSearchP
   const [showLocationWizard, setShowLocationWizard] = useState(false);
   const [startLocationData, setStartLocationData] = useState<LocationData | null>(null);
   
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const eightAM = new Date(today.getTime() + 8 * 60 * 60 * 1000);
+  const initialStartTime = now > eightAM ? now.toISOString().slice(0, 16) : eightAM.toISOString().slice(0, 16);
+  const initialEndTime = new Date(new Date(initialStartTime).getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16);
+  
+  const [minStartTime, setMinStartTime] = useState(now.toISOString().slice(0, 16));
+  const [minEndTime, setMinEndTime] = useState(initialEndTime);
+  
   const [form, setForm] = useState({
     startLocation: 'islamabad',
     endLocation: 'Lahor',
-    startTime: '2025-11-06T08:40',
-    endTime: '2025-11-13T08:41',
+    startTime: initialStartTime,
+    endTime: initialEndTime,
     budget: 500000,
     numberOfTravelers: 2,
     interests: [] as string[],
-    needsReturnTransport: true,
-    useAIOptimization: false
+    needsReturnTransport: true
   });
 
   const interestOptions = [
@@ -38,10 +46,25 @@ export const SearchForm = ({ onSearch }: { onSearch: (params: TripPlannerSearchP
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value
-    }));
+    setForm(prev => {
+      const newForm = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value
+      };
+      
+      if (name === 'startTime') {
+        const startDate = new Date(value);
+        const newMinEnd = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16);
+        setMinEndTime(newMinEnd);
+        
+        // If current endTime is before new min, update it
+        if (prev.endTime < newMinEnd) {
+          newForm.endTime = newMinEnd;
+        }
+      }
+      
+      return newForm;
+    });
   };
 
   const toggleInterest = (interest: string) => {
@@ -176,6 +199,7 @@ export const SearchForm = ({ onSearch }: { onSearch: (params: TripPlannerSearchP
             name="startTime" 
             value={form.startTime} 
             onChange={handleChange}
+            min={minStartTime}
             className="input w-full hover:shadow-md transition-all duration-200" 
             required 
           />
@@ -191,6 +215,7 @@ export const SearchForm = ({ onSearch }: { onSearch: (params: TripPlannerSearchP
             name="endTime" 
             value={form.endTime} 
             onChange={handleChange}
+            min={minEndTime}
             className="input w-full hover:shadow-md transition-all duration-200" 
             required 
           />
@@ -253,7 +278,7 @@ export const SearchForm = ({ onSearch }: { onSearch: (params: TripPlannerSearchP
       </div>
 
       {/* Options Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 gap-4 mb-8">
         <label className="flex items-center gap-4 cursor-pointer group p-4 rounded-button border-2 transition-all duration-200 hover:shadow-md" 
           style={{ 
             borderColor: form.needsReturnTransport ? 'rgb(var(--primary))' : 'rgba(var(--primary), 0.2)',
@@ -273,30 +298,6 @@ export const SearchForm = ({ onSearch }: { onSearch: (params: TripPlannerSearchP
             </span>
             <p className="text-body-sm" style={{ color: 'rgba(var(--text), 0.6)' }}>
               Include round-trip in your plan
-            </p>
-          </div>
-        </label>
-
-        <label className="flex items-center gap-4 cursor-pointer group p-4 rounded-button border-2 transition-all duration-200 hover:shadow-md" 
-          style={{ 
-            borderColor: form.useAIOptimization ? 'rgb(var(--secondary))' : 'rgba(var(--secondary), 0.2)',
-            backgroundColor: form.useAIOptimization ? 'rgba(var(--secondary), 0.05)' : 'transparent'
-          }}>
-          <input 
-            type="checkbox" 
-            name="useAIOptimization" 
-            checked={form.useAIOptimization}
-            onChange={handleChange} 
-            className="w-5 h-5 rounded cursor-pointer transition-all duration-200"
-            style={{ accentColor: 'rgb(var(--secondary))' }}
-          />
-          <div className="flex-1">
-            <span className="flex items-center gap-2 text-body-lg font-semibold mb-1" style={{ color: 'rgb(var(--text))' }}>
-              <Sparkles className="w-4 h-4" style={{ color: 'rgb(var(--secondary))' }} />
-              AI Optimization
-            </span>
-            <p className="text-body-sm" style={{ color: 'rgba(var(--text), 0.6)' }}>
-              Smart itinerary generation
             </p>
           </div>
         </label>

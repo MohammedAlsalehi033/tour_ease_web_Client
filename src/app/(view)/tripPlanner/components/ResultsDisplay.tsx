@@ -194,6 +194,7 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
         totalCost,
         tags: originalRequest.interests || [],
         originalSearchParams: originalRequest,
+        status: 'saved',
         // Additional required fields from search params
         startLocation: originalRequest.startLocation,
         endLocation: originalRequest.endLocation,
@@ -327,10 +328,64 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
 
       // Step 4: All set!
       setProgressStep("done");
-      setTimeout(() => {
+      setTimeout(async () => {
         setShowProgressDialog(false);
         setPendingBookingRequest(null);
         alert('Payment successful! Booking confirmed. Total: PKR ' + confirmation.totalCost.toLocaleString() + '\n' + confirmation.message);
+
+        // Save the booked plan with same structure as manual save
+        try {
+          const outboundOption = activeOutboundTransport;
+          const returnOption = activeReturnTransport;
+          const roomPayload = selectedAccommodation
+            ? (selectedRoomAllocations.length > 0
+                ? selectedRoomAllocations.map(allocation => ({
+                    roomId: allocation.roomId,
+                    quantity: 1
+                  }))
+                : (selectedAccommodation.roomAllocations || []).map((r: any) => ({
+                    roomId: r.roomId || r.room?.id,
+                    quantity: (r.numberOfRooms || r.quantity || 0) > 0 ? 1 : 0
+                  })).filter((entry: any) => entry.roomId && entry.quantity > 0))
+            : [];
+
+          // Build filtered search results with only selected options
+          const filteredSearchResults = {
+            ...currentResults?.data,
+            availableOptions: {
+              outboundTransportation: outboundOption ? [outboundOption] : [],
+              returnTransportation: returnOption ? [returnOption] : [],
+              accommodations: selectedAccommodation ? [selectedAccommodation] : []
+            }
+          };
+
+          const bookedPlanRequest = {
+            planName: `Booked Trip - ${originalRequest.endLocation}`,
+            description: `Booked on ${new Date().toLocaleDateString()}`,
+            selectedOutboundId: outboundOption?.id || 0,
+            selectedReturnId: returnOption?.id ?? null,
+            selectedAccommodationId: selectedAccommodation?.id || 0,
+            selectedRoomAllocations: roomPayload,
+            selectedActivities: [],
+            totalCost: confirmation.totalCost,
+            tags: originalRequest.interests || [],
+            originalSearchParams: originalRequest,
+            status: 'booked',
+            startLocation: originalRequest.startLocation,
+            endLocation: originalRequest.endLocation,
+            startTime: originalRequest.startTime,
+            endTime: originalRequest.endTime,
+            numberOfTravelers: originalRequest.numberOfTravelers,
+            budget: originalRequest.budget,
+            interests: originalRequest.interests,
+            needsReturnTransport: originalRequest.needsReturnTransport,
+            searchResultsData: filteredSearchResults
+          };
+
+          await tripPlannerController.saveTripPlan(bookedPlanRequest);
+        } catch (error) {
+          console.error('Failed to save booked plan:', error);
+        }
       }, 1200);
     } catch (error) {
       setShowProgressDialog(false);
@@ -345,6 +400,61 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
     try {
       const confirmation = await tripPlannerController.confirmBooking(bookingDetails.bookingRequest);
       alert('Booking offers sent successfully! Total estimated cost: PKR ' + confirmation.totalCost.toLocaleString());
+      
+      // Save the booked plan with same structure as manual save
+      try {
+        const outboundOption = activeOutboundTransport;
+        const returnOption = activeReturnTransport;
+        const roomPayload = selectedAccommodation
+          ? (selectedRoomAllocations.length > 0
+              ? selectedRoomAllocations.map(allocation => ({
+                  roomId: allocation.roomId,
+                  quantity: 1
+                }))
+              : (selectedAccommodation.roomAllocations || []).map((r: any) => ({
+                  roomId: r.roomId || r.room?.id,
+                  quantity: (r.numberOfRooms || r.quantity || 0) > 0 ? 1 : 0
+                })).filter((entry: any) => entry.roomId && entry.quantity > 0))
+          : [];
+
+        // Build filtered search results with only selected options
+        const filteredSearchResults = {
+          ...currentResults?.data,
+          availableOptions: {
+            outboundTransportation: outboundOption ? [outboundOption] : [],
+            returnTransportation: returnOption ? [returnOption] : [],
+            accommodations: selectedAccommodation ? [selectedAccommodation] : []
+          }
+        };
+
+        const bookedPlanRequest = {
+          planName: `Booked Trip - ${originalRequest.endLocation}`,
+          description: `Booked on ${new Date().toLocaleDateString()}`,
+          selectedOutboundId: outboundOption?.id || 0,
+          selectedReturnId: returnOption?.id ?? null,
+          selectedAccommodationId: selectedAccommodation?.id || 0,
+          selectedRoomAllocations: roomPayload,
+          selectedActivities: [],
+          totalCost: confirmation.totalCost,
+          tags: originalRequest.interests || [],
+          originalSearchParams: originalRequest,
+          status: 'booked',
+          startLocation: originalRequest.startLocation,
+          endLocation: originalRequest.endLocation,
+          startTime: originalRequest.startTime,
+          endTime: originalRequest.endTime,
+          numberOfTravelers: originalRequest.numberOfTravelers,
+          budget: originalRequest.budget,
+          interests: originalRequest.interests,
+          needsReturnTransport: originalRequest.needsReturnTransport,
+          searchResultsData: filteredSearchResults
+        };
+
+        await tripPlannerController.saveTripPlan(bookedPlanRequest);
+      } catch (error) {
+        console.error('Failed to save booked plan:', error);
+      }
+
       setBookingDetails(null);
     } catch (error) {
       console.error('Booking error:', error);
