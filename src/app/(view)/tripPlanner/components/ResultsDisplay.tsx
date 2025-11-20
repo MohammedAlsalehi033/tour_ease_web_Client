@@ -5,6 +5,8 @@ import { container } from '@/app/lib/diContainer';
 import { TripPlannerController } from '@/app/(controller)/tripPlanner/tripPlannerController';
 import { RefinePlanChat } from './RefinePlanChat';
 import { BookingSummary } from './BookingSummary';
+import PaymentDialog from './PaymentDialog';
+import BookingProgressDialog from './BookingProgressDialog';
 import type { TripPlannerSearchParams, TransportOption, AccommodationOption } from '@/app/(model)/tripPlanner/tripPlannerModel';
 import {
   RoomSelectionMap,
@@ -29,6 +31,10 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
   const [currentResults, setCurrentResults] = useState(results);
   const [showBudgetWidget, setShowBudgetWidget] = useState(true);
   const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [pendingBookingRequest, setPendingBookingRequest] = useState<any>(null);
+  const [progressStep, setProgressStep] = useState<string>("");
+  const [showProgressDialog, setShowProgressDialog] = useState(false);
   const tripPlannerController = container.resolve(TripPlannerController);
 
   const { optimalPlan, recommendedPlans, availableOptions, itinerary, tripSummary } = currentResults?.data || {};
@@ -234,7 +240,7 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
       return;
     }
 
-    console.log('Validation passed, creating booking details...');
+    console.log('Validation passed, creating booking request...');
 
     const roomPayload = selectedAccommodation
       ? (selectedRoomAllocations.length > 0
@@ -248,25 +254,89 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
             })).filter((entry: any) => entry.roomId && entry.numberOfRooms > 0))
       : [];
 
-    setBookingDetails({
-      outboundTransport: outboundOption,
-      returnTransport: returnOption,
-      accommodation: selectedAccommodation,
-      selectedRooms: selectedRoomAllocations,
-      totalCost: calculateTotalCost(),
-      nightsCount: nightsCount,
-      bookingRequest: {
-        outboundTransportId: outboundOption?.id || 0,
-        returnTransportId: returnOption?.id ?? null,
-        accommodationId: selectedAccommodation?.id || 0,
-        selectedRoomAllocations: roomPayload,
-        seatsNeeded: currentResults.data.requestSummary.numberOfTravelers,
-        checkInDate: currentResults.data.requestSummary.startTime,
-        checkOutDate: currentResults.data.requestSummary.endTime
-      }
-    });
+    const bookingRequest: any = {
+      seatsNeeded: currentResults.data.requestSummary.numberOfTravelers,
+      checkInDate: currentResults.data.requestSummary.startTime,
+      checkOutDate: currentResults.data.requestSummary.endTime
+    };
+
+    // Add transport IDs only if they exist
+    if (outboundOption?.id) {
+      bookingRequest.outboundTransportId = outboundOption.id;
+    }
+    if (returnOption?.id) {
+      bookingRequest.returnTransportId = returnOption.id;
+    }
+
+    // Add accommodation info only if selected
+    if (selectedAccommodation?.id) {
+      bookingRequest.accommodationId = selectedAccommodation.id;
+      bookingRequest.selectedRoomAllocations = roomPayload;
+    }
+
+    // If accommodation is selected, show payment dialog
+    if (selectedAccommodation) {
+      setPendingBookingRequest(bookingRequest);
+      setShowPaymentDialog(true);
+    } else {
+      // No accommodation selected, proceed with booking details
+      setBookingDetails({
+        outboundTransport: outboundOption,
+        returnTransport: returnOption,
+        accommodation: selectedAccommodation,
+        selectedRooms: selectedRoomAllocations,
+        totalCost: calculateTotalCost(),
+        nightsCount: nightsCount,
+        bookingRequest
+      });
+    }
     
-    console.log('Booking details set!');
+    console.log('Payment dialog or booking details set!');
+  };
+
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
+    if (!pendingBookingRequest) return;
+
+    setShowPaymentDialog(false);
+    setProgressStep("payment");
+    setShowProgressDialog(true);
+
+    try {
+      // Step 1: Payment is already confirmed by Stripe
+      await new Promise(res => setTimeout(res, 800));
+
+      // Step 2: Reserving ride (will be part of the full booking request)
+      setProgressStep("ride");
+      await new Promise(res => setTimeout(res, 600));
+
+      // Step 3: Setting up rooms (preparing full booking with payment info)
+      setProgressStep("rooms");
+      
+      // Add payment information to the complete booking request
+      const bookingRequestWithPayment = {
+        ...pendingBookingRequest,
+        paymentMethod: 'stripe' as const,
+        stripePaymentIntentId: paymentIntentId,
+        specialRequests: '' // Optional field for any user notes
+      };
+
+      console.log('Confirming booking with payment:', bookingRequestWithPayment);
+      
+      // Make the actual API call with all booking info
+      const confirmation = await tripPlannerController.confirmBooking(bookingRequestWithPayment);
+
+      // Step 4: All set!
+      setProgressStep("done");
+      setTimeout(() => {
+        setShowProgressDialog(false);
+        setPendingBookingRequest(null);
+        alert('Payment successful! Booking confirmed. Total: PKR ' + confirmation.totalCost.toLocaleString() + '\n' + confirmation.message);
+      }, 1200);
+    } catch (error) {
+      setShowProgressDialog(false);
+      console.error('Booking error:', error);
+      alert('Booking failed: ' + (error as Error).message);
+    }
   };
 
   const confirmAndBook = async () => {
@@ -871,6 +941,28 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
       )}
     </div>
       )}
+
+      {/* Payment Dialog */}
+      <PaymentDialog
+        isOpen={showPaymentDialog}
+        onClose={() => {
+          setShowPaymentDialog(false);
+          setPendingBookingRequest(null);
+        }}
+        totalAmount={calculateTotalCost()}
+        onPaymentSuccess={handlePaymentSuccess}
+        bookingSummary={{
+          transportCost: transportCost,
+          accommodationCost: accommodationCost,
+          nightsCount: nightsCount,
+          accommodationName: selectedAccommodation?.name,
+          outboundTransport: activeOutboundTransport?.providerName || activeOutboundTransport?.type,
+          returnTransport: activeReturnTransport?.providerName || activeReturnTransport?.type,
+        }}
+      />
+
+      {/* Booking Progress Dialog */}
+      <BookingProgressDialog step={progressStep} visible={showProgressDialog} />
     </>
   );
 };

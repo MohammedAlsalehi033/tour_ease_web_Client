@@ -142,6 +142,10 @@ export interface BookingRequest {
   checkInDate: string;
   checkOutDate: string;
   selectedActivities?: number[];
+  // Payment fields (required if booking accommodation)
+  paymentMethod?: 'stripe' | 'paypal' | 'credit_card';
+  stripePaymentIntentId?: string;
+  specialRequests?: string;
 }
 
 export interface TransportBooking {

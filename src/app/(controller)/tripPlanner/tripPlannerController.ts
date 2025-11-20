@@ -240,6 +240,11 @@ export class TripPlannerController {
       if (!request.selectedRoomAllocations || request.selectedRoomAllocations.length === 0) {
         throw new Error('Room allocations are required for accommodation booking');
       }
+
+      // Payment is required when booking accommodation
+      if (!request.paymentMethod || !request.stripePaymentIntentId) {
+        throw new Error('Payment information is required for accommodation booking');
+      }
     }
   }
 
