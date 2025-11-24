@@ -36,7 +36,6 @@ export const SearchForm = ({ onSearch }: { onSearch: (params: TripPlannerSearchP
   });
 
   const interestOptions = [
-    'Beaches',
     'Museums', 
     'Food',
     'Adventure',
