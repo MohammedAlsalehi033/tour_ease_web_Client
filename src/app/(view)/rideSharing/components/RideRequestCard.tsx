@@ -139,8 +139,8 @@ const RideRequestCard: React.FC<RideRequestCardProps> = ({
           <div className="flex items-center justify-between mb-4">
             {/* Traveler info */}
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-secondary/10 rounded-full flex items-center justify-center">
-                <span className="text-secondary font-semibold text-sm">{travelerInitial}</span>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-secondary/10 rounded-full flex items-center justify-center border-2 border-secondary/20 shadow-sm">
+                <span className="text-secondary font-semibold text-sm sm:text-base">{travelerInitial}</span>
               </div>
               <div>
                 <p className="font-medium text-sm text-light-on-surface dark:text-dark-on-surface">

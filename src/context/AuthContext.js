@@ -8,7 +8,8 @@ import {
   updateProfile,
   GoogleAuthProvider,
   FacebookAuthProvider,
-  signInWithPopup
+  signInWithPopup,
+  sendPasswordResetEmail
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { ApiService } from "@/app/services/apiService";
@@ -140,6 +141,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Reset password
+  const resetPassword = async (email) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return { success: true };
+    } catch (error) {
+      throw error;
+    }
+  };
+
   useEffect(() => {
     if (status !== "loading") {
       setLoading(false);
@@ -154,6 +165,7 @@ export const AuthProvider = ({ children }) => {
       signInWithGoogle,
       signInWithFacebook,
       logout,
+      resetPassword,
       loading
     }}>
       {children}

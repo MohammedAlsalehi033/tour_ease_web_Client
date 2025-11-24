@@ -212,15 +212,15 @@ const RideListingCard: React.FC<RideListingCardProps> = ({
                   <img
                     src={driverData.profileImage}
                     alt={driverData.name}
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-primary/20 shadow-sm"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 shadow-sm">
                     <span className="text-primary font-semibold text-sm">{driverInitial}</span>
                   </div>
                 )}
                 {isVerified && (
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full flex items-center justify-center">
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full flex items-center justify-center border-2 border-white dark:border-dark-surface">
                     <CheckCircle size={10} className="text-white" />
                   </div>
                 )}

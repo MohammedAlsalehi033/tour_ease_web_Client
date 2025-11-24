@@ -29,8 +29,7 @@ const DriverReviewsSection: React.FC<DriverReviewsSectionProps> = ({
 
   useEffect(() => {
     fetchDriverReviews();
-    fetchStats();
-  }, [driverId, sortBy, page, showAll]);
+  }, [driverId, page, showAll]);
 
   const fetchDriverReviews = useCallback(async () => {
     try {
@@ -38,11 +37,10 @@ const DriverReviewsSection: React.FC<DriverReviewsSectionProps> = ({
       setError(null);
       const reviewController = container.resolve(ReviewController);
       
-      // Get reviews FOR this transportation provider (reviews about their service)
-      const reviewsResponse = await reviewController.getReviewsForReviewable('TRANSPORTATION_PROVIDER', parseInt(driverId), {
+      // Get reviews BY this reviewer (reviews written by the driver)
+      const reviewsResponse = await reviewController.getReviewsByReviewer(driverId, {
         page,
-        limit: showAll ? 20 : limit,
-        sortBy
+        limit: showAll ? 20 : limit
       });
       
       if (reviewsResponse.success) {
@@ -55,20 +53,28 @@ const DriverReviewsSection: React.FC<DriverReviewsSectionProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [driverId, page, showAll, limit, sortBy]);
+  }, [driverId, page, showAll, limit]);
 
-  const fetchStats = useCallback(async () => {
-    try {
-      const reviewController = container.resolve(ReviewController);
-      const statsResponse = await reviewController.getReviewStats('TRANSPORTATION_PROVIDER', parseInt(driverId));
+  // Calculate stats from reviews
+  useEffect(() => {
+    if (reviews.length > 0) {
+      const totalReviews = reviews.length;
+      const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews;
+      const ratingDistribution: { [key: string]: number } = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
       
-      if (statsResponse.success) {
-        setStats(statsResponse.data);
-      }
-    } catch (err: any) {
-      console.error('Failed to fetch review stats:', err);
+      reviews.forEach(review => {
+        ratingDistribution[review.rating.toString()]++;
+      });
+
+      setStats({
+        totalReviews,
+        averageRating,
+        ratingDistribution
+      });
+    } else {
+      setStats(null);
     }
-  }, [driverId]);
+  }, [reviews]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

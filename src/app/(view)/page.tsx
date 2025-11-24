@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useTheme } from 'next-themes';
+import { useAuth } from '@/context/AuthContext';
 import { 
   Car, 
   Home, 
@@ -27,7 +29,8 @@ import {
   Menu,
   X,
   Sun,
-  Moon
+  Moon,
+  User
 } from 'lucide-react';
 
 const LandingPage = () => {
@@ -36,6 +39,7 @@ const LandingPage = () => {
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [1, 0.8, 0.3, 0]);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { currentUser, loading } = useAuth() as any;
 
   // Mobile menu state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -199,8 +203,35 @@ const LandingPage = () => {
               </button>
             )}
             
-            <Link href="/login" className="text-primary hover:text-primary-dark transition-colors font-medium">Sign In</Link>
-            <Link href="/register" className="bg-primary text-white px-6 py-2.5 rounded-2xl hover:bg-primary-dark transition-all hover:shadow-lg">Get Started</Link>
+            {/* User Profile or Sign In */}
+            {!loading && (
+              (currentUser as any) ? (
+                <Link href="/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity group">
+                  <span className="text-gray-700 dark:text-gray-300 font-medium group-hover:text-primary transition-colors">
+                    {(currentUser as any).name || (currentUser as any).email?.split('@')[0]}
+                  </span>
+                  {(currentUser as any).image ? (
+                    <div className="relative w-10 h-10 rounded-full border-2 border-primary overflow-hidden">
+                      <Image 
+                        src={(currentUser as any).image} 
+                        alt={(currentUser as any).name || 'User'} 
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold border-2 border-primary">
+                      {((currentUser as any).name || (currentUser as any).email)?.[0]?.toUpperCase()}
+                    </div>
+                  )}
+                </Link>
+              ) : (
+                <>
+                  <Link href="/login" className="text-primary hover:text-primary-dark transition-colors font-medium">Sign In</Link>
+                  <Link href="/register" className="bg-primary text-white px-6 py-2.5 rounded-2xl hover:bg-primary-dark transition-all hover:shadow-lg">Get Started</Link>
+                </>
+              )
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -241,8 +272,36 @@ const LandingPage = () => {
               <Link href="#services" className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">Services</Link>
               <Link href="#technology" className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">Technology</Link>
               <Link href="#about" className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">About</Link>
-              <Link href="/login" className="block px-3 py-2 text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors font-medium">Sign In</Link>
-              <Link href="/register" className="block px-3 py-2 bg-primary text-white rounded-2xl hover:bg-primary-dark transition-colors text-center font-medium">Get Started</Link>
+              
+              {/* User Profile or Sign In - Mobile */}
+              {!loading && (
+                (currentUser as any) ? (
+                  <Link href="/profile" className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors">
+                    {(currentUser as any).image ? (
+                      <div className="relative w-10 h-10 rounded-full border-2 border-primary overflow-hidden">
+                        <Image 
+                          src={(currentUser as any).image} 
+                          alt={(currentUser as any).name || 'User'} 
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold border-2 border-primary">
+                        {((currentUser as any).name || (currentUser as any).email)?.[0]?.toUpperCase()}
+                      </div>
+                    )}
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">
+                      {(currentUser as any).name || (currentUser as any).email?.split('@')[0]}
+                    </span>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/login" className="block px-3 py-2 text-primary hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors font-medium">Sign In</Link>
+                    <Link href="/register" className="block px-3 py-2 bg-primary text-white rounded-2xl hover:bg-primary-dark transition-colors text-center font-medium">Get Started</Link>
+                  </>
+                )
+              )}
             </div>
           </motion.div>
         )}

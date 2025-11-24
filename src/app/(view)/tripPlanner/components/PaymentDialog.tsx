@@ -23,6 +23,7 @@ interface PaymentDialogProps {
     outboundTransport?: string;
     returnTransport?: string;
   };
+  accommodationOnly?: boolean;
 }
 
 const PaymentForm = ({
@@ -30,11 +31,13 @@ const PaymentForm = ({
   onSuccess,
   onCancel,
   bookingSummary,
+  accommodationOnly,
 }: {
   totalAmount: number;
   onSuccess: (paymentIntentId: string) => void;
   onCancel: () => void;
   bookingSummary: PaymentDialogProps['bookingSummary'];
+  accommodationOnly?: boolean;
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -101,6 +104,23 @@ const PaymentForm = ({
 
   return (
     <form onSubmit={handlePayment} className="space-y-6">
+      {/* Important Notice for Accommodation Only Payment */}
+      {accommodationOnly && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-xs font-bold">i</span>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">Payment Notice</p>
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                You are only paying for <strong>accommodation</strong> at this time. Transportation and activities will need to be paid separately and directly to the respective providers.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Booking Summary */}
       <div className="bg-light-surface-variant dark:bg-dark-surface-variant rounded-lg p-4 space-y-2">
         <h4 className="font-semibold text-sm mb-3">Booking Summary</h4>
@@ -136,14 +156,16 @@ const PaymentForm = ({
         <div className="pt-3 mt-3 border-t border-light-outline dark:border-dark-outline">
           <div className="flex justify-between text-sm">
             <span className="opacity-70">Transport Cost:</span>
-            <span>PKR {bookingSummary.transportCost.toLocaleString()}</span>
+            <span className={accommodationOnly ? 'text-orange-600 dark:text-orange-400' : ''}>
+              {accommodationOnly ? 'Pay Separately' : `PKR ${bookingSummary.transportCost.toLocaleString()}`}
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="opacity-70">Accommodation Cost:</span>
             <span>PKR {bookingSummary.accommodationCost.toLocaleString()}</span>
           </div>
           <div className="flex justify-between font-bold text-base mt-2">
-            <span>Total Amount:</span>
+            <span>{accommodationOnly ? 'Amount Due Now:' : 'Total Amount:'}</span>
             <span className="text-primary">PKR {totalAmount.toLocaleString()}</span>
           </div>
         </div>
@@ -224,6 +246,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
   totalAmount,
   onPaymentSuccess,
   bookingSummary,
+  accommodationOnly,
 }) => {
   if (!isOpen) return null;
 
@@ -253,6 +276,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
               onSuccess={onPaymentSuccess}
               onCancel={onClose}
               bookingSummary={bookingSummary}
+              accommodationOnly={accommodationOnly}
             />
           </Elements>
         </div>

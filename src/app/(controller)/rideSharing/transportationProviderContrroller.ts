@@ -34,4 +34,26 @@ export class TransformationProviderController {
         }
     
     }
+
+    async updateTransformationProvider(
+        id: string,
+        seatsAvailable: number,
+        vehicleType: string,
+        vehicleMedia: File[],
+        licenseMedia: File[]
+    ) {
+        try {
+            const response = await this.transformationProviderRepo.updateTransportationProvider(
+                id,
+                seatsAvailable,
+                vehicleType,
+                vehicleMedia,
+                licenseMedia
+            );
+            return response;
+        } catch (error) {
+            console.error('Error updating transformation provider:', error);
+            throw error;
+        }
+    }
 }

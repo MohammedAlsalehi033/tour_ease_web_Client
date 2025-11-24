@@ -117,7 +117,7 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
 
           // Calculate stats from actual data
           const completedBookings = userBookings.filter(booking =>
-            booking.status === 'accepted'
+            booking.status === 'complete'
           );
 
           const totalSpent = isProvider ? 0 : userBookings.reduce((sum, booking) =>
@@ -211,19 +211,19 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
         >
           {isProvider ? (
             <>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
+              <motion.div variants={itemVariants}>
                 <StatCard
                   title="Rides Offered"
                   value={stats.ridesOffered}
                 />
               </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
+              <motion.div variants={itemVariants}>
                 <StatCard
                   title="Total Earnings"
                   value={`PKR ${stats.totalEarnings.toLocaleString()}`}
                 />
               </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
+              <motion.div variants={itemVariants}>
                 <StatCard
                   title="Completed Trips"
                   value={stats.completedRides}
@@ -232,19 +232,19 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
             </>
           ) : stats.totalBookings > 0 ? (
             <>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
+              <motion.div variants={itemVariants}>
                 <StatCard
                   title="Total Bookings"
                   value={stats.totalBookings}
                 />
               </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
+              <motion.div variants={itemVariants}>
                 <StatCard
                   title="Total Spent"
                   value={`PKR ${stats.totalSpent.toLocaleString()}`}
                 />
               </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
+              <motion.div variants={itemVariants}>
                 <StatCard
                   title="Completed Trips"
                   value={stats.completedRides}
@@ -253,22 +253,22 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
             </>
           ) : (
             <>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
+              <motion.div variants={itemVariants}>
                 <StatCard
-                  title="Get Started"
-                  value="0"
+                  title="Total Bookings"
+                  value={0}
                 />
               </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
+              <motion.div variants={itemVariants}>
                 <StatCard
-                  title="Find Rides"
-                  value="Explore"
+                  title="Total Spent"
+                  value="PKR 0"
                 />
               </motion.div>
-              <motion.div variants={itemVariants} whileHover={cardHoverVariants}>
+              <motion.div variants={itemVariants}>
                 <StatCard
-                  title="Need Help?"
-                  value="Support"
+                  title="Completed Trips"
+                  value={0}
                 />
               </motion.div>
             </>
@@ -332,13 +332,7 @@ const FunctionalDashboard: React.FC<FunctionalDashboardProps> = ({ session }) =>
 const StatCard: React.FC<{ title: string; value: string | number }> =
   ({ title, value }) => (
     <motion.div
-      className="card shadow-lg rounded-lg p-6 border border-light-outline dark:border-dark-outline cursor-pointer"
-      whileHover={{
-        scale: 1.05,
-        boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-        transition: { duration: 0.2 }
-      }}
-      whileTap={{ scale: 0.98 }}
+      className="card shadow-lg rounded-lg p-6 border border-light-outline dark:border-dark-outline"
     >
       <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant mb-1">
         {title}

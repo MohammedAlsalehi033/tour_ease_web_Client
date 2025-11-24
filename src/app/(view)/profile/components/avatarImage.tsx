@@ -77,7 +77,6 @@ const AvatarImage = ({ media, userName }: { media: string[]; userName: string })
             }
         }
     }
-
     return (
         <div>
             <div ref={errorMessage} className="hidden text-red-500 text-sm mb-2"></div>

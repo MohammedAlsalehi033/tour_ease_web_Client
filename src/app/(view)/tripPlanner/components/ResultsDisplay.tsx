@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { container } from '@/app/lib/diContainer';
+import OtherAvatarPic from '../../components/otherAvatarPic';
 import { TripPlannerController } from '@/app/(controller)/tripPlanner/tripPlannerController';
 import { RefinePlanChat } from './RefinePlanChat';
 import { BookingSummary } from './BookingSummary';
@@ -110,7 +111,8 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
       setSelectedTransport(optimalPlan.outboundTransport);
       setSelectedReturnTransport(optimalPlan.returnTransport || null);
       setSelectedAccommodation(optimalPlan.accommodation);
-      setRoomSelections(buildInitialRoomSelections(optimalPlan.accommodation, optimalPlan.accommodation?.roomAllocations));
+      // Pass undefined to select only the cheapest room instead of all rooms
+      setRoomSelections(buildInitialRoomSelections(optimalPlan.accommodation, undefined));
     }
   };
 
@@ -608,9 +610,16 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                     </div>
                   )}
                   <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h4 className="font-semibold">{transport.vehicleType}</h4>
-                      <p className="text-sm opacity-70">{transport.providerName}</p>
+                    <div className="flex items-center gap-3">
+                      <OtherAvatarPic
+                        imageUrl={transport.provider?.user?.mediaUrls?.[0]}
+                        otherUserId={transport.providerId || transport.provider?.providerId || ''}
+                        userName={transport.providerName || transport.provider?.user?.name}
+                      />
+                      <div>
+                        <h4 className="font-semibold">{transport.vehicleType}</h4>
+                        <p className="text-sm opacity-70">{transport.providerName}</p>
+                      </div>
                     </div>
                     <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
                       ⭐ {transport.avgRating}
@@ -677,9 +686,16 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                     </div>
                   )}
                   <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h4 className="font-semibold">{transport.vehicleType}</h4>
-                      <p className="text-sm opacity-70">{transport.providerName}</p>
+                    <div className="flex items-center gap-3">
+                      <OtherAvatarPic
+                        imageUrl={transport.provider?.user?.mediaUrls?.[0]}
+                        otherUserId={transport.providerId || transport.provider?.providerId || ''}
+                        userName={transport.providerName || transport.provider?.user?.name}
+                      />
+                      <div>
+                        <h4 className="font-semibold">{transport.vehicleType}</h4>
+                        <p className="text-sm opacity-70">{transport.providerName}</p>
+                      </div>
                     </div>
                     <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
                       ⭐ {transport.avgRating}
@@ -747,9 +763,16 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                     </div>
                   )}
                   <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1">
-                      <h4 className="font-semibold">{acc.name}</h4>
-                      <p className="text-sm opacity-70">📍 {acc.location}</p>
+                    <div className="flex items-center gap-3 flex-1">
+                      <OtherAvatarPic
+                        imageUrl={acc.provider?.user?.mediaUrls?.[0]}
+                        otherUserId={acc.providerId || acc.provider?.providerId || ''}
+                        userName={acc.provider?.user?.name || acc.name}
+                      />
+                      <div className="flex-1">
+                        <h4 className="font-semibold">{acc.name}</h4>
+                        <p className="text-sm opacity-70">📍 {acc.location}</p>
+                      </div>
                     </div>
                     <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
                       ⭐ {acc.avgRating}
@@ -775,12 +798,19 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
       {selectedAccommodation && (
         <div className="card ring-4 ring-primary/30 mt-6 space-y-4">
           <div className="flex justify-between items-start">
-            <div>
-              <h3 className="font-semibold text-xl">{selectedAccommodation.name}</h3>
-              <p className="text-sm opacity-70">📍 {selectedAccommodation.location}</p>
-              <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
-                Stay for {selectedAccommodation.numberOfNights || nightsCount} night(s)
-              </p>
+            <div className="flex items-start gap-3">
+              <OtherAvatarPic
+                imageUrl={selectedAccommodation.provider?.user?.mediaUrls?.[0]}
+                otherUserId={selectedAccommodation.providerId || selectedAccommodation.provider?.providerId || ''}
+                userName={selectedAccommodation.provider?.user?.name || selectedAccommodation.name}
+              />
+              <div>
+                <h3 className="font-semibold text-xl">{selectedAccommodation.name}</h3>
+                <p className="text-sm opacity-70">📍 {selectedAccommodation.location}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                  Stay for {selectedAccommodation.numberOfNights || nightsCount} night(s)
+                </p>
+              </div>
             </div>
             <span className="text-lg font-semibold text-primary">
               PKR {accommodationCost.toLocaleString()}
@@ -1059,7 +1089,7 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
           setShowPaymentDialog(false);
           setPendingBookingRequest(null);
         }}
-        totalAmount={calculateTotalCost()}
+        totalAmount={accommodationCost}
         onPaymentSuccess={handlePaymentSuccess}
         bookingSummary={{
           transportCost: transportCost,
@@ -1069,6 +1099,7 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
           outboundTransport: activeOutboundTransport?.providerName || activeOutboundTransport?.type,
           returnTransport: activeReturnTransport?.providerName || activeReturnTransport?.type,
         }}
+        accommodationOnly={true}
       />
 
       {/* Booking Progress Dialog */}

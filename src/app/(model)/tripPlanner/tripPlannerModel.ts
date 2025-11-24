@@ -36,6 +36,15 @@ export interface TransportOption {
   totalCost: number;
   pickupLocation?: string;
   dropoffLocation?: string;
+  providerId?: string;
+  provider?: {
+    providerId: string;
+    user: {
+      id: string;
+      name: string;
+      mediaUrls?: string[];
+    };
+  };
 }
 
 export interface RoomInfo {
@@ -70,6 +79,15 @@ export interface AccommodationOption {
   availableRooms?: RoomInfo[];
   amenities?: string[];
   images?: string[];
+  providerId?: string;
+  provider?: {
+    providerId: string;
+    user: {
+      id: string;
+      name: string;
+      mediaUrls?: string[];
+    };
+  };
 }
 
 export interface Activity {

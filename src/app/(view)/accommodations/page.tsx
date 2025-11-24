@@ -17,7 +17,8 @@ import {
   Waves,
   Shield,
   Banknote,
-  Loader2
+  Loader2,
+  User
 } from 'lucide-react';
 import { container } from '@/app/lib/diContainer';
 import { AccommodationController } from '@/app/(controller)/accommodation/accommodationController';
@@ -69,6 +70,9 @@ const AccommodationsPage = () => {
   const [guests, setGuests] = useState('2');
   const [budget, setBudget] = useState('');
   const [searchLocation, setSearchLocation] = useState('');
+  
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
 
   // Get controller instance
   const accommodationController = container.resolve(AccommodationController);
@@ -193,7 +197,14 @@ const AccommodationsPage = () => {
                   <input
                     type="date"
                     value={checkIn}
-                    onChange={(e) => setCheckIn(e.target.value)}
+                    min={today}
+                    onChange={(e) => {
+                      setCheckIn(e.target.value);
+                      // If check-out is before new check-in, clear it
+                      if (checkOut && e.target.value > checkOut) {
+                        setCheckOut('');
+                      }
+                    }}
                     className="input w-full pl-8 sm:pl-9 pr-3 py-2 text-sm sm:text-base"
                   />
                 </div>
@@ -206,10 +217,17 @@ const AccommodationsPage = () => {
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-3 h-3 sm:w-4 sm:h-4" />
                   <input
-                    type="date"
-                    value={checkOut}
-                    onChange={(e) => setCheckOut(e.target.value)}
-                    className="input w-full pl-8 sm:pl-9 pr-3 py-2 text-sm sm:text-base"
+                  type="date"
+                  value={checkOut}
+                  min={
+                    checkIn
+                    ? new Date(Date.parse(checkIn) + 24 * 60 * 60 * 1000)
+                      .toISOString()
+                      .split('T')[0]
+                    : today
+                  }
+                  onChange={(e) => setCheckOut(e.target.value)}
+                  className="input w-full pl-8 sm:pl-9 pr-3 py-2 text-sm sm:text-base"
                   />
                 </div>
               </div>
@@ -225,10 +243,10 @@ const AccommodationsPage = () => {
                     onChange={(e) => setGuests(e.target.value)}
                     className="input w-full pl-8 sm:pl-9 pr-3 py-2 text-sm sm:text-base appearance-none"
                   >
-                    <option>1 Guest</option>
-                    <option>2 Guests</option>
-                    <option>3 Guests</option>
-                    <option>4+ Guests</option>
+                    <option value="1">1 Guest</option>
+                    <option value="2">2 Guests</option>
+                    <option value="3">3 Guests</option>
+                    <option value="4">4+ Guests</option>
                   </select>
                 </div>
               </div>
@@ -391,6 +409,34 @@ const AccommodationsPage = () => {
                   </div>
 
                   <div className="p-3 sm:p-4">
+                    {/* Host Avatar Section */}
+                    <div className="flex items-center space-x-2 mb-3">
+                      <div className="relative">
+                        {accommodation.provider?.mediaUrls && accommodation.provider.mediaUrls.length > 0 ? (
+                          <img
+                            src={normalizeImageUrl(accommodation.provider.mediaUrls[0])}
+                            alt="Host"
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-primary/20"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            }}
+                          />
+                        ) : null}
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20 ${accommodation.provider?.mediaUrls && accommodation.provider.mediaUrls.length > 0 ? 'hidden' : ''}`}>
+                          <User className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-medium text-light-on-surface dark:text-dark-on-surface truncate">
+                          Hosted by {accommodation.provider?.accommodationName || 'Host'}
+                        </p>
+                        <p className="text-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                          Property owner
+                        </p>
+                      </div>
+                    </div>
+
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2">
                       <h3 className="font-display text-headline-sm sm:text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface group-hover:text-primary transition-colors mb-1 sm:mb-0">
                         {accommodation.name}
