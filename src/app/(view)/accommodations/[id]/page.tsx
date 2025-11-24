@@ -27,11 +27,17 @@ import {
   Phone,
   Mail,
   Share2,
+  AlertCircle,
 } from 'lucide-react';
 import { container } from '@/app/lib/diContainer';
 import { AccommodationController } from '@/app/(controller)/accommodation/accommodationController';
 import { PaymentController } from '@/app/(controller)/payment/paymentController';
+import { ReviewController } from '@/app/(controller)/review/reviewController';
+import { ReportController } from '@/app/(controller)/report/reportController';
+import type { CreateReportData, ReportableType } from '@/app/(model)/report/reportModel';
 import { Accommodation, Room } from '@/app/(model)/accommodation/accommodationModel';
+import { Review, ReviewStats } from '@/app/(model)/review/reviewModel';
+import RatingDisplay from '../../components/RatingDisplay';
 import { normalizeImageUrl, DEFAULT_IMAGE_PLACEHOLDER } from '@/app/lib/mediaUtils';
 import { useSession } from 'next-auth/react';
 import { loadStripe } from '@stripe/stripe-js';
@@ -186,6 +192,51 @@ const SafeAccommodationImage = ({
   );
 };
 
+const ReviewerAvatar = ({
+  mediaUrl,
+  username,
+}: {
+  mediaUrl?: string | null;
+  username: string;
+}) => {
+  const [imgError, setImgError] = useState(false);
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    setImgError(false);
+    if (mediaUrl) {
+      try {
+        const normalized = normalizeImageUrl(mediaUrl);
+        setImgSrc(normalized);
+      } catch {
+        setImgError(true);
+      }
+    } else {
+      setImgSrc(null);
+    }
+  }, [mediaUrl]);
+
+  if (imgError || !imgSrc) {
+    return (
+      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+        <Users className="w-5 h-5 text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+      <Image
+        src={imgSrc}
+        alt={username}
+        fill
+        className="object-cover"
+        onError={() => setImgError(true)}
+      />
+    </div>
+  );
+};
+
 export default function AccommodationDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -214,6 +265,14 @@ export default function AccommodationDetailPage() {
   const [paymentStep, setPaymentStep] = useState<'details' | 'payment'>('details');
   const [isLiked, setIsLiked] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewStats, setReviewStats] = useState<ReviewStats | null>(null);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDescription, setReportDescription] = useState('');
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
 
   const headerRef = useRef(null);
   const aboutRef = useRef(null);
@@ -230,6 +289,7 @@ export default function AccommodationDetailPage() {
 
   const accommodationController = container.resolve(AccommodationController);
   const paymentController = container.resolve(PaymentController);
+  const reviewController = container.resolve(ReviewController);
 
   const fetchAccommodationDetails = async () => {
     try {
@@ -256,8 +316,32 @@ export default function AccommodationDetailPage() {
     }
   };
 
+  const fetchReviews = async () => {
+    try {
+      setReviewsLoading(true);
+      
+      const [reviewsResult, statsResult] = await Promise.all([
+        reviewController.getReviewsForItem('ACCOMMODATION', accommodationId, { page: 1, limit: 10 }),
+        reviewController.getReviewStats('ACCOMMODATION', accommodationId),
+      ]);
+
+      if (reviewsResult.success) {
+        setReviews(reviewsResult.data.reviews || []);
+      }
+
+      if (statsResult.success) {
+        setReviewStats(statsResult.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching reviews:', err);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchAccommodationDetails();
+    fetchReviews();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accommodationId]);
 
@@ -336,6 +420,14 @@ export default function AccommodationDetailPage() {
     return parseFloat(selectedRoom.pricePerNight.toString()) * nights * numberOfRooms;
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   const images = accommodation?.mediaUrls || [];
   const amenityIcons = {
     wifi: Wifi,
@@ -362,6 +454,59 @@ export default function AccommodationDetailPage() {
       });
     } else {
       setShowShareMenu(!showShareMenu);
+    }
+  };
+
+  const handleReportSubmit = async () => {
+    if (!session?.user || !accommodation) {
+      router.push('/login');
+      return;
+    }
+
+    if (!reportReason.trim()) {
+      setReportError('Please provide a reason for reporting');
+      return;
+    }
+
+    if (!reportDescription.trim() || reportDescription.trim().length < 10) {
+      setReportError('Please provide a detailed description (at least 10 characters)');
+      return;
+    }
+
+    try {
+      setReportLoading(true);
+      setReportError(null);
+
+      const reportController = container.resolve(ReportController);
+      const reportData: CreateReportData = {
+        reporterId: (session.user as any).id,
+        reportableType: 'ACCOMMODATION' as ReportableType,
+        reportReason: reportReason.trim(),
+        description: reportDescription.trim(),
+        accommodationId: accommodation.id,
+      };
+
+      const validation = reportController.validateReportData(reportData);
+      if (!validation.isValid) {
+        setReportError(validation.errors.join(', '));
+        return;
+      }
+
+      await reportController.createReport(reportData);
+      
+      // Success - close modal and reset form
+      setShowReportModal(false);
+      setReportReason('');
+      setReportDescription('');
+      setReportError(null);
+      
+      // Show success message
+      alert('Report submitted successfully. Our team will review it shortly.');
+    } catch (err: any) {
+      console.error('Error submitting report:', err);
+      setReportError(err.message || 'Failed to submit report');
+    } finally {
+      setReportLoading(false);
     }
   };
 
@@ -502,9 +647,18 @@ export default function AccommodationDetailPage() {
                 <h1 className="font-display text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface">
                   {accommodation.name}
                 </h1>
-                <button className="p-2 hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant rounded-full transition-colors">
-                  <Heart className="w-6 h-6 text-light-on-surface-variant dark:text-dark-on-surface-variant" />
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button 
+                    onClick={() => setShowReportModal(true)}
+                    className="p-2 hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant rounded-full transition-colors"
+                    title="Report accommodation"
+                  >
+                    <AlertCircle className="w-6 h-6 text-light-on-surface-variant dark:text-dark-on-surface-variant" />
+                  </button>
+                  <button className="p-2 hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant rounded-full transition-colors">
+                    <Heart className="w-6 h-6 text-light-on-surface-variant dark:text-dark-on-surface-variant" />
+                  </button>
+                </div>
               </div>
               <div className="flex items-center space-x-4 text-light-on-surface-variant dark:text-dark-on-surface-variant">
                 <div className="flex items-center space-x-1">
@@ -634,6 +788,116 @@ export default function AccommodationDetailPage() {
                 )}
               </div>
             </div>
+
+            {/* Reviews Section */}
+            <div className="card p-6">
+              <h2 className="font-display text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface mb-4">
+                Guest Reviews
+              </h2>
+
+              {reviewsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <>
+                  {/* Review Stats */}
+                  {reviewStats && reviewStats.totalReviews > 0 && (
+                    <div className="bg-light-surface-variant/30 dark:bg-dark-surface-variant/30 rounded-lg p-6 mb-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <div className="flex items-center space-x-2 mb-1">
+                            <span className="font-display text-headline-lg font-bold text-light-on-surface dark:text-dark-on-surface">
+                              {reviewStats.averageRating.toFixed(1)}
+                            </span>
+                            <RatingDisplay rating={reviewStats.averageRating} size="lg" showNumber={false} />
+                          </div>
+                          <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                            Based on {reviewStats.totalReviews} review{reviewStats.totalReviews !== 1 ? 's' : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Rating Distribution */}
+                      <div className="space-y-2">
+                        {[5, 4, 3, 2, 1].map((rating) => {
+                          const count = reviewStats.ratingDistribution[rating] || 0;
+                          const percentage = reviewStats.totalReviews > 0 
+                            ? (count / reviewStats.totalReviews) * 100 
+                            : 0;
+                          return (
+                            <div key={rating} className="flex items-center space-x-2">
+                              <span className="text-body-sm text-light-on-surface dark:text-dark-on-surface w-8">
+                                {rating} <Star className="inline w-3 h-3 fill-warning text-warning" />
+                              </span>
+                              <div className="flex-1 bg-light-surface dark:bg-dark-surface rounded-full h-2 overflow-hidden">
+                                <div
+                                  className="bg-warning h-full transition-all duration-300"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                              <span className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant w-12 text-right">
+                                {count}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Reviews List */}
+                  <div className="space-y-4">
+                    {reviews.length > 0 ? (
+                      reviews.map((review) => (
+                        <motion.div
+                          key={review.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="border border-light-outline dark:border-dark-outline rounded-lg p-4"
+                        >
+                          <div className="flex items-start space-x-3 mb-3">
+                            <ReviewerAvatar 
+                              mediaUrl={review.reviewer?.mediaUrls?.[0]} 
+                              username={review.reviewer?.username || 'Anonymous'} 
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <h4 className="text-body-md font-semibold text-light-on-surface dark:text-dark-on-surface">
+                                  {review.reviewer?.username || 'Anonymous'}
+                                </h4>
+                                <span className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                                  {formatDate(review.createdAt)}
+                                </span>
+                              </div>
+                              <RatingDisplay rating={review.rating} size="sm" showNumber={false} />
+                            </div>
+                          </div>
+                          <p className="text-body-md text-light-on-surface dark:text-dark-on-surface leading-relaxed ml-13">
+                            {review.comment}
+                          </p>
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <Star className="w-12 h-12 text-light-on-surface-variant dark:text-dark-on-surface-variant mx-auto mb-3 opacity-50" />
+                        <p className="text-body-md text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                          No reviews yet. Be the first to review this accommodation!
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {reviews.length > 0 && reviews.length >= 10 && (
+                    <div className="mt-6 text-center">
+                      <button className="btn-outline px-6 py-2 rounded-lg">
+                        Load More Reviews
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -662,10 +926,145 @@ export default function AccommodationDetailPage() {
                   </div>
                 )}
               </div>
+
+              {/* View on Google Maps Button */}
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(accommodation.location)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 w-full btn-outline px-4 py-3 rounded-lg flex items-center justify-center space-x-2 hover:bg-primary hover:text-white transition-all"
+              >
+                <MapPin className="w-5 h-5" />
+                <span>View on Google Maps</span>
+              </a>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Report Modal */}
+      <AnimatePresence>
+        {showReportModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => {
+              setShowReportModal(false);
+              setReportError(null);
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="card p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-display text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface">
+                    Report Accommodation
+                  </h3>
+                  <p className="text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                    Help us maintain quality by reporting issues
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowReportModal(false);
+                    setReportError(null);
+                  }}
+                  className="p-2 hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-body-sm font-medium mb-2 text-light-on-surface dark:text-dark-on-surface">
+                    Reason for Report *
+                  </label>
+                  <select
+                    value={reportReason}
+                    onChange={(e) => setReportReason(e.target.value)}
+                    className="input w-full"
+                    disabled={reportLoading}
+                  >
+                    <option value="">Select a reason</option>
+                    <option value="Inaccurate information">Inaccurate information</option>
+                    <option value="Safety concerns">Safety concerns</option>
+                    <option value="Misleading photos">Misleading photos</option>
+                    <option value="Property doesn't exist">Property doesn't exist</option>
+                    <option value="Inappropriate content">Inappropriate content</option>
+                    <option value="Pricing issues">Pricing issues</option>
+                    <option value="Poor maintenance">Poor maintenance</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-body-sm font-medium mb-2 text-light-on-surface dark:text-dark-on-surface">
+                    Description *
+                  </label>
+                  <textarea
+                    value={reportDescription}
+                    onChange={(e) => setReportDescription(e.target.value)}
+                    placeholder="Please provide details about your concern (minimum 10 characters)"
+                    rows={5}
+                    className="input w-full resize-none"
+                    disabled={reportLoading}
+                    minLength={10}
+                    maxLength={1000}
+                  />
+                  <p className="text-body-xs text-light-on-surface-variant dark:text-dark-on-surface-variant mt-1">
+                    {reportDescription.length}/1000 characters
+                  </p>
+                </div>
+
+                {reportError && (
+                  <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-600 dark:text-red-400">{reportError}</p>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowReportModal(false);
+                      setReportError(null);
+                    }}
+                    disabled={reportLoading}
+                    className="flex-1 py-3 rounded-lg border border-light-outline dark:border-dark-outline hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleReportSubmit}
+                    disabled={reportLoading || !reportReason || !reportDescription}
+                    className="flex-1 bg-error text-white py-3 rounded-lg flex items-center justify-center space-x-2 disabled:opacity-50 hover:bg-error/90 transition-colors"
+                  >
+                    {reportLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="w-5 h-5" />
+                        <span>Submit Report</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Booking Modal */}
       <AnimatePresence>

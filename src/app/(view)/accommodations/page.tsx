@@ -600,25 +600,7 @@ const AccommodationsPage = () => {
           </div>
         )}
 
-        {/* Coming Soon Notice */}
-        <div className="mt-6 sm:mt-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="card shadow-lg rounded-lg border border-primary/20 bg-light-surface-variant/30 dark:bg-dark-surface-variant/30 p-3 sm:p-4"
-          >
-            <div className="text-center">
-              <Shield className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 text-primary" />
-              <h3 className="font-display text-headline-sm sm:text-headline-md font-bold text-light-on-surface dark:text-dark-on-surface mb-1 sm:mb-2">
-                Coming Soon
-              </h3>
-              <p className="text-body-xs sm:text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant max-w-xl mx-auto">
-                Full accommodation booking functionality is under development. Stay tuned for our complete booking system!
-              </p>
-            </div>
-          </motion.div>
-        </div>
+       
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ const router = useRouter();
   const [map, setMap] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const [geocoder, setGeocoder] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
   const mapRef = useRef(null);
   
   const today = new Date().toISOString().split('T')[0];
@@ -81,12 +82,37 @@ const router = useRouter();
     }
   };
   
+  // Get user's current location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.log('Error getting user location:', error);
+          // Fall back to default location (Pakistan) if geolocation fails
+          setUserLocation({ lat: 33.6844, lng: 73.0479 });
+        }
+      );
+    } else {
+      // Geolocation not supported, use default location
+      setUserLocation({ lat: 33.6844, lng: 73.0479 });
+    }
+  }, []);
+
   useEffect(() => {
     // Check if API key is available
     if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
       console.error('Google Maps API key is not configured. Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your environment variables.');
       return;
     }
+
+    // Wait for user location to be available
+    if (!userLocation) return;
 
     if (window.google?.maps) {
       initMap();
@@ -109,15 +135,14 @@ const router = useRouter();
         document.head.removeChild(script);
       }
     };
-  }, []);
+  }, [userLocation]);
   
   const initMap = () => {
-    if (!mapRef.current || loaded) return;
+    if (!mapRef.current || loaded || !userLocation) return;
 
-    const pakistanLocation = { lat: 33.6844, lng: 73.0479 };
     const mapOptions = {
-      center: pakistanLocation,
-      zoom: 12,
+      center: userLocation,
+      zoom: 14,
       mapTypeControl: false,
       streetViewControl: false,
       fullscreenControl: false,

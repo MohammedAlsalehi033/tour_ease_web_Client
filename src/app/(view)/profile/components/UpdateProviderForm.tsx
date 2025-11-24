@@ -1,14 +1,38 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { container } from '@/app/lib/diContainer';
 import { TransformationProviderController } from '@/app/(controller)/rideSharing/transportationProviderContrroller';
+
+// Vehicle type configurations
+const vehicleConfigs = {
+  car: { minSeats: 1, maxSeats: 7, showModel: true, label: 'Car' },
+  van: { minSeats: 4, maxSeats: 15, showModel: true, label: 'Van' },
+  bus: { minSeats: 10, maxSeats: 60, showModel: true, label: 'Bus' },
+  motorcycle: { minSeats: 1, maxSeats: 1, showModel: true, label: 'Motorcycle' },
+  bike: { minSeats: 1, maxSeats: 2, showModel: false, label: 'Bike' },
+  other: { minSeats: 1, maxSeats: 20, showModel: false, label: 'Other' }
+};
 
 interface UpdateProviderFormProps {
   providerId: string;
   currentVehicleType: string;
   currentSeatsAvailable: number;
   onUpdate?: () => void;
+}
+
+// Parse the combined vehicle type string
+function parseVehicleType(combinedType: string) {
+  const plateMatch = combinedType.match(/\(Plate: ([^)]+)\)/);
+  const plateNumber = plateMatch ? plateMatch[1] : '';
+  
+  let typeAndModel = combinedType.replace(/\s*\(Plate: [^)]+\)\s*/, '').trim();
+  const parts = typeAndModel.split(' - ');
+  
+  const baseType = parts[0].toLowerCase();
+  const vehicleModel = parts[1] || '';
+  
+  return { baseType, vehicleModel, plateNumber };
 }
 
 export default function UpdateProviderForm({
@@ -22,8 +46,12 @@ export default function UpdateProviderForm({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const parsedData = parseVehicleType(currentVehicleType);
+  
   const [formData, setFormData] = useState({
-    vehicleType: currentVehicleType,
+    vehicleType: parsedData.baseType in vehicleConfigs ? parsedData.baseType : 'car',
+    vehicleModel: parsedData.vehicleModel,
+    plateNumber: parsedData.plateNumber,
     seatsAvailable: currentSeatsAvailable,
   });
 
@@ -32,14 +60,22 @@ export default function UpdateProviderForm({
   const [licensePreview, setLicensePreview] = useState<string[]>([]);
   const [vehiclePreview, setVehiclePreview] = useState<string[]>([]);
 
-  const vehicleTypes = ['Car', 'Van', 'SUV', 'Bus', 'Minibus', 'Motorcycle'];
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'seatsAvailable' ? parseInt(value) || 0 : value
-    }));
+    
+    // Reset seats when vehicle type changes
+    if (name === 'vehicleType') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        seatsAvailable: 0
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: name === 'seatsAvailable' ? parseInt(value) || 0 : value
+      }));
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'license' | 'vehicle') => {
@@ -80,12 +116,21 @@ export default function UpdateProviderForm({
         return;
       }
 
+      // Combine vehicle type with model and plate number
+      let combinedVehicleType = formData.vehicleType;
+      if (formData.vehicleModel) {
+        combinedVehicleType += ` - ${formData.vehicleModel}`;
+      }
+      if (formData.plateNumber) {
+        combinedVehicleType += ` (Plate: ${formData.plateNumber})`;
+      }
+
       const controller = container.resolve(TransformationProviderController);
       
       await controller.updateTransformationProvider(
         providerId,
         formData.seatsAvailable,
-        formData.vehicleType,
+        combinedVehicleType,
         vehicleMedia,
         licenseMedia
       );
@@ -119,8 +164,11 @@ export default function UpdateProviderForm({
 
   const handleCancel = () => {
     setIsEditing(false);
+    const parsedData = parseVehicleType(currentVehicleType);
     setFormData({
-      vehicleType: currentVehicleType,
+      vehicleType: parsedData.baseType in vehicleConfigs ? parsedData.baseType : 'car',
+      vehicleModel: parsedData.vehicleModel,
+      plateNumber: parsedData.plateNumber,
       seatsAvailable: currentSeatsAvailable,
     });
     
@@ -180,11 +228,51 @@ export default function UpdateProviderForm({
             required
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800"
           >
-            <option value="">Select a vehicle type</option>
-            {vehicleTypes.map(type => (
-              <option key={type} value={type}>{type}</option>
+            {Object.entries(vehicleConfigs).map(([key, config]) => (
+              <option key={key} value={key}>{config.label}</option>
             ))}
           </select>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {formData.vehicleType === 'bike' 
+              ? 'Bikes are not motorized vehicles'
+              : `Allowed seats: ${vehicleConfigs[formData.vehicleType as keyof typeof vehicleConfigs].minSeats}-${vehicleConfigs[formData.vehicleType as keyof typeof vehicleConfigs].maxSeats}`}
+          </p>
+        </div>
+
+        {/* Vehicle Model - Only for motorized vehicles */}
+        {vehicleConfigs[formData.vehicleType as keyof typeof vehicleConfigs].showModel && (
+          <div>
+            <label htmlFor="vehicleModel" className="block text-body-md font-medium mb-2">
+              Vehicle Model {formData.vehicleType !== 'other' && <span className="text-red-500">*</span>}
+            </label>
+            <input
+              type="text"
+              id="vehicleModel"
+              name="vehicleModel"
+              value={formData.vehicleModel}
+              onChange={handleInputChange}
+              placeholder={`e.g., ${formData.vehicleType === 'car' ? 'Toyota Camry 2020' : formData.vehicleType === 'motorcycle' ? 'Honda CBR 500R' : formData.vehicleType === 'bus' ? 'Mercedes Sprinter' : 'Enter model'}`}
+              required={formData.vehicleType !== 'other'}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800"
+            />
+          </div>
+        )}
+
+        {/* Plate Number */}
+        <div>
+          <label htmlFor="plateNumber" className="block text-body-md font-medium mb-2">
+            License Plate Number <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="plateNumber"
+            name="plateNumber"
+            value={formData.plateNumber}
+            onChange={handleInputChange}
+            placeholder="e.g., ABC-1234"
+            required
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800"
+          />
         </div>
 
         {/* Seats Available */}
@@ -198,11 +286,14 @@ export default function UpdateProviderForm({
             name="seatsAvailable"
             value={formData.seatsAvailable}
             onChange={handleInputChange}
-            min="1"
-            max="50"
+            min={vehicleConfigs[formData.vehicleType as keyof typeof vehicleConfigs].minSeats}
+            max={vehicleConfigs[formData.vehicleType as keyof typeof vehicleConfigs].maxSeats}
             required
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800"
           />
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            For {vehicleConfigs[formData.vehicleType as keyof typeof vehicleConfigs].label}: {vehicleConfigs[formData.vehicleType as keyof typeof vehicleConfigs].minSeats}-{vehicleConfigs[formData.vehicleType as keyof typeof vehicleConfigs].maxSeats} seats
+          </p>
         </div>
 
         {/* License Media */}

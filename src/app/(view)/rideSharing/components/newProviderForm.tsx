@@ -6,6 +6,16 @@ import { container } from '@/app/lib/diContainer';
 import { TransformationProviderController } from '@/app/(controller)/rideSharing/transportationProviderContrroller';
 import { useSession } from "next-auth/react";
 
+// Vehicle type configurations
+const vehicleConfigs = {
+  car: { minSeats: 1, maxSeats: 7, showModel: true, label: 'Car' },
+  van: { minSeats: 4, maxSeats: 15, showModel: true, label: 'Van' },
+  bus: { minSeats: 10, maxSeats: 60, showModel: true, label: 'Bus' },
+  motorcycle: { minSeats: 1, maxSeats: 1, showModel: true, label: 'Motorcycle' },
+  bike: { minSeats: 1, maxSeats: 2, showModel: false, label: 'Bike' },
+  other: { minSeats: 1, maxSeats: 20, showModel: false, label: 'Other' }
+};
+
 const TransportationProviderForm = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
@@ -13,6 +23,8 @@ const TransportationProviderForm = () => {
   const [formData, setFormData] = useState({
     seatsAvailable: '',
     vehicleType: 'car',
+    vehicleModel: '',
+    plateNumber: '',
     licenseMedia: [],
     vehicleMedia: []
   });
@@ -23,10 +35,20 @@ const TransportationProviderForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    
+    // Reset seats when vehicle type changes
+    if (name === 'vehicleType') {
+      setFormData({
+        ...formData,
+        [name]: value,
+        seatsAvailable: ''
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
   
   const handleFileChange = (e) => {
@@ -44,10 +66,20 @@ const TransportationProviderForm = () => {
     
     try {
       const transformationProviderController = container.resolve(TransformationProviderController);
+      
+      // Combine vehicle type with model and plate number
+      let combinedVehicleType = formData.vehicleType;
+      if (formData.vehicleModel) {
+        combinedVehicleType += ` - ${formData.vehicleModel}`;
+      }
+      if (formData.plateNumber) {
+        combinedVehicleType += ` (Plate: ${formData.plateNumber})`;
+      }
+      
       const transformationProviderModel = {
         userId: userId,
         role: "transportationProvider",
-        vehicleType: formData.vehicleType,
+        vehicleType: combinedVehicleType,
         seatsAvailable: formData.seatsAvailable
       };
 
@@ -98,12 +130,51 @@ const TransportationProviderForm = () => {
                 className="input w-full p-3 border border-light-outline dark:border-dark-outline rounded-md bg-light-surface dark:bg-dark-surface text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 required
               >
-                <option value="car">Car</option>
-                <option value="van">Van</option>
-                <option value="bus">Bus</option>
-                <option value="motorcycle">Motorcycle</option>
-                <option value="other">Other</option>
+                {Object.entries(vehicleConfigs).map(([key, config]) => (
+                  <option key={key} value={key}>{config.label}</option>
+                ))}
               </select>
+              <p className="mt-1 text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                {formData.vehicleType === 'bike' 
+                  ? 'Bikes are not motorized vehicles'
+                  : `Allowed seats: ${vehicleConfigs[formData.vehicleType].minSeats}-${vehicleConfigs[formData.vehicleType].maxSeats}`}
+              </p>
+            </div>
+
+            {/* Vehicle Model - Only for motorized vehicles */}
+            {vehicleConfigs[formData.vehicleType].showModel && (
+              <div>
+                <label className="block text-title-md mb-2 text-light-on-surface dark:text-dark-on-surface" htmlFor="vehicleModel">
+                  Vehicle Model {formData.vehicleType !== 'other' && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  type="text"
+                  id="vehicleModel"
+                  name="vehicleModel"
+                  value={formData.vehicleModel}
+                  onChange={handleInputChange}
+                  placeholder={`e.g., ${formData.vehicleType === 'car' ? 'Toyota Camry 2020' : formData.vehicleType === 'motorcycle' ? 'Honda CBR 500R' : formData.vehicleType === 'bus' ? 'Mercedes Sprinter' : 'Enter model'}`}
+                  className="input w-full p-3 border border-light-outline dark:border-dark-outline rounded-md bg-light-surface dark:bg-dark-surface text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                  required={formData.vehicleType !== 'other'}
+                />
+              </div>
+            )}
+
+            {/* Plate Number */}
+            <div>
+              <label className="block text-title-md mb-2 text-light-on-surface dark:text-dark-on-surface" htmlFor="plateNumber">
+                License Plate Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="plateNumber"
+                name="plateNumber"
+                value={formData.plateNumber}
+                onChange={handleInputChange}
+                placeholder="e.g., ABC-1234"
+                className="input w-full p-3 border border-light-outline dark:border-dark-outline rounded-md bg-light-surface dark:bg-dark-surface text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                required
+              />
             </div>
             
             {/* Seats Available */}
@@ -117,10 +188,13 @@ const TransportationProviderForm = () => {
                 onChange={handleInputChange}
                 placeholder="Number of available seats"
                 className="input w-full p-3 border border-light-outline dark:border-dark-outline rounded-md bg-light-surface dark:bg-dark-surface text-light-on-surface dark:text-dark-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-                min="1"
-                max="8"
+                min={vehicleConfigs[formData.vehicleType].minSeats}
+                max={vehicleConfigs[formData.vehicleType].maxSeats}
                 required
               />
+              <p className="mt-1 text-body-sm text-light-on-surface-variant dark:text-dark-on-surface-variant">
+                For {vehicleConfigs[formData.vehicleType].label}: {vehicleConfigs[formData.vehicleType].minSeats}-{vehicleConfigs[formData.vehicleType].maxSeats} seats
+              </p>
             </div>
             
             <div className="divider border-t border-light-outline dark:border-dark-outline my-4"></div>

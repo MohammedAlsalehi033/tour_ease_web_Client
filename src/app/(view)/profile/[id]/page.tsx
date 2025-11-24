@@ -11,8 +11,9 @@ import OtherAvatarPic from '../../components/otherAvatarPic';
 import ReportUserButton from '../../components/ReportUserButton';
 import ProviderRatingDisplay from '../../components/ProviderRatingDisplay';
 import DriverReviewsSection from '../../components/DriverReviewsSection';
-import { Home, MapPin, Users, Calendar, Star } from 'lucide-react';
+import { Home, MapPin, Users, Calendar, Star, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
+import { normalizeImageUrl, DEFAULT_IMAGE_PLACEHOLDER } from '@/app/lib/mediaUtils';
 
 // This is the page that displays another user's profile.
 const UserProfilePage = ({ params }: { params: { id: string } }) => {
@@ -181,13 +182,13 @@ const UserProfilePage = ({ params }: { params: { id: string } }) => {
                   <div className="relative h-48 w-full overflow-hidden">
                     {accommodation.mediaUrls && accommodation.mediaUrls.length > 0 ? (
                       <Image
-                        src={accommodation.mediaUrls[0].startsWith('http') 
-                          ? accommodation.mediaUrls[0] 
-                          : `${process.env.NEXT_PUBLIC_API_BASE_URL}/${accommodation.mediaUrls[0]}`
-                        }
+                        src={normalizeImageUrl(accommodation.mediaUrls[0]) || DEFAULT_IMAGE_PLACEHOLDER}
                         alt={accommodation.name}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          e.currentTarget.src = DEFAULT_IMAGE_PLACEHOLDER;
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
@@ -210,9 +211,21 @@ const UserProfilePage = ({ params }: { params: { id: string } }) => {
                       </h3>
                       <div className="flex items-start gap-1.5 mt-1">
                         <MapPin className="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {accommodation.location}
-                        </p>
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                            {accommodation.location}
+                          </p>
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(accommodation.location)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-variant transition-colors mt-1"
+                          >
+                            <span>View on Google Maps</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
                       </div>
                     </div>
 

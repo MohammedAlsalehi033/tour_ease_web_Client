@@ -11,11 +11,20 @@ import EnhancedRideListings from './EnhancedRideListings';
 import EnhancedRideRequests from './EnhancedRideRequests';
 import TransportationProviderForm from './newProviderForm';
 
+interface TransportationProvider {
+  id: string;
+  accountStatus: 'pending' | 'active' | 'rejected';
+  vehicleType?: string;
+  seatsAvailable?: number;
+  [key: string]: any;
+}
+
 interface SimplifiedRideHubProps {
   rideListings: RideListing[];
   rideRequests?: RideRequest[];
   initialMode?: UserMode;
   isTransportationProvider: boolean;
+  transportationProvider?: TransportationProvider | null;
 }
 
 type UserMode = 'driver' | 'traveler';
@@ -26,7 +35,8 @@ const SimplifiedRideHub: React.FC<SimplifiedRideHubProps> = ({
   rideListings,
   rideRequests = [],
   initialMode = 'traveler',
-  isTransportationProvider
+  isTransportationProvider,
+  transportationProvider
 }) => {
   const [userMode, setUserMode] = useState<UserMode>(initialMode);
   const [driverView, setDriverView] = useState<DriverView>('browse-requests');
@@ -138,6 +148,48 @@ const SimplifiedRideHub: React.FC<SimplifiedRideHubProps> = ({
             >
               {!isTransportationProvider ? (
                 <TransportationProviderForm />
+              ) : transportationProvider?.accountStatus === 'pending' ? (
+                <div className="card rounded-2xl p-8 text-center shadow-lg">
+                  <div className="mb-6">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-yellow-100 flex items-center justify-center">
+                      <svg className="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-primary mb-2">Account Under Review</h2>
+                    <p className="text-lg" style={{ color: 'rgba(var(--text), 0.7)' }}>
+                      Your transportation provider application is currently being reviewed by our team.
+                    </p>
+                  </div>
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+                    <p className="text-sm" style={{ color: 'rgba(var(--text), 0.6)' }}>
+                      This usually takes 24-48 hours. We'll notify you once your account has been approved.
+                    </p>
+                  </div>
+                  <p className="text-sm" style={{ color: 'rgba(var(--text), 0.5)' }}>
+                    In the meantime, you can still browse and book rides as a traveler.
+                  </p>
+                </div>
+              ) : transportationProvider?.accountStatus === 'rejected' ? (
+                <div className="card rounded-2xl p-8 text-center shadow-lg">
+                  <div className="mb-6">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+                      <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-red-600 mb-2">Application Not Approved</h2>
+                    <p className="text-lg" style={{ color: 'rgba(var(--text), 0.7)' }}>
+                      Unfortunately, your transportation provider application was not approved.
+                    </p>
+                  </div>
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                    <p className="text-sm" style={{ color: 'rgba(var(--text), 0.6)' }}>
+                      This may be due to incomplete documentation or verification issues. Please contact support for more details or to submit a new application.
+                    </p>
+                  </div>
+                
+                </div>
               ) : (
                 <>
                   {/* Driver Sub-Navigation - Responsive */}

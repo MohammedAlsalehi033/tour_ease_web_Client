@@ -32,7 +32,7 @@ export const SearchForm = ({ onSearch }: { onSearch: (params: TripPlannerSearchP
     budget: 500000,
     numberOfTravelers: 2,
     interests: [] as string[],
-    needsReturnTransport: true
+    needsReturnTransport: false
   });
 
   const interestOptions = [

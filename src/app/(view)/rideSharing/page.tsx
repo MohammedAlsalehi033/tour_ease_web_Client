@@ -205,6 +205,7 @@ export default async function Page(
     const rideRequestController = container.resolve(RideRequestController);
     const userController = container.resolve(UserController);
     const offerController = container.resolve(OfferController);
+    const transportationProviderController = container.resolve(TransformationProviderController);
 
     // Get user data and validate
     const userData = await userController.getUserById(session.user.id);
@@ -251,6 +252,16 @@ export default async function Page(
 
     // Check if user is a transportation provider
     const isTransportationProvider = userData.roles.some(role => role === "transportationProvider");
+    
+    // Fetch transportation provider details if user has the role
+    let transportationProviderData = null;
+    if (isTransportationProvider) {
+      try {
+        transportationProviderData = await transportationProviderController.getTransformationProviderById(session.user.id);
+      } catch (error) {
+        console.error("Error fetching transportation provider data:", error);
+      }
+    }
 
     return (
       <div>
@@ -259,6 +270,7 @@ export default async function Page(
           rideRequests={rideRequests}
           initialMode={searchData.userMode}
           isTransportationProvider={isTransportationProvider}
+          transportationProvider={transportationProviderData}
         />
       </div>
     );
