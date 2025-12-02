@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @font-face {
   font-family: 'Lina Round';
@@ -22,523 +22,553 @@
 
 /*
 ================================================================================
- BASE LAYER & THEME VARIABLES (:root)
-================================================================================
- This layer defines the core design tokens for the application, directly
- translating the theme from the Flutter `AppThemes.dart` file.
- - Colors are mapped from the Flutter `ColorScheme`.
- - Sizing variables for border radius are defined here.
- - Light and Dark mode variables are set up for theme switching.
+ MODERN DESIGN SYSTEM - BASE LAYER
 ================================================================================
 */
 @layer base {
   :root {
-    /* Font family variables */
-    --font-display: 'Poppins', sans-serif;
+    /* Typography */
+    --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Inter', sans-serif;
     --font-lina: 'Lina Round', sans-serif;
     --font-rounded: 'Rounded Mplus 1c', sans-serif;
 
-    /* Sizing variables from Flutter Theme */
-    --radius-standard: 12px; /* Flutter: _borderRadius = 12.0 */
-    --radius-button: 8px;   /* Flutter: _buttonBorderRadius = 8.0 */
+    /* Refined Spacing & Radius */
+    --radius-xs: 6px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
 
-    /* Light mode variables (blue theme) - Mapped from Flutter's light ColorScheme */
-    --primary: 33, 150, 243;      /* #2196F3 - Material Blue (_primaryColor) */
-    --secondary: 66, 165, 245;    /* #42A5F5 - Blue 400 (_secondaryColor) */
-    --primary-dark: 13, 71, 161;  /* #0D47A1 - Darker for hover (not in Flutter theme, but good for web) */
+    /* Light Theme - Refined Cyan Palette */
+    --primary: 8, 145, 178;           /* Cyan 600 - More sophisticated */
+    --primary-light: 34, 211, 238;    /* Cyan 400 */
+    --primary-dark: 21, 94, 117;      /* Cyan 700 */
     
-    --error: 229, 57, 53;         /* #E53935 - Red 600 (_errorColor) */
-    --success: 67, 160, 71;       /* #43A047 - Green 600 (_successColor) */
-    --warning: 255, 160, 0;       /* #FFA000 - Amber 700 (_warningColor) */
-    --info: 2, 136, 209;          /* #0288D1 - Light Blue 700 (_infoColor) */
+    --accent: 99, 102, 241;           /* Indigo 500 - Elegant contrast */
     
-    --background: 245, 245, 245;  /* #F5F5F5 - Flutter: background */
-    --surface: 255, 255, 255;     /* #FFFFFF - Flutter: surface */
-    --text: 0, 0, 0, 0.87;        /* Black87 - Flutter: onSurface / onBackground */
+    --error: 239, 68, 68;
+    --success: 34, 197, 94;
+    --warning: 245, 158, 11;
+    --info: 59, 130, 246;
     
-    /* Gradient for button animations */
-    --gradient-primary: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
+    --background: 255, 255, 255;      /* Pure white */
+    --surface: 249, 250, 251;         /* Gray 50 */
+    --surface-elevated: 255, 255, 255;
+    --border: 229, 231, 235;          /* Gray 200 */
+    
+    --text-primary: 17, 24, 39;       /* Gray 900 */
+    --text-secondary: 107, 114, 128;  /* Gray 500 */
+    --text-tertiary: 156, 163, 175;   /* Gray 400 */
+    
+    /* Shadows - Refined and subtle */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    /* Dark mode variables - Mapped from Flutter's dark ColorScheme */
-    --primary: 33, 150, 243;      /* Same blue for consistency */
-    --secondary: 66, 165, 245;    /* Same blue light */
-    --primary-dark: 13, 71, 161;  /* Same blue dark */
+    /* Dark Theme - Deep and Sophisticated */
+    --primary: 34, 211, 238;          /* Cyan 400 - Brighter in dark mode */
+    --primary-light: 103, 232, 249;   /* Cyan 300 */
+    --primary-dark: 8, 145, 178;      /* Cyan 600 */
     
-    --background: 18, 18, 18;     /* #121212 - Flutter: background */
-    --surface: 32, 32, 32;        /* #202020 - Flutter: surface */
-    --text: 255, 255, 255;        /* White - Flutter: onSurface / onBackground */
+    --accent: 129, 140, 248;          /* Indigo 400 */
+    
+    --background: 9, 9, 11;           /* Zinc 950 */
+    --surface: 24, 24, 27;            /* Zinc 900 */
+    --surface-elevated: 39, 39, 42;   /* Zinc 800 */
+    --border: 39, 39, 42;             /* Zinc 800 */
+    
+    --text-primary: 250, 250, 250;    /* Zinc 50 */
+    --text-secondary: 161, 161, 170;  /* Zinc 400 */
+    --text-tertiary: 113, 113, 122;   /* Zinc 500 */
+    
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.5);
   }
 
   body {
     background-color: rgb(var(--background));
-    color: rgb(var(--text));
-    @apply transition-colors duration-200;
+    color: rgb(var(--text-primary));
     font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply transition-colors duration-300;
   }
 
-  /* Typography mapping from Flutter's TextTheme */
+  /* Typography System */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    color: rgb(var(--text-primary));
   }
 
   h1 {
-    /* Matches displaySmall: fontSize: 24, fontWeight: bold */
-    @apply text-2xl font-bold;
-    color: rgb(var(--primary));
+    @apply text-4xl lg:text-5xl;
   }
 
   h2 {
-    /* Matches headlineMedium: fontSize: 20, fontWeight: w600 */
-    @apply text-xl font-semibold;
-    color: rgb(var(--text));
+    @apply text-3xl lg:text-4xl;
   }
 
   h3 {
-    /* Matches headlineSmall: fontSize: 18, fontWeight: w600 */
-    @apply text-lg font-semibold;
-     color: rgb(var(--text));
+    @apply text-2xl lg:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl lg:text-2xl;
+  }
+
+  h5 {
+    @apply text-lg lg:text-xl;
+  }
+
+  h6 {
+    @apply text-base lg:text-lg;
+  }
+
+  p {
+    @apply leading-relaxed;
+    color: rgb(var(--text-secondary));
   }
 }
-
 
 /*
 ================================================================================
  COMPONENTS LAYER
 ================================================================================
- This layer defines reusable component classes. These classes are designed
- to match the styled widgets in the Flutter theme (Buttons, Cards, Inputs, etc.).
- They use the variables defined in the :root for consistency.
-================================================================================
 */
 @layer components {
 
-  /* Tabs Component */
-  .tabs {
-    @apply flex overflow-x-auto;
-    background-color: rgb(var(--surface));
-  }
-  .tabs > *:not(:last-child) {
-    @apply border-r;
-    border-color: rgba(var(--text), 0.1);
-  }
-   .tabs > *:not(:last-child):hover {
-    border-color: rgba(var(--text), 0.2);
-  }
-
-  .tab {
-    /* Matches bodyLarge: fontSize: 16, and titleLarge: fontWeight: w600 */
-    @apply px-4 py-2 text-base font-semibold transition-colors duration-200;
-    color: rgb(var(--text));
-    background-color: rgb(var(--surface));
-  }
-  .tab:hover {
-     background-color: rgba(var(--surface), 0.8);
-  }
-
-  /* Enhanced Base Button Style with Smooth Animations */
+  /* Modern Button System */
   .btn {
-    /* Matches _baseButtonStyle: padding & button border radius */
-    @apply px-6 py-3 font-medium relative overflow-hidden;
-    border-radius: var(--radius-button);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-style: preserve-3d;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 
+           font-medium text-sm relative overflow-hidden
+           transition-all duration-200 ease-out
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
+    border-radius: var(--radius-sm);
   }
-  
-  /* Shimmer effect for all buttons */
-  .btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.6s ease;
-  }
-  
-  .btn:hover::before {
-    left: 100%;
-  }
-  
-  .btn:active {
-    transform: scale(0.97);
-    transition: transform 0.1s ease;
-  }
-  
-  /* Enhanced Primary Button (ElevatedButton) with Gradient Option */
+
   .btn-primary {
     @apply btn text-white;
-    background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 50%, rgb(var(--primary)) 100%);
-    background-size: 200% auto;
-    box-shadow: 0 4px 12px rgba(var(--primary), 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--primary-light)) 100%);
+    box-shadow: var(--shadow-sm);
   }
-  
-  .btn-primary:hover {
-    background-position: right center;
-    box-shadow: 0 6px 20px rgba(var(--primary), 0.4);
-    transform: translateY(-2px);
-  }
-  
-  .btn-primary:disabled {
-    @apply opacity-40 cursor-not-allowed;
-    transform: none;
-  }
-  
-  /* Enhanced Outlined Button with Hover Fill Effect */
-  .btn-outlined {
-    @apply btn bg-transparent border-2;
-    border-color: rgb(var(--primary));
-    color: rgb(var(--primary));
-    position: relative;
-    z-index: 1;
-  }
-  
-  .btn-outlined::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0;
-    height: 100%;
-    background-color: rgba(var(--primary), 0.1);
-    transition: width 0.3s ease;
-    z-index: -1;
-    border-radius: inherit;
-  }
-  
-  .btn-outlined:hover::after {
-    width: 100%;
-  }
-  
-  .btn-outlined:hover {
-    box-shadow: 0 4px 12px rgba(var(--primary), 0.2);
+
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: var(--shadow-md);
     transform: translateY(-1px);
   }
-  
-  .btn-outlined:disabled {
-    @apply opacity-40 cursor-not-allowed;
-  }
-  
-  /* Enhanced Text Button with Underline Animation */
-  .btn-text {
-    @apply btn bg-transparent;
-    color: rgb(var(--primary));
-    position: relative;
-  }
-  
-  .btn-text::after {
-    content: '';
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: var(--gradient-primary);
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-  }
-  
-  .btn-text:hover::after {
-    width: calc(100% - 48px); /* Accounting for padding */
-  }
-  
-  .btn-text:hover {
-    background-color: rgba(var(--primary), 0.05);
-  }
-  
-  .btn-text:disabled {
-    @apply opacity-40 cursor-not-allowed;
-  }
-  
-  /* Card Component with Animation */
-  .card {
-    /* Matches CardTheme: elevation, margin, shape, color */
-    @apply p-4 m-2 shadow-md dark:shadow-lg transition-all duration-300;
-    background-color: rgb(var(--surface));
-    border-radius: var(--radius-standard);
-  }
-  .card:hover {
-    /* Added lift animation on hover */
-    @apply shadow-xl transform -translate-y-1;
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
   }
 
-  /* Chat Message (Styled like a card) */
-  .chat-message {
-    @apply p-4 m-2 w-1/2 shadow-md dark:shadow-lg transition-shadow duration-200;
-    border-radius: var(--radius-standard);
+  .btn-primary:focus-visible {
+    @apply ring-primary/20;
   }
-  
-  /* Input Field with Animation */
+
+  .btn-secondary {
+    @apply btn;
+    background-color: rgb(var(--surface));
+    color: rgb(var(--text-primary));
+    border: 1px solid rgb(var(--border));
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background-color: rgb(var(--surface-elevated));
+    border-color: rgb(var(--primary));
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent;
+    color: rgb(var(--text-secondary));
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: rgb(var(--surface));
+    color: rgb(var(--text-primary));
+  }
+
+  .btn-accent {
+    @apply btn text-white;
+    background-color: rgb(var(--accent));
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-accent:hover:not(:disabled) {
+    filter: brightness(1.1);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
+  /* Size Variants */
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  /* Modern Card System */
+  .card {
+    @apply p-6 transition-all duration-300;
+    background-color: rgb(var(--surface));
+    border: 1px solid rgb(var(--border));
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .card-elevated {
+    @apply card;
+    background-color: rgb(var(--surface-elevated));
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-flat {
+    @apply card shadow-none border-0;
+  }
+
+  /* Input System */
   .input {
-    /* Matches InputDecorationTheme: fill, border, padding */
-    @apply border focus:border-2 focus:outline-none px-4 py-4 text-base transition-all duration-300;
-    background-color: rgba(var(--surface), 0.8);
-    border-color: rgba(var(--primary), 0.2);
-    color: rgb(var(--text));
-    border-radius: var(--radius-standard);
+    @apply w-full px-4 py-3 text-sm
+           transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-offset-0;
+    background-color: rgb(var(--surface));
+    border: 1px solid rgb(var(--border));
+    border-radius: var(--radius-sm);
+    color: rgb(var(--text-primary));
   }
-  .dark .input {
-    background-color: rgba(var(--surface), 0.5);
-  }
+
   .input:focus {
     border-color: rgb(var(--primary));
-    /* Added glow effect on focus */
-    box-shadow: 0 0 0 3px rgba(var(--primary), 0.2);
-  }
-  
-  /* Divider */
-  .divider {
-    /* Matches DividerTheme */
-    @apply h-px my-4;
-    background-color: rgba(var(--text), 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--primary), 0.1);
   }
 
-  /* Scrollbar Hide Utility */
-  .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari and Opera */
+  .input::placeholder {
+    color: rgb(var(--text-tertiary));
   }
 
-  /* Slide Up Animation */
-  @keyframes slide-up {
-    from {
-      transform: translateY(100px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  .animate-slide-up {
-    animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  
-  /* Checkbox */
-  .checkbox {
-    /* Matches CheckboxTheme */
-    @apply h-5 w-5;
-    accent-color: rgb(var(--primary));
-    border-radius: 4px;
-  }
-  
-  /* Switch */
-  .switch {
-    /* Matches SwitchTheme */
-    @apply relative inline-block h-6 w-11;
-  }
-  .switch input { @apply opacity-0 w-0 h-0; }
-  .switch .slider {
-    @apply absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 dark:bg-gray-600 transition-all rounded-full;
-  }
-  .switch .slider:before {
-    @apply absolute content-[''] h-5 w-5 left-0.5 bottom-0.5 bg-white transition-all rounded-full;
-  }
-  .switch input:checked + .slider {
-    background-color: rgba(var(--primary), 0.5);
-  }
-  .switch input:checked + .slider:before {
-    background-color: rgb(var(--primary));
-    transform: translateX(20px);
+  .input-error {
+    @apply input;
+    border-color: rgb(var(--error));
   }
 
-  /* App Bar */
-  .app-bar {
-    /* Matches AppBarTheme */
-    @apply border-b py-4 px-6 flex items-center;
-    background-color: rgb(var(--surface));
-    border-color: rgba(var(--text), 0.1);
-  }
-  
-  /* Bottom Sheet */
-  .bottom-sheet {
-    /* Matches BottomSheetTheme */
-    @apply p-6 shadow-lg;
-    background-color: rgb(var(--surface));
-    border-top-left-radius: var(--radius-standard);
-    border-top-right-radius: var(--radius-standard);
+  .input-error:focus {
+    border-color: rgb(var(--error));
+    box-shadow: 0 0 0 3px rgba(var(--error), 0.1);
   }
 
-  /* Badge Components */
+  /* Badge System */
   .badge {
-    @apply inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium;
+    border-radius: var(--radius-full);
   }
+
+  .badge-primary {
+    background-color: rgba(var(--primary), 0.1);
+    color: rgb(var(--primary));
+  }
+
+  .dark .badge-primary {
+    background-color: rgba(var(--primary), 0.15);
+    color: rgb(var(--primary-light));
+  }
+
   .badge-success {
     background-color: rgba(var(--success), 0.1);
     color: rgb(var(--success));
   }
+
   .dark .badge-success {
-    background-color: rgba(var(--success), 0.2);
+    background-color: rgba(var(--success), 0.15);
   }
+
   .badge-error {
     background-color: rgba(var(--error), 0.1);
     color: rgb(var(--error));
   }
+
   .dark .badge-error {
-    background-color: rgba(var(--error), 0.2);
+    background-color: rgba(var(--error), 0.15);
   }
+
+  .badge-warning {
+    background-color: rgba(var(--warning), 0.1);
+    color: #b45309;
+  }
+
+  .dark .badge-warning {
+    background-color: rgba(var(--warning), 0.15);
+    color: rgb(var(--warning));
+  }
+
   .badge-info {
     background-color: rgba(var(--info), 0.1);
     color: rgb(var(--info));
   }
+
   .dark .badge-info {
-    background-color: rgba(var(--info), 0.2);
-  }
-  .badge-warning {
-    background-color: rgba(var(--warning), 0.2);
-    color: #c28b00; /* Equivalent to text-yellow-800 */
-  }
-  .dark .badge-warning {
-    color: rgb(var(--warning));
+    background-color: rgba(var(--info), 0.15);
   }
 
-  /* Accordion content for smooth open/close */
-  .accordion-content {
-    @apply overflow-hidden transition-all duration-500 ease-in-out;
+  /* Modern Tabs */
+  .tabs {
+    @apply flex gap-1 p-1;
+    background-color: rgb(var(--surface));
+    border-radius: var(--radius-sm);
+    border: 1px solid rgb(var(--border));
   }
-  
-  /* Additional Modern Button Variants */
-  
-  /* Pulse Button - Great for CTAs */
-  .btn-pulse {
-    @apply btn-primary;
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  .tab {
+    @apply px-4 py-2 text-sm font-medium rounded-md transition-all duration-200;
+    color: rgb(var(--text-secondary));
   }
-  
-  /* Glow Button */
-  .btn-glow {
-    @apply btn-primary;
+
+  .tab:hover {
+    color: rgb(var(--text-primary));
+    background-color: rgba(var(--primary), 0.05);
   }
-  
-  .btn-glow:hover {
-    box-shadow: 0 0 20px rgba(var(--primary), 0.6),
-                0 0 40px rgba(var(--primary), 0.4);
+
+  .tab-active {
+    @apply tab;
+    color: rgb(var(--primary));
+    background-color: rgb(var(--background));
+    box-shadow: var(--shadow-sm);
   }
-  
-  /* Ripple Button */
-  .btn-ripple {
-    @apply btn-primary;
-    position: relative;
-    overflow: hidden;
+
+  /* Divider */
+  .divider {
+    @apply h-px my-6;
+    background-color: rgb(var(--border));
   }
-  
-  .btn-ripple::after {
+
+  /* Switch */
+  .switch {
+    @apply relative inline-block w-11 h-6;
+  }
+
+  .switch input {
+    @apply opacity-0 w-0 h-0;
+  }
+
+  .switch .slider {
+    @apply absolute inset-0 cursor-pointer transition-all duration-200;
+    background-color: rgb(var(--border));
+    border-radius: var(--radius-full);
+  }
+
+  .switch .slider:before {
+    @apply absolute h-5 w-5 left-0.5 bottom-0.5 transition-all duration-200;
     content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+    background-color: white;
+    border-radius: var(--radius-full);
+  }
+
+  .switch input:checked + .slider {
+    background-color: rgb(var(--primary));
+  }
+
+  .switch input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+
+  /* Checkbox */
+  .checkbox {
+    @apply h-5 w-5 cursor-pointer transition-all duration-200;
+    accent-color: rgb(var(--primary));
+    border-radius: var(--radius-xs);
+  }
+
+  /* App Bar */
+  .app-bar {
+    @apply flex items-center justify-between px-6 py-4;
+    background-color: rgb(var(--surface-elevated));
+    border-bottom: 1px solid rgb(var(--border));
+  }
+
+  /* Bottom Sheet */
+  .bottom-sheet {
+    @apply p-6;
+    background-color: rgb(var(--surface-elevated));
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Chat Message */
+  .chat-message {
+    @apply p-4 max-w-md;
+    background-color: rgb(var(--surface));
+    border-radius: var(--radius-md);
+    border: 1px solid rgb(var(--border));
+  }
+
+  /* Range Slider */
+  .range-slider {
+    @apply w-full h-2 rounded-lg appearance-none cursor-pointer;
+    background-color: rgb(var(--surface));
   }
   
-  .btn-ripple:active::after {
-    width: 300px;
-    height: 300px;
+  .range-slider::-webkit-slider-thumb {
+    @apply appearance-none w-5 h-5 rounded-full border-2 border-white shadow-sm transition-transform duration-200;
+    background-color: rgb(var(--primary));
+  }
+  
+  .range-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+  }
+  
+  .range-slider::-moz-range-thumb {
+    @apply w-5 h-5 rounded-full border-2 border-white shadow-sm transition-transform duration-200;
+    background-color: rgb(var(--primary));
+  }
+
+  .range-slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+  }
+
+  /* Custom Gradients */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--primary-dark)) 100%);
+  }
+  
+  .bg-gradient-surface {
+    background: linear-gradient(135deg, rgb(var(--background)) 0%, rgb(var(--surface)) 100%);
+  }
+
+  /* Ripple Effect */
+  .ripple {
+    @apply relative overflow-hidden;
+  }
+  
+  .ripple::before {
+    content: '';
+    @apply absolute top-1/2 left-1/2 w-0 h-0 rounded-full -translate-x-1/2 -translate-y-1/2 transition-all duration-500;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .ripple:active::before {
+    @apply w-[300px] h-[300px];
+  }
+
+  /* Spinner */
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-current border-t-transparent;
+  }
+
+  /* Utility Classes */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Glass Effect */
+  .glass {
+    background: rgba(var(--surface), 0.8);
+    backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(var(--border), 0.5);
+  }
+
+  /* Gradient Text */
+  .text-gradient {
+    background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Shimmer Effect */
+  .shimmer {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer::before {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: shimmer 2s infinite;
+  }
+
+  .dark .shimmer::before {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
   }
 }
-
 
 /*
 ================================================================================
- UTILITIES LAYER & ANIMATIONS
-================================================================================
- This layer contains custom animations and utility classes.
+ UTILITIES & ANIMATIONS
 ================================================================================
 */
 @layer utilities {
-  .animate-pulse-glow {
-    animation: pulse-glow 2s infinite;
+  .animate-fade-in {
+    animation: fade-in 0.4s ease-out forwards;
   }
-  
-  .animate-active-ride-pulse {
-    animation: active-ride-pulse 2s infinite;
+
+  .animate-slide-up {
+    animation: slide-up 0.4s ease-out forwards;
   }
-  
-  .animate-notification-bounce {
-    animation: notification-bounce 1s ease-out;
-  }
-  
-  /* Utility for a fade-in-up entrance animation */
-  .animate-fade-in-up {
-    animation: fade-in-up 0.5s ease-out forwards;
-    opacity: 0; /* Start hidden */
-  }
-  
-  /* Smooth slide in from left */
+
   .animate-slide-in-left {
-    animation: slide-in-left 0.5s ease-out forwards;
-    opacity: 0;
+    animation: slide-in-left 0.4s ease-out forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.4s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out forwards;
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 0.5s ease-out forwards;
+  }
+
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out forwards;
   }
   
-  /* Smooth slide in from right */
-  .animate-slide-in-right {
-    animation: slide-in-right 0.5s ease-out forwards;
+  .animate-pulse-slow {
+    animation: pulse 2s infinite;
+  }
+}
+
+/* Keyframe Animations */
+@keyframes fade-in {
+  from {
     opacity: 0;
   }
-}
-
-/* Enhanced Keyframes for button animations */
-@keyframes pulse {
-  0%, 100% {
+  to {
     opacity: 1;
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(1.05);
   }
 }
 
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 1;
-    box-shadow: 0 0 0 0 rgba(var(--primary), 0.4);
-  }
-  50% {
-    opacity: 0.9;
-    box-shadow: 0 0 10px 4px rgba(var(--primary), 0.2);
-  }
-} 
-
-@keyframes active-ride-pulse {
-  0%, 100% {
-    opacity: 1;
-    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.6);
-  }
-  50% {
-    opacity: 0.8;
-    box-shadow: 0 0 15px 6px rgba(255, 193, 7, 0.3);
-    transform: scale(1.05);
-  }
-}
-
-@keyframes notification-bounce {
-  0% {
-    transform: translateY(-10px) scale(0.9);
-    opacity: 0;
-  }
-  50% {
-    transform: translateY(5px) scale(1.1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-} 
-
-/* Keyframe for the fade-in-up animation */
-@keyframes fade-in-up {
+@keyframes slide-up {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -549,7 +579,17 @@
   }
 }
 
-/* Slide animations */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes slide-in-left {
   from {
     opacity: 0;
@@ -569,5 +609,51 @@
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
   }
 }

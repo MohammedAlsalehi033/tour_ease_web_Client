@@ -19,38 +19,38 @@ import { useRideData, FilterOptions } from './hooks/useRideData';
 
 // Temporary placeholder components
 const RideListingCard = ({ listing, onClick, isBooked }: any) => (
-  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer" onClick={onClick}>
-    <h3 className="font-semibold">{listing.startLocationText} → {listing.endLocationText}</h3>
-    <p>${listing.pricePerSeat} per seat</p>
+  <div className="card cursor-pointer hover:shadow-md transition-all" onClick={onClick}>
+    <h3 className="font-semibold text-[rgb(var(--text-primary))]">{listing.startLocationText} → {listing.endLocationText}</h3>
+    <p className="text-[rgb(var(--text-secondary))]">${listing.pricePerSeat} per seat</p>
   </div>
 );
 
 const RideRequestCard = ({ request, onClick, isAccepted }: any) => (
-  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer" onClick={onClick}>
-    <h3 className="font-semibold">{request.startLocationText} → {request.endLocationText}</h3>
-    <p>Budget: ${request.budget}</p>
+  <div className="card cursor-pointer hover:shadow-md transition-all" onClick={onClick}>
+    <h3 className="font-semibold text-[rgb(var(--text-primary))]">{request.startLocationText} → {request.endLocationText}</h3>
+    <p className="text-[rgb(var(--text-secondary))]">Budget: ${request.budget}</p>
   </div>
 );
 
 const RideFilters = ({ filters, onFiltersChange, onReset }: any) => (
-  <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-    <p>Filters coming soon...</p>
-    <button onClick={onReset} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded">Reset</button>
+  <div className="p-4 bg-[rgb(var(--surface-elevated))] rounded-lg border border-[rgb(var(--border))]">
+    <p className="text-[rgb(var(--text-secondary))]">Filters coming soon...</p>
+    <button onClick={onReset} className="mt-2 btn btn-primary">Reset</button>
   </div>
 );
 
 const RideDetailModal = ({ item, isOpen, onClose, onBookRide, onAcceptOffer }: any) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
-        <h2 className="text-xl font-bold mb-4">Ride Details</h2>
-        <button onClick={onClose} className="float-right text-gray-500">×</button>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-[rgb(var(--surface))] p-6 rounded-xl max-w-md w-full mx-4 shadow-xl border border-[rgb(var(--border))]">
+        <h2 className="text-xl font-bold mb-4 text-[rgb(var(--text-primary))]">Ride Details</h2>
+        <button onClick={onClose} className="float-right text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]">×</button>
         <div className="mt-4">
           <button onClick={() => {
             if (onBookRide) onBookRide(item);
             if (onAcceptOffer) onAcceptOffer(item);
-          }} className="w-full bg-blue-500 text-white py-2 rounded">
+          }} className="w-full btn btn-primary">
             {onBookRide ? 'Book Ride' : 'Accept Request'}
           </button>
         </div>
@@ -165,7 +165,7 @@ const RideHub: React.FC<RideHubProps> = ({ rideListings, rideRequests = [] }) =>
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-light-background via-light-surface to-light-background dark:from-dark-background dark:via-dark-surface dark:to-dark-background">
+    <div className="min-h-screen bg-[rgb(var(--background))]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div
@@ -173,10 +173,10 @@ const RideHub: React.FC<RideHubProps> = ({ rideListings, rideRequests = [] }) =>
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-light-on-surface dark:text-dark-on-surface mb-2">
+          <h1 className="text-4xl font-bold text-[rgb(var(--text-primary))] mb-2">
             RideShare Hub
           </h1>
-          <p className="text-light-on-surface-variant dark:text-dark-on-surface-variant text-lg">
+          <p className="text-[rgb(var(--text-secondary))] text-lg">
             Find your perfect ride or help others reach their destination
           </p>
         </motion.div>
@@ -188,7 +188,7 @@ const RideHub: React.FC<RideHubProps> = ({ rideListings, rideRequests = [] }) =>
           transition={{ delay: 0.1 }}
           className="mb-8"
         >
-          <div className="bg-light-surface dark:bg-dark-surface rounded-2xl p-2 shadow-sm border border-light-outline dark:border-dark-outline">
+          <div className="bg-[rgb(var(--surface))] rounded-2xl p-2 shadow-sm border border-[rgb(var(--border))]">
             <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
               {Object.entries(viewConfigs).map(([key, config]) => {
                 const Icon = config.icon;
@@ -198,19 +198,19 @@ const RideHub: React.FC<RideHubProps> = ({ rideListings, rideRequests = [] }) =>
                     onClick={() => handleViewChange(key as ViewMode)}
                     className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 whitespace-nowrap ${
                       activeView === key
-                        ? 'bg-primary text-white shadow-lg transform scale-105'
-                        : 'text-light-on-surface-variant dark:text-dark-on-surface-variant hover:bg-light-surface-variant dark:hover:bg-dark-surface-variant hover:text-light-on-surface dark:hover:text-dark-on-surface'
+                        ? 'bg-[rgb(var(--primary))] text-white shadow-lg transform scale-105'
+                        : 'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--surface-elevated))] hover:text-[rgb(var(--text-primary))]'
                     }`}
                   >
                     <Icon size={18} />
                     <span>{config.title}</span>
                     {key === 'my-rides' && myRides.length > 0 && (
-                      <span className="bg-primary text-white text-xs rounded-full px-2 py-1">
+                      <span className="bg-[rgb(var(--primary))] text-white text-xs rounded-full px-2 py-1">
                         {myRides.length}
                       </span>
                     )}
                     {key === 'my-offers' && myAcceptedOffers.length > 0 && (
-                      <span className="bg-primary text-white text-xs rounded-full px-2 py-1">
+                      <span className="bg-[rgb(var(--primary))] text-white text-xs rounded-full px-2 py-1">
                         {myAcceptedOffers.length}
                       </span>
                     )}
@@ -229,17 +229,17 @@ const RideHub: React.FC<RideHubProps> = ({ rideListings, rideRequests = [] }) =>
             transition={{ delay: 0.2 }}
             className="mb-8"
           >
-            <div className="bg-light-surface dark:bg-dark-surface rounded-2xl p-6 shadow-sm border border-light-outline dark:border-dark-outline">
+            <div className="bg-[rgb(var(--surface))] rounded-2xl p-6 shadow-sm border border-[rgb(var(--border))]">
               <div className="flex flex-col sm:flex-row gap-4">
                 {/* Search Input */}
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-on-surface-variant dark:text-dark-on-surface-variant w-5 h-5" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[rgb(var(--text-tertiary))] w-5 h-5" />
                   <input
                     type="text"
                     placeholder="Search by location or driver name..."
                     value={filters.searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-light-surface-variant dark:bg-dark-surface-variant border border-light-outline dark:border-dark-outline rounded-xl text-light-on-surface dark:text-dark-on-surface placeholder-light-on-surface-variant dark:placeholder-dark-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200"
+                    className="w-full pl-10 pr-4 py-3 bg-[rgb(var(--surface-elevated))] border border-[rgb(var(--border))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary))] focus:border-transparent transition-colors duration-200"
                   />
                 </div>
 
@@ -248,8 +248,8 @@ const RideHub: React.FC<RideHubProps> = ({ rideListings, rideRequests = [] }) =>
                   onClick={() => setShowFilters(!showFilters)}
                   className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                     showFilters || hasActiveFilters(filters)
-                      ? 'bg-primary text-white shadow-lg'
-                      : 'bg-light-surface-variant dark:bg-dark-surface-variant text-light-on-surface-variant dark:text-dark-on-surface-variant hover:bg-primary hover:text-white'
+                      ? 'bg-[rgb(var(--primary))] text-white shadow-lg'
+                      : 'bg-[rgb(var(--surface-elevated))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--primary))] hover:text-white'
                   }`}
                 >
                   <SlidersHorizontal size={18} />
@@ -271,7 +271,7 @@ const RideHub: React.FC<RideHubProps> = ({ rideListings, rideRequests = [] }) =>
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="mt-6 border-t border-light-outline dark:border-dark-outline pt-6"
+                    className="mt-6 border-t border-[rgb(var(--border))] pt-6"
                   >
                     <RideFilters
                       filters={filters}
@@ -290,7 +290,7 @@ const RideHub: React.FC<RideHubProps> = ({ rideListings, rideRequests = [] }) =>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 bg-error/10 border border-error/20 text-error rounded-2xl p-4"
+            className="mb-6 bg-[rgba(var(--error),0.1)] border border-[rgba(var(--error),0.2)] text-[rgb(var(--error))] rounded-2xl p-4"
           >
             <p>{error}</p>
           </motion.div>
@@ -305,19 +305,19 @@ const RideHub: React.FC<RideHubProps> = ({ rideListings, rideRequests = [] }) =>
         >
           {isLoading ? (
             <div className="flex justify-center items-center py-16">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[rgb(var(--primary))]"></div>
             </div>
           ) : currentConfig.data.length === 0 ? (
             <div className="text-center py-16">
               <div className="mb-6 flex justify-center">
-                <div className="w-20 h-20 rounded-full bg-light-surface-variant dark:bg-dark-surface-variant flex items-center justify-center">
-                  <IconComponent className="w-10 h-10 text-light-on-surface-variant dark:text-dark-on-surface-variant" />
+                <div className="w-20 h-20 rounded-full bg-[rgb(var(--surface-elevated))] flex items-center justify-center">
+                  <IconComponent className="w-10 h-10 text-[rgb(var(--text-secondary))]" />
                 </div>
               </div>
-              <h3 className="text-2xl font-semibold text-light-on-surface dark:text-dark-on-surface mb-2">
+              <h3 className="text-2xl font-semibold text-[rgb(var(--text-primary))] mb-2">
                 {currentConfig.emptyMessage}
               </h3>
-              <p className="text-light-on-surface-variant dark:text-dark-on-surface-variant text-lg max-w-md mx-auto">
+              <p className="text-[rgb(var(--text-secondary))] text-lg max-w-md mx-auto">
                 {currentConfig.emptyDescription}
               </p>
             </div>

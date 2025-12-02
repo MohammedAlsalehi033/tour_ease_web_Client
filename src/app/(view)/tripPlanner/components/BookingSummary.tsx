@@ -5,7 +5,7 @@ import {
   TransportOption,
   AccommodationOption,
 } from '@/app/(model)/tripPlanner/tripPlannerModel';
-import { SelectedRoomAllocation } from '../tripPlannerHelpers';
+import { SelectedRoomAllocation, isValidUrl } from '../tripPlannerHelpers';
 
 interface BookingSummaryProps {
   outboundTransport: TransportOption | null;
@@ -121,7 +121,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
             <div>
               <h3 className="text-xl font-semibold mb-3 border-b pb-2">🏨 Accommodation Details</h3>
               <div className="card-sm flex gap-4">
-                {accommodation.images?.[0] && (
+                {accommodation.images?.[0] && isValidUrl(accommodation.images[0]) && (
                   <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                     <Image src={accommodation.images[0]} alt={accommodation.name} layout="fill" objectFit="cover" />
                   </div>

@@ -29,10 +29,10 @@ function QuestionsList({ questions, currentUserId }: { questions: Question[], cu
   
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4 sm:gap-6">
       {questions.map((question: Question) => (
         <Link key={question.id} href={`/questions/${question.id}`} className="no-underline">
-          <div className="card group flex items-center gap-6 p-5 min-h-24 rounded-2xl shadow-lg border border-primary/10 dark:border-dark-outline/40 bg-white dark:bg-dark-surface transition-all duration-200 hover:scale-[1.02] hover:shadow-xl cursor-pointer">
+          <div className="card group flex flex-wrap sm:flex-nowrap items-start sm:items-center gap-4 sm:gap-6 p-4 sm:p-5 min-h-24 rounded-2xl shadow-lg border border-primary/10 dark:border-dark-outline/40 bg-white dark:bg-dark-surface transition-all duration-200 hover:scale-[1.02] hover:shadow-xl cursor-pointer">
             <div className="flex-shrink-0">
               <OtherAvatarPic
                 imageUrl={question.user.mediaUrls && question.user.mediaUrls[0]}
@@ -40,7 +40,7 @@ function QuestionsList({ questions, currentUserId }: { questions: Question[], cu
                 userName={question.user.username}
               />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 w-full sm:w-auto">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <span className="font-semibold text-lg text-primary group-hover:text-primary-dark dark:group-hover:text-primary-light transition-colors">
                   {question.user.username}
@@ -53,7 +53,7 @@ function QuestionsList({ questions, currentUserId }: { questions: Question[], cu
                     questionId={question.id.toString()}
                     questionTitle={question.title}
                     currentUserId={currentUserId}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                   />
                 </div>
               </div>
@@ -78,7 +78,7 @@ function QuestionsList({ questions, currentUserId }: { questions: Question[], cu
                 )}
               </div>
             </div>
-            <div className="flex flex-col items-center justify-center gap-2 px-2 min-w-[80px]">
+            <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-center gap-2 w-full sm:w-auto sm:min-w-[80px] mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-green-600 font-bold bg-green-100 dark:bg-green-900/30 rounded-full px-2 py-1">▲ {question.upvotes ?? 0}</span>
                 <span className="text-xs text-red-600 font-bold bg-red-100 dark:bg-red-900/30 rounded-full px-2 py-1">▼ {question.downvotes ?? 0}</span>
@@ -95,11 +95,11 @@ function QuestionsList({ questions, currentUserId }: { questions: Question[], cu
 // This component remains unchanged
 function QuestionsSkeleton() {
   return (
-    <>
+    <div className="flex flex-col gap-4 sm:gap-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="card p-5 flex items-center gap-6 animate-pulse bg-gray-100 dark:bg-dark-surface-container rounded-2xl">
-          <div className="h-16 w-16 rounded-full bg-gray-300 dark:bg-gray-700" />
-          <div className="flex-1 min-w-0 space-y-3">
+        <div key={i} className="card p-4 sm:p-5 flex flex-wrap sm:flex-nowrap items-start sm:items-center gap-4 sm:gap-6 animate-pulse bg-gray-100 dark:bg-dark-surface-container rounded-2xl">
+          <div className="h-16 w-16 rounded-full bg-gray-300 dark:bg-gray-700 flex-shrink-0" />
+          <div className="flex-1 min-w-0 space-y-3 w-full sm:w-auto">
             <div className="flex justify-between items-center">
               <div className="h-4 w-1/4 bg-gray-300 dark:bg-gray-700 rounded" />
               <div className="h-3 w-1/5 bg-gray-200 dark:bg-gray-600 rounded" />
@@ -107,9 +107,13 @@ function QuestionsSkeleton() {
             <div className="h-5 w-3/4 bg-gray-300 dark:bg-gray-700 rounded" />
             <div className="h-4 w-full bg-gray-200 dark:bg-gray-600 rounded" />
           </div>
+          <div className="w-full sm:w-auto mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-200 dark:border-gray-600 flex sm:flex-col gap-2">
+             <div className="h-6 w-16 bg-gray-300 dark:bg-gray-700 rounded-full" />
+             <div className="h-6 w-20 bg-gray-300 dark:bg-gray-700 rounded-full" />
+          </div>
         </div>
       ))}
-    </>
+    </div>
   );
 }
 

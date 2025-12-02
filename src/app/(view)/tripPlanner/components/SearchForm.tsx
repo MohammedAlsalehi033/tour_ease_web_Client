@@ -108,9 +108,9 @@ export const SearchForm = ({ onSearch }: { onSearch: (params: TripPlannerSearchP
     <form onSubmit={handleSubmit} className="w-full card hover:shadow-float transition-all duration-500 animate-fade-in-up border border-gray-100 dark:border-gray-700">
       {/* Header */}
       <div className="mb-8">
-        <h2 className="text-display-md font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+        <h1 className="font-bold text-3xl mb-2">
           Plan Your Perfect Trip
-        </h2>
+        </h1>
         <p className="text-body-lg text-gray-600 dark:text-gray-400">
           Let us help you create an unforgettable journey
         </p>

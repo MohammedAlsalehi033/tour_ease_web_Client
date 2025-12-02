@@ -5,7 +5,6 @@ import { Bell } from 'lucide-react';
 import { TransportationOffer } from '@/app/(model)/rideSharing/offer/offerModel';
 import NotificationTabs from './NotificationTabs';
 import NotificationFilters from './NotificationFilters';
-import BulkActions from './BulkActions';
 import DateGroupedNotifications from './DateGroupedNotifications';
 import EnhancedNotificationCard from './EnhancedNotificationCard';
 import EmptyState from './EmptyState';
@@ -27,7 +26,6 @@ const OrganizedNotifications: React.FC<OrganizedNotificationsProps> = ({ initial
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [selectedOffers, setSelectedOffers] = useState<Set<number>>(new Set());
 
   // Filter and sort offers based on current settings
   const filteredAndSortedOffers = useMemo(() => {
@@ -111,45 +109,6 @@ const OrganizedNotifications: React.FC<OrganizedNotificationsProps> = ({ initial
     completed: initialOffers.filter(offer => offer.status !== 'pending').length,
   }), [initialOffers]);
 
-  // Selection handlers
-  const handleSelectOffer = (offerId: number) => {
-    const newSelected = new Set(selectedOffers);
-    if (newSelected.has(offerId)) {
-      newSelected.delete(offerId);
-    } else {
-      newSelected.add(offerId);
-    }
-    setSelectedOffers(newSelected);
-  };
-
-  const handleSelectAll = () => {
-    const allIds = new Set(filteredAndSortedOffers.map(offer => offer.id));
-    setSelectedOffers(allIds);
-  };
-
-  const handleDeselectAll = () => {
-    setSelectedOffers(new Set());
-  };
-
-  // Bulk action handlers (these would connect to your backend)
-  const handleMarkAllRead = () => {
-    console.log('Mark as read:', Array.from(selectedOffers));
-    // Implement mark as read functionality
-    setSelectedOffers(new Set());
-  };
-
-  const handleArchiveSelected = () => {
-    console.log('Archive:', Array.from(selectedOffers));
-    // Implement archive functionality
-    setSelectedOffers(new Set());
-  };
-
-  const handleDeleteSelected = () => {
-    console.log('Delete:', Array.from(selectedOffers));
-    // Implement delete functionality
-    setSelectedOffers(new Set());
-  };
-
   // Clear all filters
   const clearAllFilters = () => {
     setSearchTerm('');
@@ -212,19 +171,6 @@ const OrganizedNotifications: React.FC<OrganizedNotificationsProps> = ({ initial
           filteredCount={filteredAndSortedOffers.length}
         />
 
-        {/* Bulk Actions */}
-        {filteredAndSortedOffers.length > 0 && (
-          <BulkActions
-            selectedCount={selectedOffers.size}
-            totalCount={filteredAndSortedOffers.length}
-            onSelectAll={handleSelectAll}
-            onDeselectAll={handleDeselectAll}
-            onMarkAllRead={handleMarkAllRead}
-            onArchiveSelected={handleArchiveSelected}
-            onDeleteSelected={handleDeleteSelected}
-          />
-        )}
-
         {/* Notifications List */}
         {filteredAndSortedOffers.length > 0 ? (
           <DateGroupedNotifications offers={filteredAndSortedOffers}>
@@ -232,8 +178,6 @@ const OrganizedNotifications: React.FC<OrganizedNotificationsProps> = ({ initial
               <EnhancedNotificationCard
                 key={offer.id}
                 offer={offer}
-                isSelected={selectedOffers.has(offer.id)}
-                onSelect={handleSelectOffer}
                 searchTerm={searchTerm}
               />
             )}

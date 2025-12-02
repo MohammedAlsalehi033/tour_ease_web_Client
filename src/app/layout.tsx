@@ -3,16 +3,13 @@ import 'reflect-metadata';
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import MySideBar from "./(view)/components/MySideBar";
 import Providers from './(view)/components/Providers';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './api/auth/[...nextauth]/route';
-import { Suspense } from 'react';
-import SidebarSkeleton from './(view)/components/SidebarSkeleton';
 import { container } from 'tsyringe';
 import { BookingController } from './(controller)/rideSharing/bookingController';
-import NotificationIcon from './(view)/components/notificationIcon';
 import { ActiveRideProvider } from '@/app/components/ActiveRideProvider';
+import ConditionalLayout from '@/app/components/ConditionalLayout';
 
 export const metadata: Metadata = {
   title: "TourEase",
@@ -56,13 +53,9 @@ export default async function RootLayout({
         <ThemeProvider attribute="class">
           <Providers>
             <ActiveRideProvider>
-              <Suspense fallback={<SidebarSkeleton />}>
-                <MySideBar hasActiveRide={hasActiveRide} />
-              </Suspense>
-              <NotificationIcon />
-              <div className="min-h-screen bg-light-background dark:bg-dark-background transition-colors duration-300 xl:pl-72 p-5 md:p-5">
+              <ConditionalLayout hasActiveRide={hasActiveRide}>
                 {children}
-              </div>
+              </ConditionalLayout>
             </ActiveRideProvider>
           </Providers>
         </ThemeProvider>

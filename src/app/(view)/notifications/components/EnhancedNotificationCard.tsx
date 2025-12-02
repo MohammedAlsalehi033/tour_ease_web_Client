@@ -14,7 +14,6 @@ import {
   MessageCircle,
   ArrowRight,
   User,
-  CheckCircle2,
   Briefcase
 } from 'lucide-react';
 import { TransportationOffer } from '@/app/(model)/rideSharing/offer/offerModel';
@@ -31,8 +30,6 @@ interface EnhancedNotificationCardProps {
       mediaUrls?: string[];
     };
   };
-  isSelected: boolean;
-  onSelect: (offerId: number) => void;
   searchTerm: string;
 }
 
@@ -98,34 +95,15 @@ const highlightSearchTerm = (text: string, searchTerm: string) => {
 
 const EnhancedNotificationCard: React.FC<EnhancedNotificationCardProps> = ({
   offer,
-  isSelected,
-  onSelect,
   searchTerm
 }) => {
   const isListingOffer = offer.transportationListingId !== null;
   const routeInfo = isListingOffer ? offer.listing : offer.request;
   
   return (
-    <div className={`card p-6 rounded-lg border transition-all duration-200 mb-4 ${
-      isSelected 
-        ? 'border-primary bg-primary/5 shadow-lg scale-[1.02]' 
-        : 'border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface hover:shadow-md hover:scale-[1.01]'
-    }`}>
-      {/* Header with Selection */}
+    <div className={`card p-6 rounded-lg border transition-all duration-200 mb-4 border-light-outline dark:border-dark-outline bg-light-surface dark:bg-dark-surface hover:shadow-md hover:scale-[1.01]`}>
+      {/* Header */}
       <div className="flex items-start mb-4">
-        {/* Selection Checkbox */}
-        <button
-          onClick={() => onSelect(offer.id)}
-          className="mr-4 mt-2"
-        >
-          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-            isSelected 
-              ? 'bg-primary border-primary text-white' 
-              : 'border-light-outline dark:border-dark-outline hover:border-primary'
-          }`}>
-            {isSelected && <CheckCircle2 className="w-3 h-3" />}
-          </div>
-        </button>
         
         <div className="flex justify-between items-start flex-1">
           <div className="flex items-center">

@@ -28,6 +28,17 @@ export function toNumber(value: any): number {
   return 0;
 }
 
+export function isValidUrl(url: string): boolean {
+  if (!url) return false;
+  if (url.startsWith('/')) return true;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function extractRoomId(room: any): number | null {
   if (!room) return null;
   const idCandidate =

@@ -65,21 +65,50 @@ export default function TripPlanner() {
           <p className="text-sm  ">Plan your perfect trip with AI-powered recommendations</p>
         </div>
 
-        <div className="flex gap-4 mb-6 justify-center">
-          <button onClick={() => setViewMode('search')}
-            className={`px-4 py-2 rounded-lg transition-all duration-200 ${viewMode === 'search'
-                ? 'bg-primary text-white shadow-lg'
-                : 'bg-gray-200  text-gray-800  hover:bg-gray-300 '
-              }`}>
-            New Search
-          </button>
-          <button onClick={() => setViewMode('savedPlans')}
-            className={`px-4 py-2 rounded-lg transition-all duration-200 ${viewMode === 'savedPlans'
-                ? 'bg-primary text-white shadow-lg'
-                : 'bg-gray-200  text-gray-800  hover:bg-gray-300 '
-              }`}>
-            My Saved Plans
-          </button>
+        <div className="flex justify-center mb-10">
+          <div className="p-1.5 rounded-full bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 inline-flex relative">
+            <button
+              onClick={() => setViewMode('search')}
+              className={`
+                relative px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-2.5
+                ${(viewMode === 'search' || viewMode === 'results')
+                  ? 'text-primary shadow-md'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                }
+              `}
+              style={
+                (viewMode === 'search' || viewMode === 'results')
+                  ? { background: 'linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%)' }
+                  : {}
+              }
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Plan a Trip
+            </button>
+
+            <button
+              onClick={() => setViewMode('savedPlans')}
+              className={`
+                relative px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-2.5
+                ${viewMode === 'savedPlans'
+                  ? 'text-primary shadow-md'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                }
+              `}
+              style={
+                viewMode === 'savedPlans'
+                  ? { background: 'linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%)' }
+                  : {}
+              }
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              Saved Plans
+            </button>
+          </div>
         </div>
 
         {loading && (

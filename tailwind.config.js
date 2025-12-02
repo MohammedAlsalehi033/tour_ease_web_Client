@@ -11,6 +11,7 @@ module.exports = {
       animation: {
         'gradient-shift': 'gradient-shift 8s ease infinite',
         'mesh': 'mesh-animation 20s ease infinite',
+        'meteor-effect': 'meteor 5s linear infinite',
         'fade-in-up': 'fade-in-up 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards',
         'fade-in-scale': 'fade-in-scale 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
         'float': 'float 3s ease-in-out infinite',
@@ -28,6 +29,14 @@ module.exports = {
         'gradient-shift': {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
+        },
+        meteor: {
+          "0%": { transform: "rotate(215deg) translateX(0)", opacity: "1" },
+          "70%": { opacity: "1" },
+          "100%": {
+            transform: "rotate(215deg) translateX(-500px)",
+            opacity: "0",
+          },
         },
         'mesh-animation': {
           '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
@@ -82,19 +91,19 @@ module.exports = {
       },
       colors: {
         primary: {
-          light: '#90CAF9',
-          DEFAULT: '#2196F3',
-          dark: '#0D47A1',
-          50: '#E3F2FD',
-          100: '#BBDEFB',
-          200: '#90CAF9',
-          300: '#64B5F6',
-          400: '#42A5F5',
-          500: '#2196F3',
-          600: '#1E88E5',
-          700: '#1976D2',
-          800: '#1565C0',
-          900: '#0D47A1',
+          light: '#22D3EE', // Cyan 400
+          DEFAULT: '#06B6D4', // Cyan 500
+          dark: '#0891B2', // Cyan 600
+          50: '#ECFEFF',
+          100: '#CFFAFE',
+          200: '#A5F3FC',
+          300: '#67E8F9',
+          400: '#22D3EE',
+          500: '#06B6D4',
+          600: '#0891B2',
+          700: '#0E7490',
+          800: '#155E75',
+          900: '#164E63',
         },
         accent: {
           DEFAULT: '#5E35B1',

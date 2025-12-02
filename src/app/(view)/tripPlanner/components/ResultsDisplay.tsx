@@ -14,6 +14,7 @@ import {
   RoomCatalogEntry,
   SelectedRoomAllocation,
   toNumber,
+  isValidUrl,
   getRoomCatalog,
   buildInitialRoomSelections,
   buildSelectedRoomAllocations
@@ -78,11 +79,11 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
   const budget = toNumber(originalRequest.budget);
   const clientSideBudgetStatus = budget > 0 && updatedTotalCost > budget ? 'over_budget' : 'within_budget';
 
-  const selectedAccommodationImages = Array.isArray(selectedAccommodation?.images) && selectedAccommodation.images.length > 0
+  const selectedAccommodationImages = (Array.isArray(selectedAccommodation?.images) && selectedAccommodation.images.length > 0
     ? selectedAccommodation.images
     : Array.isArray(selectedAccommodation?.mediaUrls)
       ? selectedAccommodation.mediaUrls
-      : [];
+      : []).filter((url: string) => isValidUrl(url));
 
   // Check if this is an itinerary-based response
   const hasItinerary = itinerary && Array.isArray(itinerary) && itinerary.length > 0;
@@ -969,9 +970,9 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                           PKR {(activity.estimatedCost || 0).toLocaleString()}
                         </p>
                       </div>
-                      {activity.placeDetails?.photos && activity.placeDetails.photos.length > 0 && (
+                      {activity.placeDetails?.photos && activity.placeDetails.photos.filter((p: string) => isValidUrl(p)).length > 0 && (
                         <div className="mt-3 flex gap-2 overflow-x-scroll scrollbar-hide">
-                          {activity.placeDetails.photos.slice(0, 3).map((photo: string, photoIdx: number) => (
+                          {activity.placeDetails.photos.filter((p: string) => isValidUrl(p)).slice(0, 3).map((photo: string, photoIdx: number) => (
                             <div key={photoIdx} className="relative w-24 h-24 rounded overflow-hidden flex-shrink-0">
                               <Image
                                 src={photo}

@@ -21,7 +21,9 @@ const protectedRoutes = [
   '/users',
   '/reviews',
   '/my-reviews',
-  '/questions',
+  '/bookings',
+  '/payment',
+  '/report',
 ];
 
 // Helper function to check if a path is public

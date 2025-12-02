@@ -15,7 +15,7 @@ import {
   ItineraryDay,
   TripSummary
 } from '@/app/(model)/tripPlanner/tripPlanner.types';
-import { toNumber, getRoomCatalog, buildInitialRoomSelections, buildSelectedRoomAllocations } from '@/lib/tripPlannerUtils';
+import { toNumber, isValidUrl, getRoomCatalog, buildInitialRoomSelections, buildSelectedRoomAllocations } from '@/lib/tripPlannerUtils';
 
 const parseMaybeJson = (value: unknown) => {
   if (!value) return null;
@@ -422,11 +422,11 @@ console.log('Normalized options:', resolvedData);
     selectedTransport.id === optimalPlanData.outboundTransport?.id &&
     selectedAccommodation.id === optimalPlanData.accommodation?.id
   );
-  const selectedAccommodationImages = Array.isArray(selectedAccommodation?.images) && selectedAccommodation.images.length > 0
+  const selectedAccommodationImages = (Array.isArray(selectedAccommodation?.images) && selectedAccommodation.images.length > 0
     ? selectedAccommodation.images
     : Array.isArray(selectedAccommodation?.mediaUrls)
     ? selectedAccommodation.mediaUrls
-    : [];
+    : []).filter((url: string) => isValidUrl(url));
   const isSavedAccommodationSelection = Boolean(
     selectedPlan &&
     selectedAccommodation &&
@@ -1106,9 +1106,9 @@ console.log('Normalized options:', resolvedData);
                               PKR {(activity.estimatedCost || 0).toLocaleString()}
                             </p>
                           </div>
-                          {activity.placeDetails?.photos && activity.placeDetails.photos.length > 0 && (
+                          {activity.placeDetails?.photos && activity.placeDetails.photos.filter((p: string) => isValidUrl(p)).length > 0 && (
                             <div className="mt-3 flex gap-2 overflow-x-scroll scrollbar-hide">
-                              {activity.placeDetails.photos.slice(0, 3).map((photo: string, photoIdx: number) => (
+                              {activity.placeDetails.photos.filter((p: string) => isValidUrl(p)).slice(0, 3).map((photo: string, photoIdx: number) => (
                                 <div key={photoIdx} className="relative w-24 h-24 rounded overflow-hidden flex-shrink-0">
                                   <Image
                                     src={photo}

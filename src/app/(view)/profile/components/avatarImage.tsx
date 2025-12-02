@@ -14,7 +14,7 @@ interface CustomSession {
     };
 }
 
-const AvatarImage = ({ media, userName }: { media: string[]; userName: string }) => {
+const AvatarImage = ({ media, userName, size = "w-24 h-24" }: { media: string[]; userName: string; size?: string }) => {
     const { data: session } = useSession() as { data: CustomSession | null };
     const loadingIndicator = useRef<HTMLDivElement>(null);
     const errorMessage = useRef<HTMLDivElement>(null);
@@ -81,7 +81,7 @@ const AvatarImage = ({ media, userName }: { media: string[]; userName: string })
         <div>
             <div ref={errorMessage} className="hidden text-red-500 text-sm mb-2"></div>
             {media[0] ? (
-                <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-indigo-500">
+                <div className={`relative ${size} rounded-full overflow-hidden border-2 border-indigo-500`}>
                     <div ref={loadingIndicator} className='absolute inset-0 hidden items-center justify-center bg-black bg-opacity-50 text-white z-20'>Loading</div>
                     <input
                         className='absolute inset-0 w-full h-full bg-black opacity-0 hover:opacity-75 transition-opacity cursor-pointer z-10'
@@ -93,13 +93,12 @@ const AvatarImage = ({ media, userName }: { media: string[]; userName: string })
                     <Image
                         src={media[0]}
                         alt={`${userName}'s profile picture`}
-                        width={96}
-                        height={96}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                     />
                 </div>
             ) : (
-                <div className="relative w-24 h-24 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-3xl font-display font-bold text-indigo-600 dark:text-indigo-300 border border-light-outline">
+                <div className={`relative ${size} rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-3xl font-display font-bold text-indigo-600 dark:text-indigo-300 border border-light-outline`}>
                     <input
                         className='absolute inset-0 w-full h-full bg-black opacity-0 hover:opacity-75 transition-opacity cursor-pointer z-10'
                         type='file'

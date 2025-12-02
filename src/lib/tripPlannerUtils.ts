@@ -1,4 +1,3 @@
-
 import { AccommodationOption, Room, RoomAllocation, SavedPlan } from "@/app/(model)/tripPlanner/tripPlanner.types";
 
 export const toNumber = (value: any): number => {
@@ -8,6 +7,17 @@ export const toNumber = (value: any): number => {
       return isNaN(parsed) ? 0 : parsed;
     }
     return 0;
+};
+
+export const isValidUrl = (url: string): boolean => {
+  if (!url) return false;
+  if (url.startsWith('/')) return true;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
 };
   
 export const getRoomCatalog = (accommodation: AccommodationOption | null): Room[] => {
