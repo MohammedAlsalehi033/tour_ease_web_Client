@@ -288,7 +288,6 @@ export default function AccommodationDetailPage() {
   const headerScale = useTransform(scrollY, [0, 200], [1, 0.95]);
 
   const accommodationController = container.resolve(AccommodationController);
-  const paymentController = container.resolve(PaymentController);
   const reviewController = container.resolve(ReviewController);
 
   const fetchAccommodationDetails = async () => {
@@ -377,17 +376,6 @@ export default function AccommodationDetailPage() {
       if (!bookingResult.success) {
         throw new Error('Failed to create confirmed booking');
       }
-
-      const booking = bookingResult.data as any;
-
-      // Step 2: Record payment in our system
-      await paymentController.createPayment({
-        amount: totalPrice,
-        paymentMethod: 'stripe',
-        transactionId: paymentIntentId,
-        accommodationBookingId: booking.id,
-        status: 'completed',
-      });
 
       // Success - redirect to bookings
       router.push('/bookings');

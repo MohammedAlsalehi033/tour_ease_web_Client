@@ -352,10 +352,10 @@ const StatCard: React.FC<{ title: string; value: string | number }> =
 const QuickActions: React.FC<{ isProvider: boolean; isNewUser: boolean }> =
   ({ isProvider, isNewUser }) => {
     const actions = isNewUser ? [
-      { title: 'Complete Profile', href: '/profile' },
-      { title: 'Find Rides', href: '/rideSharing/maps' },
-      { title: 'Ask Questions', href: '/questions' },
-      { title: 'Chat Support', href: '/chats' }
+      { title: isProvider ? 'Offer Ride' : 'Find Rides', href: isProvider ? '/rideSharing/listing' : '/rideSharing/maps' },
+      { title: 'Plan Your Next Trip', href: '/tripPlanner' },
+      { title: 'Find Accommodation', href: '/accommodations' },
+      { title: 'Ask Community', href: '/questions' }
     ] : isProvider ? [
       { title: 'Offer Ride', href: '/rideSharing/listing' },
       { title: 'Active Rides', href: '/rideSharing/activeRide' },
@@ -635,29 +635,6 @@ const NewUserBanner: React.FC<{ isProvider: boolean }> = ({ isProvider }) => (
             : "Find your first ride and explore the city."
           }
         </p>
-      </motion.div>
-      <motion.div
-        className="flex gap-3 flex-shrink-0"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 1.4, duration: 0.5 }}
-      >
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Link href="/profile" className="btn-secondary py-2 px-4 rounded-lg font-medium whitespace-nowrap">
-            Complete Profile
-          </Link>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Link href="/rideSharing" className="btn-primary py-2 px-4 rounded-lg font-medium whitespace-nowrap">
-            {isProvider ? 'Offer First Ride' : 'Find First Ride'}
-          </Link>
-        </motion.div>
       </motion.div>
     </div>
   </motion.div>

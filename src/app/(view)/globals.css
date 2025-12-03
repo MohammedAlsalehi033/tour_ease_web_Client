@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -18,40 +18,44 @@
 @layer base {
   :root {
     /* Font family variables */
-    --font-display: 'Poppins', sans-serif;
-    --font-body: 'Inter', sans-serif;
+    --font-display: "Poppins", sans-serif;
+    --font-body: "Inter", sans-serif;
 
     /* Sizing variables from Flutter Theme */
     --radius-standard: 12px; /* Flutter: _borderRadius = 12.0 */
-    --radius-button: 8px;   /* Flutter: _buttonBorderRadius = 8.0 */
+    --radius-button: 8px; /* Flutter: _buttonBorderRadius = 8.0 */
 
     /* Light mode variables (blue theme) - Mapped from Flutter's light ColorScheme */
-    --primary: 33, 150, 243;      /* #2196F3 - Material Blue (_primaryColor) */
-    --secondary: 66, 165, 245;    /* #42A5F5 - Blue 400 (_secondaryColor) */
-    --primary-dark: 13, 71, 161;  /* #0D47A1 - Darker for hover (not in Flutter theme, but good for web) */
-    
-    --error: 229, 57, 53;         /* #E53935 - Red 600 (_errorColor) */
-    --success: 67, 160, 71;       /* #43A047 - Green 600 (_successColor) */
-    --warning: 255, 160, 0;       /* #FFA000 - Amber 700 (_warningColor) */
-    --info: 2, 136, 209;          /* #0288D1 - Light Blue 700 (_infoColor) */
-    
-    --background: 245, 245, 245;  /* #F5F5F5 - Flutter: background */
-    --surface: 255, 255, 255;     /* #FFFFFF - Flutter: surface */
-    --text: 0, 0, 0, 0.87;        /* Black87 - Flutter: onSurface / onBackground */
-    
+    --primary: 33, 150, 243; /* #2196F3 - Material Blue (_primaryColor) */
+    --secondary: 66, 165, 245; /* #42A5F5 - Blue 400 (_secondaryColor) */
+    --primary-dark: 13, 71, 161; /* #0D47A1 - Darker for hover (not in Flutter theme, but good for web) */
+
+    --error: 229, 57, 53; /* #E53935 - Red 600 (_errorColor) */
+    --success: 67, 160, 71; /* #43A047 - Green 600 (_successColor) */
+    --warning: 255, 160, 0; /* #FFA000 - Amber 700 (_warningColor) */
+    --info: 2, 136, 209; /* #0288D1 - Light Blue 700 (_infoColor) */
+
+    --background: 245, 245, 245; /* #F5F5F5 - Flutter: background */
+    --surface: 255, 255, 255; /* #FFFFFF - Flutter: surface */
+    --text: 0, 0, 0, 0.87; /* Black87 - Flutter: onSurface / onBackground */
+
     /* Gradient for button animations */
-    --gradient-primary: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 100%);
+    --gradient-primary: linear-gradient(
+      135deg,
+      rgb(var(--primary)) 0%,
+      rgb(var(--secondary)) 100%
+    );
   }
 
   .dark {
     /* Dark mode variables - Mapped from Flutter's dark ColorScheme */
-    --primary: 33, 150, 243;      /* Same blue for consistency */
-    --secondary: 66, 165, 245;    /* Same blue light */
-    --primary-dark: 13, 71, 161;  /* Same blue dark */
-    
-    --background: 18, 18, 18;     /* #121212 - Flutter: background */
-    --surface: 32, 32, 32;        /* #202020 - Flutter: surface */
-    --text: 255, 255, 255;        /* White - Flutter: onSurface / onBackground */
+    --primary: 33, 150, 243; /* Same blue for consistency */
+    --secondary: 66, 165, 245; /* Same blue light */
+    --primary-dark: 13, 71, 161; /* Same blue dark */
+
+    --background: 18, 18, 18; /* #121212 - Flutter: background */
+    --surface: 32, 32, 32; /* #202020 - Flutter: surface */
+    --text: 255, 255, 255; /* White - Flutter: onSurface / onBackground */
   }
 
   body {
@@ -62,7 +66,12 @@
   }
 
   /* Typography mapping from Flutter's TextTheme */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
   }
 
@@ -81,10 +90,9 @@
   h3 {
     /* Matches headlineSmall: fontSize: 18, fontWeight: w600 */
     @apply text-lg font-semibold;
-     color: rgb(var(--text));
+    color: rgb(var(--text));
   }
 }
-
 
 /*
 ================================================================================
@@ -96,7 +104,6 @@
 ================================================================================
 */
 @layer components {
-
   /* Tabs Component */
   .tabs {
     @apply flex overflow-x-auto;
@@ -106,7 +113,7 @@
     @apply border-r;
     border-color: rgba(var(--text), 0.1);
   }
-   .tabs > *:not(:last-child):hover {
+  .tabs > *:not(:last-child):hover {
     border-color: rgba(var(--text), 0.2);
   }
 
@@ -117,7 +124,7 @@
     background-color: rgb(var(--surface));
   }
   .tab:hover {
-     background-color: rgba(var(--surface), 0.8);
+    background-color: rgba(var(--surface), 0.8);
   }
 
   /* Enhanced Base Button Style with Smooth Animations */
@@ -128,48 +135,58 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
   }
-  
+
   /* Shimmer effect for all buttons */
   .btn::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
     transition: left 0.6s ease;
   }
-  
+
   .btn:hover::before {
     left: 100%;
   }
-  
+
   .btn:active {
     transform: scale(0.97);
     transition: transform 0.1s ease;
   }
-  
+
   /* Enhanced Primary Button (ElevatedButton) with Gradient Option */
   .btn-primary {
     @apply btn text-white;
-    background: linear-gradient(135deg, rgb(var(--primary)) 0%, rgb(var(--secondary)) 50%, rgb(var(--primary)) 100%);
+    background: linear-gradient(
+      135deg,
+      rgb(var(--primary)) 0%,
+      rgb(var(--secondary)) 50%,
+      rgb(var(--primary)) 100%
+    );
     background-size: 200% auto;
     box-shadow: 0 4px 12px rgba(var(--primary), 0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .btn-primary:hover {
     background-position: right center;
     box-shadow: 0 6px 20px rgba(var(--primary), 0.4);
     transform: translateY(-2px);
   }
-  
+
   .btn-primary:disabled {
     @apply opacity-40 cursor-not-allowed;
     transform: none;
   }
-  
+
   /* Enhanced Outlined Button with Hover Fill Effect */
   .btn-outlined {
     @apply btn bg-transparent border-2;
@@ -178,9 +195,9 @@
     position: relative;
     z-index: 1;
   }
-  
+
   .btn-outlined::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -191,29 +208,29 @@
     z-index: -1;
     border-radius: inherit;
   }
-  
+
   .btn-outlined:hover::after {
     width: 100%;
   }
-  
+
   .btn-outlined:hover {
     box-shadow: 0 4px 12px rgba(var(--primary), 0.2);
     transform: translateY(-1px);
   }
-  
+
   .btn-outlined:disabled {
     @apply opacity-40 cursor-not-allowed;
   }
-  
+
   /* Enhanced Text Button with Underline Animation */
   .btn-text {
     @apply btn bg-transparent;
     color: rgb(var(--primary));
     position: relative;
   }
-  
+
   .btn-text::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 12px;
     left: 50%;
@@ -223,19 +240,19 @@
     transition: all 0.3s ease;
     transform: translateX(-50%);
   }
-  
+
   .btn-text:hover::after {
     width: calc(100% - 48px); /* Accounting for padding */
   }
-  
+
   .btn-text:hover {
     background-color: rgba(var(--primary), 0.05);
   }
-  
+
   .btn-text:disabled {
     @apply opacity-40 cursor-not-allowed;
   }
-  
+
   /* Card Component with Animation */
   .card {
     /* Matches CardTheme: elevation, margin, shape, color */
@@ -253,7 +270,7 @@
     @apply p-4 m-2 w-1/2 shadow-md dark:shadow-lg transition-shadow duration-200;
     border-radius: var(--radius-standard);
   }
-  
+
   /* Input Field with Animation */
   .input {
     /* Matches InputDecorationTheme: fill, border, padding */
@@ -271,7 +288,7 @@
     /* Added glow effect on focus */
     box-shadow: 0 0 0 3px rgba(var(--primary), 0.2);
   }
-  
+
   /* Divider */
   .divider {
     /* Matches DividerTheme */
@@ -281,11 +298,11 @@
 
   /* Scrollbar Hide Utility */
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari and Opera */
+    display: none; /* Chrome, Safari and Opera */
   }
 
   /* Slide Up Animation */
@@ -302,7 +319,7 @@
   .animate-slide-up {
     animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  
+
   /* Checkbox */
   .checkbox {
     /* Matches CheckboxTheme */
@@ -310,13 +327,15 @@
     accent-color: rgb(var(--primary));
     border-radius: 4px;
   }
-  
+
   /* Switch */
   .switch {
     /* Matches SwitchTheme */
     @apply relative inline-block h-6 w-11;
   }
-  .switch input { @apply opacity-0 w-0 h-0; }
+  .switch input {
+    @apply opacity-0 w-0 h-0;
+  }
   .switch .slider {
     @apply absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 dark:bg-gray-600 transition-all rounded-full;
   }
@@ -338,7 +357,7 @@
     background-color: rgb(var(--surface));
     border-color: rgba(var(--text), 0.1);
   }
-  
+
   /* Bottom Sheet */
   .bottom-sheet {
     /* Matches BottomSheetTheme */
@@ -385,34 +404,34 @@
   .accordion-content {
     @apply overflow-hidden transition-all duration-500 ease-in-out;
   }
-  
+
   /* Additional Modern Button Variants */
-  
+
   /* Pulse Button - Great for CTAs */
   .btn-pulse {
     @apply btn-primary;
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
-  
+
   /* Glow Button */
   .btn-glow {
     @apply btn-primary;
   }
-  
+
   .btn-glow:hover {
     box-shadow: 0 0 20px rgba(var(--primary), 0.6),
-                0 0 40px rgba(var(--primary), 0.4);
+      0 0 40px rgba(var(--primary), 0.4);
   }
-  
+
   /* Ripple Button */
   .btn-ripple {
     @apply btn-primary;
     position: relative;
     overflow: hidden;
   }
-  
+
   .btn-ripple::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -423,13 +442,12 @@
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
   }
-  
+
   .btn-ripple:active::after {
     width: 300px;
     height: 300px;
   }
 }
-
 
 /*
 ================================================================================
@@ -442,27 +460,27 @@
   .animate-pulse-glow {
     animation: pulse-glow 2s infinite;
   }
-  
+
   .animate-active-ride-pulse {
     animation: active-ride-pulse 2s infinite;
   }
-  
+
   .animate-notification-bounce {
     animation: notification-bounce 1s ease-out;
   }
-  
+
   /* Utility for a fade-in-up entrance animation */
   .animate-fade-in-up {
     animation: fade-in-up 0.5s ease-out forwards;
     opacity: 0; /* Start hidden */
   }
-  
+
   /* Smooth slide in from left */
   .animate-slide-in-left {
     animation: slide-in-left 0.5s ease-out forwards;
     opacity: 0;
   }
-  
+
   /* Smooth slide in from right */
   .animate-slide-in-right {
     animation: slide-in-right 0.5s ease-out forwards;
@@ -472,7 +490,8 @@
 
 /* Enhanced Keyframes for button animations */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -482,7 +501,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     box-shadow: 0 0 0 0 rgba(var(--primary), 0.4);
   }
@@ -490,10 +510,11 @@
     opacity: 0.9;
     box-shadow: 0 0 10px 4px rgba(var(--primary), 0.2);
   }
-} 
+}
 
 @keyframes active-ride-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.6);
   }
@@ -517,7 +538,7 @@
     transform: translateY(0) scale(1);
     opacity: 1;
   }
-} 
+}
 
 /* Keyframe for the fade-in-up animation */
 @keyframes fade-in-up {
