@@ -312,7 +312,7 @@ const HeroGallery = () => {
               <p className="font-medium">Lahore Junction</p>
             </div>
           </div>
-          <Link href="/rideSharing" className="block w-full">
+          <Link href="/rideSharing/maps" className="block w-full">
              <button className="w-full py-1.5 rounded-lg bg-cyan-500/10 text-cyan-500 text-xs font-bold hover:bg-cyan-500/20 transition-colors">
                Track Ride
              </button>
@@ -741,14 +741,7 @@ const LandingPage = () => {
               transition={{ duration: 0.8 }}
               className="space-y-8 text-center lg:text-left"
             >
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="inline-block px-4 py-2 rounded-full bg-cyan-500/10 text-cyan-500 font-medium text-sm mb-4"
-              >
-                🚀 The Future of Travel is Here
-              </motion.div>
+              
               
               <h1 className="text-5xl sm:text-6xl md:text-7xl font-display font-bold leading-tight tracking-tight text-light-text dark:text-dark-text">
                 Explore Pakistan with <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">TourEase</span>
