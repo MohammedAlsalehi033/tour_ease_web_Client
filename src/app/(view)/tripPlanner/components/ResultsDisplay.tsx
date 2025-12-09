@@ -8,6 +8,7 @@ import { RefinePlanChat } from './RefinePlanChat';
 import { BookingSummary } from './BookingSummary';
 import PaymentDialog from './PaymentDialog';
 import BookingProgressDialog from './BookingProgressDialog';
+import ProviderReviewsDisplay from './ProviderReviewsDisplay';
 import type { TripPlannerSearchParams, TransportOption, AccommodationOption } from '@/app/(model)/tripPlanner/tripPlannerModel';
 import {
   RoomSelectionMap,
@@ -622,8 +623,9 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                         <p className="text-sm opacity-70">{transport.providerName}</p>
                       </div>
                     </div>
-                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium flex items-center gap-1">
                       ⭐ {transport.avgRating}
+                      {transport.providerReviews?.stats?.totalReviews ? ` (${transport.providerReviews.stats.totalReviews})` : ''}
                     </span>
                   </div>
                   <div className="space-y-2 text-sm">
@@ -637,6 +639,12 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                     )}
                     <p>🪑 {transport.seatsAvailable} seats available</p>
                     <p className="text-lg font-bold text-primary">PKR {(transport.totalCost || 0).toLocaleString()}</p>
+                    {transport.providerReviews && (
+                      <ProviderReviewsDisplay 
+                        providerReviews={transport.providerReviews} 
+                        providerName={transport.providerName} 
+                      />
+                    )}
                   </div>
                 </div>
               );
@@ -698,8 +706,9 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                         <p className="text-sm opacity-70">{transport.providerName}</p>
                       </div>
                     </div>
-                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                    <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium flex items-center gap-1">
                       ⭐ {transport.avgRating}
+                      {transport.providerReviews?.stats?.totalReviews ? ` (${transport.providerReviews.stats.totalReviews})` : ''}
                     </span>
                   </div>
                   <div className="space-y-2 text-sm">
@@ -713,6 +722,12 @@ const ResultsDisplay = ({ results, onBack, originalRequest }: {
                     )}
                     <p>🪑 {transport.seatsAvailable} seats available</p>
                     <p className="text-lg font-bold text-primary">PKR {(transport.totalCost || 0).toLocaleString()}</p>
+                    {transport.providerReviews && (
+                      <ProviderReviewsDisplay 
+                        providerReviews={transport.providerReviews} 
+                        providerName={transport.providerName} 
+                      />
+                    )}
                   </div>
                 </div>
               );

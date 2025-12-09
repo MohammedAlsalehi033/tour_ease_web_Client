@@ -8,6 +8,33 @@ export interface TravelerInfo {
   preferences?: string[];
 }
 
+export interface Reviewer {
+  id: string;
+  username: string;
+  mediaUrls: string[];
+}
+
+export interface Review {
+  id: number;
+  reviewerId: string;
+  reviewableType: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  reviewer: Reviewer;
+}
+
+export interface ReviewStats {
+  totalReviews: number;
+  averageRating: number;
+  ratingDistribution: { [key: string]: number };
+}
+
+export interface ProviderReviews {
+  reviews: Review[];
+  stats: ReviewStats;
+}
+
 export interface TripPlannerSearchParams {
   startLocation: string;
   endLocation: string;
@@ -37,6 +64,7 @@ export interface TransportOption {
   pickupLocation?: string;
   dropoffLocation?: string;
   providerId?: string;
+  providerReviews?: ProviderReviews;
   provider?: {
     providerId: string;
     user: {
